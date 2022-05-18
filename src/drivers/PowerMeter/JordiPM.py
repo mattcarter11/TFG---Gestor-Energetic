@@ -10,19 +10,22 @@ class JordiPM(PowerMeter):
         self.zero_ref   = zero_ref
 
     def power_consumed(self) -> float:
-        if (data := self.__get_data()):
+        data = self.__get_data()
+        if data:
             return self.__exract_consumed(data)
         return 0.0
 
     def power_generated(self) -> float:
-        if (data := self.__get_data()):
+        data = self.__get_data()
+        if data:
             prod = self.__exract_generated(data)
             if prod > self.zero_ref:
                 return prod
         return 0.0
 
     def power_gc(self) -> float:
-        if (data := self.__get_data()):
+        data = self.__get_data()
+        if data:
             prod = self.__exract_generated(data)
             cons = self.__exract_consumed(data)
             if prod > self.zero_ref:
@@ -43,7 +46,7 @@ class JordiPM(PowerMeter):
             return None
 
     def __exract_consumed(self, data:dict) -> float:
-        return data['total-consumption']['ph-a']['p']+data['total-consumption']['ph-b']['p']+data['total-consumption']['ph-c']
+        return data['total-consumption']['ph-a']['p']+data['total-consumption']['ph-b']['p']+data['total-consumption']['ph-c']['p']
 
     def __exract_generated(self, data:dict) -> float:
         return data['production']['ph-a']['p']+data['production']['ph-b']['p']+data['production']['ph-c']['p']

@@ -17,11 +17,14 @@ class InfluxDB(DataBase):
         pass
 
     def insert(self, table:str, dic:dict):
-        json = [
-            {
-                "measurement": table,
-                "time": datetime.utcnow(),
-                "fields": dic
-            }
-        ]
-        self.client.write_points(json)
+        try:
+            json = [
+                {
+                    "measurement": table,
+                    "time": datetime.utcnow(),
+                    "fields": dic
+                }
+            ]
+            self.__client.write_points(json)
+        except:
+            pass

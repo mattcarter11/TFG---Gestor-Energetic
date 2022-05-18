@@ -9,4 +9,4 @@ class PowerMeter(ABC):
     def power_generated(self) -> float: pass
 
     @abstractmethod
-    def power_cg(self) -> float: pass
+    def power_gc(self) -> float: pass

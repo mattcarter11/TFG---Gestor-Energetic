@@ -29,7 +29,7 @@ if __name__ == '__main__':
             energy_a = energy_p = 0
             current_hour = timestamp.hour
         
-        power_g, power_c = powermeter.power_generated()
+        power_g, power_c = powermeter.power_gc()
         energy_a = (power_g-power_c) * Ts / 3600 + energy_a
         energy_p = power_g*Ts / 3600 + energy_p
         #endregion
