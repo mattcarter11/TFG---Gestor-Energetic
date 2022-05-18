@@ -1,4 +1,4 @@
-from Load import Load
+from .Load import Load
 from ShellyPy import Shelly
 
 class ShellyLoad(Load):

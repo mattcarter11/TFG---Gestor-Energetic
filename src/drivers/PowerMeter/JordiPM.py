@@ -1,5 +1,5 @@
+from .PowerMeter import PowerMeter
 import json, requests
-from PowerMeter import PowerMeter
 
 class JordiPM(PowerMeter):
 

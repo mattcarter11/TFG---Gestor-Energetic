@@ -1,0 +1,19 @@
+[Unit]
+Description=TFG Gestor Energetic
+After=multi-user.target
+
+[Service]
+WorkingDirectory=/home/pi2/TFG
+ExecStart=python3 managing.py
+User=pi2
+
+StandardOutput=append:/home/pi2/TFG/managing-output.log
+StandardError=append:/home/pi2/TFG/managing-error.log
+
+Restart=on-failure
+RestartSec=10s
+
+
+[Install]
+WantedBy=multi-user.target
+

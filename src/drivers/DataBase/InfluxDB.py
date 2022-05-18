@@ -1,4 +1,4 @@
-from DataBase import DataBase
+from .DataBase import DataBase
 from influxdb import InfluxDBClient
 from datetime import datetime
 
