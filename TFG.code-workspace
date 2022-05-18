@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+    ],
+    "settings": {
+        "vsicons.associations.folders": [
+            { "icon": "simulation", "extensions": ["simulació", "sim", "simulation"], "format": "svg" }
+        ]
+    }
+}

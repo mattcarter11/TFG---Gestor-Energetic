@@ -1,0 +1,21 @@
+{
+    "simulation":{
+        "clean_db": true,
+        "db":"db/simulation.db",
+        "driver_db": "db/power.db",
+        "start_timestamp": "2022-02-02 07:20:00",
+        "end_timestamp": "2022-02-02 17:05:00",
+        "base_tdp_W": 0
+    },
+    "sampling_s": 10,
+    "algorithm":"Hysteresis",
+    "threshold": {
+        "top_kJ": 150,
+        "bottom_kJ": -150
+    },
+    "charges":{
+        "a":{
+            "tdp_W":2500
+        }
+    }
+}
