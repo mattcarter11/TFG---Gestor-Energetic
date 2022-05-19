@@ -833,6 +833,64 @@ p, li { white-space: pre-wrap; }
                   </property>
                  </spacer>
                 </item>
+                <item alignment="Qt::AlignRight">
+                 <widget class="QTableView" name="table_loads_aprox">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>200</width>
+                    <height>10000000</height>
+                   </size>
+                  </property>
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::PreventContextMenu</enum>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectRows</enum>
+                  </property>
+                  <property name="textElideMode">
+                   <enum>Qt::ElideNone</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                   <number>10</number>
+                  </attribute>
+                 </widget>
+                </item>
                 <item alignment="Qt::AlignHCenter">
                  <widget class="QTableView" name="table_eb_t">
                   <property name="sizePolicy">

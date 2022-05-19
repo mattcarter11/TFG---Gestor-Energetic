@@ -1,16 +1,18 @@
-import math
-import sys, json
+import sys, json, PySide6
 from time import time
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView, QItemDelegate, QCheckBox, QTableView
-from PySide6.QtCore import QFile, QIODevice, QDateTime, QCoreApplication, Qt, QModelIndex
-import QMplWidgets as mw
-import QPandasWidgets as pw
+from PySide6.QtCore import QFile, QIODevice, QDateTime, QCoreApplication, Qt
+from lib.sim.Simulator import Simulator
+from lib.sim.Load import Load
+from lib.sim.Results import Results
+import lib.sim.AlgorithmsConfig as ac
+import lib.sim.DataFrames as df
+import lib.myQT.QMplWidgets as mw
+import lib.myQT.QPandasWidgets as pw
 import pandas as pd
-import datetime as dt
 import numpy as np
 import matplotlib as mp
-from PySide6.QtGui import QColor
 
 # To hide constants
 if True:
@@ -43,22 +45,6 @@ if True:
         'energyL'   :{"color":'#e15f4b', "translate": ('Energy Lost',' Lost')}, 
     }
 
-
-class Load():
-    def __init__(self):
-        self.on = False
-        self.commutations = 0
-
-    def turn_on(self):
-        if not self.on:
-            self.on = True
-            self.commutations += 1
-
-    def turn_off(self):
-        if self.on:
-            self.on = False
-            self.commutations += 1
-
 class AlignDelegate(QItemDelegate):
     def paint(self, painter, option, index):
         option.displayAlignment = Qt.AlignCenter
@@ -81,15 +67,11 @@ class QPandasModelPlus(pw.QPandasModel):
         
         return super().headerData(section, orientation, role)
 
-def rearange_df(df):
-    columns = [col for col in OCT.keys() if col in df.columns]
-    return df[columns]
-
 def df_plot_col(df, xcol, ycol, ax):
     return ax.plot(df[xcol], df[ycol], color=OCT[ycol]['color'], label=OCT[ycol]['translate'][0])
 
 class App(QMainWindow):
-    # Init
+    #region -> Init
     def __init__(self):
         super().__init__()
         self.sim_prev_ls = self.data_prev_ls = ''
@@ -97,11 +79,11 @@ class App(QMainWindow):
         self.load_prev_settings()
         self.sig_init()
         # Tables view style
-        for name in ['table_in', 'table_s', 'table_eb', 'table_eb_t', 'table_t']:
+        for name in ['table_in', 'table_s', 'table_eb', 'table_loads_aprox', 'table_eb_t', 'table_t']:
             table = self.ui.findChild(QTableView, name)
             table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             table.setItemDelegate(AlignDelegate())
-        for name in ['table_eb_t', 'table_t']:
+        for name in ['table_loads_aprox', 'table_eb_t', 'table_t']:
             table = self.ui.findChild(QTableView, name)
             table.verticalHeader().setDefaultAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
             
@@ -150,8 +132,9 @@ class App(QMainWindow):
         self.ui = loader.load(ui_file)
         self.ui.show()
         ui_file.close()
+    #endregion
 
-    # Settings Load/Save
+    #region -> Settings Load/Save
     def load_prev_settings(self):
         with open('prev_settings.json', 'r') as f:
             settings = json.load(f)
@@ -245,23 +228,24 @@ class App(QMainWindow):
 
         with open('prev_settings.json', 'w') as f:
             json.dump(settings, f, indent=4)
+    #endregion
 
-    # Load data
+    #region -> Load data
     def load_file(self):
-        path = QFileDialog.getOpenFileName(self, "Select Generated Power", '.', '*.csv')[0]
+        path = QFileDialog.getOpenFileName(self, "Select Generated Power", './db', '*.csv')[0]
         if path != '':
             self.load_csv(path)
 
     def load_csv(self, path):
         l = [self.ui.simulate, self.ui.data_line_style]
         try:
-            self.df = pd.read_csv(path, parse_dates=['timestamp']).fillna(0)
-            self.df["powerG"] = self.df["powerG"].clip(lower=0)
-            self.validate_df()
-            if self.is_full_data():
+            self.dfI = df.DataFrameIn(pd.read_csv(path, parse_dates=['timestamp']))
+            try:
+                self.dfI = df.DataFrameOut(self.dfI.df)
+            except:
+                pass
+            else:
                 self.ui.results.setEnabled(True)
-                self.fill_missing_powerLB()
-                self.df = rearange_df(self.df)
 
         except Exception as err:
             if self.ui.file_path.text() == "":
@@ -271,48 +255,30 @@ class App(QMainWindow):
             QMessageBox.warning(self, "Error", str(err), QMessageBox.Ok)
 
         else:
+            self.sim = Simulator(self.dfI)
             # Enable options
             for e in l:
                 e.setEnabled(True)
             # Update UI
             self.ui.file_path.setText(path)
             self.limit_datarange_selectors()
-            self.Ts = round((self.df['timestamp'].iloc[2] - self.df['timestamp'].iloc[1]).total_seconds() )
-            self.ui.sampling_rate.setText(f'Sampling Rate: {self.Ts} s')
+            self.ui.sampling_rate.setText(f'Sampling Rate: {self.sim.Ts} s')
             # Update table
-            model = QPandasModelPlus(self.df, i=0)
+            model = QPandasModelPlus(self.dfI.df, i=0)
             self.ui.table_in.setModel(model)
             self.plot_in_data()
     
-    def validate_df(self):
-        if 'powerG' not in self.df.columns:
-            raise Exception('mussint powerG column, must be an int or float')
-        if not isinstance(self.df['powerG'].iloc[0], (float, int)):
-            raise Exception('powerG must be an int or float')
-
-    def is_full_data(self):
-        l = ['on_offL1', 'on_offL2', 'powerC', 'powerG', 'powerL1', 'powerL2']
-        return all([x in self.df.columns for x in l])
-
-    def fill_missing_powerLB(self):
-        # Calc missing base load power
-        if 'powerC' in self.df.columns and 'powerLB' not in self.df.columns:
-            self.df['powerLB'] = self.df['powerC']
-            if 'powerL1' in self.df.columns:
-                self.df['powerLB'] -= self.df['powerL1']
-            if 'powerL2' in self.df.columns:
-                self.df['powerLB'] -= self.df['powerL2']
-
     def limit_datarange_selectors(self):
-        self.min_date = self.df['timestamp'].min()
-        self.max_date = self.df['timestamp'].max()
+        self.min_date = self.dfI.df['timestamp'].min()
+        self.max_date = self.dfI.df['timestamp'].max()
         self.ui.date_range.setText(f'Min Date: {self.min_date}  -  Max Date: {self.max_date}')
         self.ui.start_date.setMinimumDateTime(self.min_date)
         self.ui.end_date.setMinimumDateTime(self.min_date)
         self.ui.start_date.setMaximumDateTime(self.max_date)
         self.ui.end_date.setMaximumDateTime(self.max_date)
+    #endregion
 
-    # Simulation Settings
+    #region -> Simulation Settings
     def time_limit_changed(self):
         self.tl_eq = self.ui.time_limit.value() * self.ui.load1.value() / 3600
         self.ui.wh_eq.setText(f'Top threshold {self.tl_eq:.2f} Wh')
@@ -327,8 +293,9 @@ class App(QMainWindow):
         status_l2 = (self.ui.load2.value() > 0)
         self.ui.th_top2.setEnabled(status_l2)
         self.ui.th_bottom2.setEnabled(status_l2)
+    #endregion
 
-    # Line style
+    #region ->  Line style
     def data_line_style(self, text):
         self.set_line_style(self.ui.plot_dr, self.data_lines, text, self.data_prev_ls, self.ui.data_line_style)
         
@@ -356,14 +323,16 @@ class App(QMainWindow):
                     line.set_marker(marker)
                 self.data_prev_ls = text
                 plot.draw()
+    #endregion
 
-    # Data range selection
+    #region ->  Data range selection
     def datetime_changed(self, _):
         self.date_range_lines[0].set_xdata(self.ui.start_date.dateTime().toPython())
         self.date_range_lines[1].set_xdata(self.ui.end_date.dateTime().toPython())
         self.ui.plot_dr.draw()
+    #endregion
 
-    # Toggle Options
+    #region ->  Toggle Options
     def toggle_th(self, val):
         if val:
             for line in self.th_lines:
@@ -388,8 +357,9 @@ class App(QMainWindow):
         legend = plot.ax.get_legend()
         plot.ax.legend(handles, labels)._set_loc(legend._loc)
         plot.draw()
+    #endregion
 
-    # Date Range Selection lines
+    #region ->  Date Range Selection lines
     def data_lines_on_pick(self, event):
         line = event.artist
         x, _ = line.get_data()
@@ -427,233 +397,64 @@ class App(QMainWindow):
             self.date_range = event.xdata
             self.date_line.set_xdata(event.xdata)
             self.ui.plot_dr.draw()
+    #endregion
 
-    # Results
+    #region -> Simulation/Results
     def results_press(self):
+        self.is_sim = False
         start = time()
-        err = self.fill_missing_data()
-        self.ui.simulation_time.setText(f'Simulation Time: {time()-start:.3f} s')
-        if not err:
-            self.show_results()
-
-    def fill_missing_data(self):
-        if self.select_data():
-            return
-
-        energyA = []
-        energyP = []
-        current_hour = None
-        for _, row in self.data.iterrows():
-            timestamp   = row['timestamp']
-            power_g     = row['powerG']
-            power_c     = row['powerLB'] + row['powerL1'] + row['powerL2']
-
-            if current_hour != timestamp.hour:
-                energy_a = energy_p =  0
-                current_hour = timestamp.hour
-
-            energy_a = (power_g - power_c) * self.Ts / 3600 + energy_a
-            energy_p = (power_g * self.Ts) / 3600 + energy_p
-            energyA.append( energy_a )
-            energyP.append( energy_p )
-
-        if 'powerA' not in self.df.columns:
-            self.data['energyA'] = energyA
-        if 'energyP' not in self.df.columns: 
-            self.data['energyP'] = energyP
-
-        # Calc the resot of the data
-        self.split_energyA()
-        self.simulation_hour_data()
-        dic = {'Base Load': 0}
-        dic['Load 1'] = self.data['on_offL1'].astype(bool).sum(axis=0)
-        dic['Load 2'] = self.data['on_offL2'].astype(bool).sum(axis=0)
-        commutations = pd.Series(dic)
-        self.simulation_total_data(commutations)
-
-    # Simulate
-    def simulate_press(self):
-        start = time()
-        self.simulation()
-        self.ui.simulation_time.setText(f'Simulation Time: {time()-start:.3f} s')
+        startDT = self.ui.start_date.dateTime().toString()
+        endDT = self.ui.end_date.dateTime().toString()
+        self.results = Results(self.dfI.select_daterange(startDT, endDT, 300))
+        self.ui.simulation_time.setText(f'Results Time: {time()-start:.3f} s')
         self.show_results()
 
-    def select_data(self):
-        # Get Data limited by Date & Time interval
-        start_date = self.ui.start_date.dateTime().toString()
-        end_date = self.ui.end_date.dateTime().toString()
-        self.data = self.df[self.df['timestamp'].between(start_date, end_date)].copy()
-
-        # And check if there are enought samples (5 min of samples)
-        samples = len(self.data.index)
-        if samples <= (300/self.Ts):
+    def simulate_press(self):
+        self.is_sim = True
+        start = time()
+        try:
+            self.sim.simulate(
+                self.ui.start_date.dateTime().toString(),
+                self.ui.end_date.dateTime().toString(),
+                self.get_algorithm_config(),
+                Load(self.ui.load1.value()), 
+                Load(self.ui.load2.value()),
+                None if isinstance(self.dfI, df.DataFrameOut) and self.ui.use_data_bl.isChecked() else self.ui.base_load.value()
+            )
+        except Exception as e:
             QMessageBox.warning(self, "Error", f"Date & Time interval must be at least 5 min", QMessageBox.Ok)
-            return True
-        self.ui.n_samples.setText(f'Simulation duration {samples*self.Ts/3600:.3f} h ({samples} Samples)')
-        return False
+        else:
+            self.ui.n_samples.setText(f'Simulation duration {self.sim.simulated_nsec/3600:.3f} h ({self.sim.simulated_nsec} Samples)')
+            self.ui.simulation_time.setText(f'Simulation Time: {time()-start:.3f} s')
+            self.results = Results(df.DataFrameOut(self.sim.df_out))
+            self.show_results()
 
-    def simulation(self):
-        if self.select_data():
-            return True
-        
-        self.data = self.data.drop(['on_offL1', 'on_offL2'],axis=1)
-        # [Simulation] Init data results
-        sim_data = {'powerC':[], 'powerLB':[], 'powerL1':[], 'powerL2':[], 'energyP':[], 'energyA':[]}
+    def get_algorithm_config(self):
+        match self.ui.algorithm.currentIndex():
+            case 0: 
+                return ac.HysteresisConfig(
+                    self.ui.th_top1.value(), self.ui.th_bottom1.value(),
+                    self.ui.th_top2.value(), self.ui.th_bottom2.value(),
+                )
+            case 1:
+                return ac.MinOnTimeConfig( self.ui.time_limit.value() )
+            case 2:
+                return ac.TimeToConsume( self.ui.predict_final_energy.isChecked() )
+    #endregion
 
-        # [Program] Init data results
-        loads = [None, Load(), Load()]
-        current_hour = None
-        off_timestamp_limit = dt.datetime.now()
-
-        # [Simulation] -> [Program] while True:
-        for _, row in self.data.iterrows():
-            # [Simulation] Calc Powers at that instant of time
-            power_lb = self.ui.base_load.value()                # Base Load (not controled)
-            if 'powerLB' in self.data.columns and self.ui.use_data_bl.isChecked():
-                power_lb = row['powerLB']
-            power_l1 = loads[1].on*self.ui.load1.value()        # Load 1    (controled)
-            power_l2 = loads[2].on*self.ui.load2.value()        # Load 2    (controled)
-            power_c = power_lb + power_l1 + power_l2            # Total Consumed
-            # [Program] Get timestamp power generated and consumed 
-            timestamp = row['timestamp']                        # [Program]
-            power_g = row['powerG']                             # [Program] power_g = driver.get_generated()
-            power_c = power_c                                   # [Program] power_c = driver.get_consumed()
-
-            # [Program] See if hour has passed
-            if current_hour != timestamp.hour:
-                energy_a =  0
-                current_hour = timestamp.hour
-                next_hour = timestamp.replace(second=0, microsecond=0, minute=0) + dt.timedelta(hours=1)
-                # [Simulation]
-                energy_p = 0
-
-            # [Program] Calc Available Energy [Wh]
-            energy_a = (power_g - power_c) * self.Ts / 3600 + energy_a
-
-            # [Program] Algorithm
-            match self.ui.algorithm.currentIndex():
-                case 0:
-                    if self.ui.load1.value() > 0:
-                        if energy_a >= self.ui.th_top1.value(): 
-                            loads[1].turn_on()
-                        elif energy_a <= self.ui.th_bottom1.value():
-                            loads[1].turn_off()
-                    if self.ui.load2.value() > 0:
-                        if energy_a >= self.ui.th_top2.value(): 
-                            loads[2].turn_on()
-                        elif energy_a <= self.ui.th_bottom2.value():
-                            loads[2].turn_off()
-                
-                case 1:
-                    time_to_use = energy_a/self.ui.load1.value() * 3600 # [s] <- Wh/W = h
-                    time_limit = self.ui.time_limit.value()
-                    if time_to_use >= time_limit:
-                        off_timestamp_limit = timestamp + dt.timedelta(seconds=time_limit)
-                        loads[1].turn_on()
-                    elif timestamp >= off_timestamp_limit:
-                        loads[1].turn_off()
-
-                case 2:
-                    time_remaining = (next_hour - timestamp).total_seconds()
-                    if self.ui.predict_final_energy.isChecked():
-                        energy = energy_a + time_remaining*power_g/3600
-                    else:
-                        energy = energy_a
-                    time_to_use = energy / self.ui.load1.value() * 3600 # [s] <- Wh/W = h
-                    if time_to_use >= time_remaining:
-                        loads[1].turn_on()
-                    elif energy <= 0:
-                        loads[1].turn_off()
-
-            # [Simulation] Calc/Save other energys for data avaluation [Wh]
-            energy_p = (power_g * self.Ts) / 3600 + energy_p            # Energy Produced
-            sim_data['powerC'].append(power_c)
-            sim_data['powerLB'].append(power_lb)
-            sim_data['powerL1'].append(power_l1)
-            sim_data['powerL2'].append(power_l2)
-            sim_data['energyP'].append(energy_p)
-            sim_data['energyA'].append(energy_a)
-        
-        # [Simulation] Store data to pandas dataframe
-        for key, value in sim_data.items():
-            self.data[key] = value
-
-        # Calc the resot of the data
-        self.split_energyA()
-        self.simulation_hour_data()
-        commutations = pd.Series({'Base Load': 0, 'Load 1': loads[1].commutations, 'Load 2': loads[2].commutations})
-        self.simulation_total_data(commutations)
-        return False
-    
-    def split_energyA(self):
-        # Split available into grid and available
-        energy_g = self.data['energyA'].copy()
-        energy_g[energy_g > 0] = 0
-        self.data['energyG'] = - energy_g
-        self.data['energyA'] = self.data['energyA'].mask(self.data['energyA'] < 0, 0)
-        
-    def simulation_hour_data(self):
-        # Grup data by hour, select only energies, copy data in new place, add hour grups to get total
-        data_h = self.data.groupby(pd.Grouper(key='timestamp', freq='H'), as_index=False)
-        select = ['timestamp', 'energyP', 'energyG', 'energyA']
-        self.data_h = data_h[select].last().copy()
-        data_h_sum = data_h.sum()
-        # Energy in system
-        self.data_h.insert(1, 'energySY', (self.data_h['energyP'] + self.data_h['energyG']).values)
-        # Max Energy Consunption
-        n_elements = self.data_h.shape[0] # Number of rows
-        energy_cm = self.ui.base_load.value() + self.ui.load1.value() + self.ui.load2.value()
-        self.data_h['energyCM'] = np.repeat(energy_cm, n_elements)
-        # Energy Consumptions
-        self.data_h['energyC'] = (data_h_sum['powerC']*self.Ts/3600).values
-        self.data_h['energyLB'] = (data_h_sum['powerLB']*self.Ts/3600).values
-        self.data_h['energyL1'] = (data_h_sum['powerL1']*self.Ts/3600).values
-        self.data_h['energyL2'] = (data_h_sum['powerL2']*self.Ts/3600).values
-        # Energy Surplus
-        energy_s = (self.data_h['energyP'] - energy_cm).values
-        energy_s[energy_s < 0] = 0
-        self.data_h['energyS'] = energy_s
-        # Energy Lost
-        energy_l = (self.data_h['energyA'] - self.data_h['energyS']).values
-        energy_l[energy_l < 0] = 0
-        self.data_h['energyL'] = energy_l
-
-    def simulation_total_data(self, commutations):
-        samples = len(self.data.index)
-        sim_hours = samples*self.Ts/3600
-        sim_days = 24/sim_hours
-
-        # Energy Balance - Add hourly columns to get one row series of the total        
-        self.data_eb_t = self.data_h.sum(numeric_only=True).rename('Total [Wh]')
-        self.data_eb_t = self.data_eb_t.to_frame()
-        self.data_eb_t['Daily Total [Wh/day]'] = self.data_eb_t['Total [Wh]'].mul(sim_days)
-        self.data_eb_t = self.data_eb_t.T
-
-        # Average commutations (day)
-        dayly_com = commutations*sim_days
-        # Time On/Powered
-        select = ['powerLB', 'powerL1', 'powerL2']
-        name = ['Base Load', 'Load 1', 'Load 2']
-        samples_on = self.data[select][self.data[select] > 0].count()
-        samples_on.rename(dict(zip(select, name)), inplace = True)
-        hours_on = samples_on*self.Ts/3600
-        hours_on_daily = hours_on*sim_days
-        # Convert to dataframe
-        dic = {'Commutations':commutations, 'Daily Commutations':dayly_com, 'Time On [samples]':samples_on, 'Time On [h]':hours_on, 'Daily Time On [h/day]': hours_on_daily}
-        self.data_t = pd.DataFrame.from_dict(dic).T
-
-    # Plots
+    #region ->  Plots
     def plot_in_data(self):
         start = time()
         plot = self.ui.plot_dr
         ax1, ax2 = plot.ax1, plot.ax2
         ax1.clear()
         ax2.clear()
+        df = self.dfI.df
 
         # Plot Data
-        self.data_lines = df_plot_col(self.df, 'timestamp', 'powerG', ax1)
-        if 'powerLB' in self.df.columns:
-            self.data_lines += df_plot_col(self.df, 'timestamp', 'powerLB', ax2)
+        self.data_lines = df_plot_col(df, 'timestamp', 'powerG', ax1)
+        if 'powerLB' in self.dfI.df.columns:
+            self.data_lines += df_plot_col(df, 'timestamp', 'powerLB', ax2)
 
         # Plot start & end
         self.date_range_lines = [ 
@@ -686,16 +487,17 @@ class App(QMainWindow):
         ax1, ax2 = plot.ax1, plot.ax2
         ax1.clear()
         ax2.clear()
+        df = self.sim.df_out if self.is_sim else self.results.dfI.df
 
         # Plot Power Lines
-        self.sim_lines = df_plot_col(self.data, 'timestamp', 'powerC', ax1)
-        self.sim_lines += df_plot_col(self.data, 'timestamp', 'powerG', ax1)
+        self.sim_lines = df_plot_col(df, 'timestamp', 'powerC', ax1)
+        self.sim_lines += df_plot_col(df, 'timestamp', 'powerG', ax1)
         
         # Power Load Areas
         cols = ['powerLB', 'powerL1', 'powerL2']
         labels = [OCT[col]['translate'][0] for col in cols]
         colors = [OCT[col]['color'] for col in cols]
-        self.sim_areas = self.data.plot.area('timestamp', cols, ax=ax1, linewidth=0, color=colors, label=labels).collections
+        self.sim_areas = df.plot.area('timestamp', cols, ax=ax1, linewidth=0, color=colors, label=labels).collections
         self.toggle_loads_area(self.ui.show_loads_area.isChecked())
 
         # Add energy thresholds
@@ -714,9 +516,9 @@ class App(QMainWindow):
 
         # Energy
         if self.ui.energyP_s.isChecked():
-            self.sim_lines += df_plot_col(self.data, 'timestamp', 'energyP', ax2)
-        self.sim_lines += df_plot_col(self.data, 'timestamp', 'energyA', ax2)
-        self.sim_lines += df_plot_col(self.data, 'timestamp', 'energyG', ax2)
+            self.sim_lines += df_plot_col(df, 'timestamp', 'energyP', ax2)
+        self.sim_lines += df_plot_col(df, 'timestamp', 'energyA', ax2)
+        self.sim_lines += df_plot_col(df, 'timestamp', 'energyG', ax2)
 
         # Visuals
         ax1.grid(True, linestyle=':')
@@ -736,11 +538,11 @@ class App(QMainWindow):
     def plot_eb(self):
         showV = self.ui.show_values_eb.isChecked()
         showD = self.ui.subdivide_eb.isChecked()
-        self.plot_bars(self.data_h, self.ui.plot_eb, showV, showD)
+        self.plot_bars(self.results.df_hour, self.ui.plot_eb, showV, showD)
 
     def plot_t(self):
-        data = self.data_eb_t
-        data['timestamp'] = self.data_h.iloc[-1]['timestamp']
+        data = self.results.df_total
+        data['timestamp'] = self.results.df_hour.iloc[-1]['timestamp']
         showV = self.ui.show_values_t.isChecked()
         showD = self.ui.subdivide_t.isChecked()
         self.plot_bars(data, self.ui.plot_eb_t, showV, showD, None, 'horizontal', False)
@@ -816,17 +618,16 @@ class App(QMainWindow):
         # Draw
         plot.draw()
         self.ui.plotting_time.setText(f'Plotting Time: {time()-start:.3f} s')
+    #endregion
 
-    # Show data
+    #region ->  Show data
     def show_results(self): 
-        model = QPandasModelPlus(self.data, i=0)
-        self.ui.table_s.setModel(model)
-        model = QPandasModelPlus(self.data_h, i=0)
-        self.ui.table_eb.setModel(model)
-        model = QPandasModelPlus(self.data_eb_t.T)
-        self.ui.table_eb_t.setModel(model)
-        model = QPandasModelPlus(self.data_t.T)
-        self.ui.table_t.setModel(model)
+        df = self.sim.df_out if self.is_sim else self.results.dfI.df
+        self.ui.table_s.setModel( QPandasModelPlus(df, i=0) )
+        self.ui.table_eb.setModel( QPandasModelPlus(self.results.df_hour, i=0) )
+        self.ui.table_loads_aprox.setModel( QPandasModelPlus(self.results.df_load_aprox) )
+        self.ui.table_eb_t.setModel( QPandasModelPlus(self.results.df_total.T) )
+        self.ui.table_t.setModel( QPandasModelPlus(self.results.df_results.T))
 
         start = time()
         self.plot_general()
@@ -839,6 +640,8 @@ class App(QMainWindow):
             c.setEnabled(True)
         
         self.ui.sim_line_style.setEnabled(True)
+    #endregion
+
 
 if __name__ == "__main__":
     QCoreApplication.setAttribute(Qt.AA_ShareOpenGLContexts)

@@ -33,7 +33,6 @@ def proces_jordi(fileOpen, fileSave, start, end):
     df = df.loc[mask]
     df = df.fillna(0)
     df.to_csv(f'{start}..{end} {fileSave}', index=False)
-    print(df)
 
 if __name__ == "__main__":
     # G_merge_LB('2022-02-1..8 (G).csv', 'consumed.csv', '2022-02-1..8 (G+LB).csv')
