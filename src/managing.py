@@ -1,8 +1,14 @@
 import time
 import datetime as dt
+from enum import Enum
 from drivers.Load.Load import Load
 from drivers.Load.Shelly import ShellyLoad
 from drivers.PowerMeter.JordiPM import JordiPM
+
+class AlgorithmsEnum(Enum):
+    hysteresis = 1
+    min_on_time = 2
+    time_to_consume = 3
 
 # ======== INIT ========
 # Global parameters
@@ -10,7 +16,7 @@ Ts              = 10 # [s]
 load1           = ShellyLoad('192.168.100.131') # None = no load
 load2           = ShellyLoad('192.168.100.132') # None = no load
 powermeter      = JordiPM('http://envoy.local/stream/meter', 'installer', 'aeceha39', 5, 20)
-algorithm       = 'hysteresis'  # hysteresis, min_on_time
+algorithm       = AlgorithmsEnum.hysteresis
 # Managing load interval
 start_managing  = '06:00:00'
 end_managing    = '23:59:59'
@@ -64,7 +70,7 @@ if __name__ == '__main__':
 
         # region -> Algorithms
         if working_hours: # [Day] Control loads - [Night] Don't controal loads
-            if algorithm == 'hysteresis':
+            if algorithm == AlgorithmsEnum.hysteresis:
                 if is_load(load1):
                     if energy_a >= th_top1 and not l1['ison']:
                         load1.set_status(True, 3630)
@@ -76,12 +82,12 @@ if __name__ == '__main__':
                     elif energy_a <= th_bottom2 and l2['ison']:
                         load2.set_status(False)
 
-            elif algorithm == "min_on_time":
+            elif algorithm == AlgorithmsEnum.min_on_time:
                 # Select first load that can be controlled
                 load = load1 if is_load(load1) else load2 if is_load(load2) else None
                 lX = l1 if is_load(load1) else l2 if is_load(load2) else None
-                if is_load(load):
-                    time_to_use = energy_a/lX['power']* 3600 # [s] <- Wh/W = h
+                if is_load(load) and lX['power'] > 0:
+                    time_to_use = energy_a / lX['power'] * 3600 # [s] <- Wh/W = h
                     if time_to_use >= time_limit:
                         load.set_status(True, time_limit)
         #endregion
