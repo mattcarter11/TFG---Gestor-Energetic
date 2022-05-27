@@ -3,15 +3,16 @@ from ShellyPy import Shelly
 
 class ShellyLoad(Load):
 
-    def __init__(self, ip:str, port:str="80"):
+    def __init__(self, ip:str, port:str="80", value:int=0):
         self.__load = Shelly(ip, port)
+        self.value = value
 
-    def set_status(self, value:bool, timer:int=None):
+    def set_status(self, status:bool, timer:int=None):
         try:
             if timer is not None:
-                self.__load.relay(0, turn=value, timer=timer)
+                self.__load.relay(0, turn=status, timer=timer)
             else:
-                self.__load.relay(0, turn=value)
+                self.__load.relay(0, turn=status)
         except:
             pass
         

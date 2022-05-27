@@ -59,7 +59,6 @@ class DataFrameOut (DataFrameIn):
     def __init__(self, df:pd.DataFrame):
         super().__init__(df)
         self._fill_missing_LB()
-        self._fill_missing_power()
 
     def _set_col_dtype(self):
         self.columns = ['timestamp', 'powerG', 'powerC', 'powerL1', 'powerL2', 'on_offL1', 'on_offL2']
@@ -72,7 +71,7 @@ class DataFrameOut (DataFrameIn):
                 if col in self.df.columns:
                     self.df['powerLB'] -= self.df[col]
 
-    def _fill_missing_power(self):
+    def fill_missing_power(self):
         columns = ['energyA', 'energyP','energyG']
         if any([x in self.df.columns for x in columns]):
             energyA = []

@@ -13,8 +13,8 @@ class AlgorithmsEnum(Enum):
 # ======== INIT ========
 # Global parameters
 Ts              = 10 # [s]
-load1           = ShellyLoad('192.168.100.131') # None = no load
-load2           = ShellyLoad('192.168.100.132') # None = no load
+load1           = ShellyLoad('192.168.100.131', value=700) # None = no load
+load2           = ShellyLoad('192.168.100.132', value=700) # None = no load
 powermeter      = JordiPM('http://envoy.local/stream/meter', 'installer', 'aeceha39', 5, 20)
 algorithm       = AlgorithmsEnum.hysteresis
 # Managing load interval
@@ -86,8 +86,8 @@ if __name__ == '__main__':
                 # Select first load that can be controlled
                 load = load1 if is_load(load1) else load2 if is_load(load2) else None
                 lX = l1 if is_load(load1) else l2 if is_load(load2) else None
-                if is_load(load) and lX['power'] > 0:
-                    time_to_use = energy_a / lX['power'] * 3600 # [s] <- Wh/W = h
+                if is_load(load):
+                    time_to_use = energy_a / load.value * 3600 # [s] <- Wh/W = h
                     if time_to_use >= time_limit:
                         load.set_status(True, time_limit)
         #endregion

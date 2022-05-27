@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 class Load(ABC):
 
     @abstractmethod
-    def set_status(self, value:bool, timer:int=None): pass
+    def set_status(self, status:bool, timer:int=None): pass
 
     @abstractmethod
     def get_status(self) -> bool: pass

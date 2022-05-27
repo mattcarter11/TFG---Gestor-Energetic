@@ -1,10 +1,11 @@
 from email.mime import base
+from email.policy import default
 from sys import builtin_module_names
 import pandas as pd
 import datetime as dt
 from .Load import Load
-from .DataFrames import DataFrameIn, DataFrameOut
-from .AlgorithmsConfig import AlgorithmConfig, AlgorithmsEnum
+from .DataFrames import DataFrameIn
+from .AlgorithmsConfig import AlgorithmConfig, AlgorithmsEnum, PredictFinalEnergy
 
 class Simulator:
 
@@ -73,14 +74,18 @@ class Simulator:
 
                 case AlgorithmsEnum.time_to_consume:
                     time_remaining = (next_hour - timestamp).total_seconds()
-                    if algorithm.predict_final_energy:
-                        energy = energy_a + time_remaining*power_g/3600
-                    else:
-                        energy = energy_a
-                    time_to_use = energy / load1.power * 3600 # [s] <- Wh/W = h
+                    match algorithm.predict_final_energy:
+                        case PredictFinalEnergy.disabled:
+                            energy1h = energy_a
+                        case PredictFinalEnergy.avarage_power:
+                            avg = energy_a / (3600-time_remaining)
+                            energy1h = avg*3600
+                        case PredictFinalEnergy.project_current_power:
+                            energy1h = energy_a + time_remaining*power_g/3600
+                    time_to_use = energy1h / load1.power * 3600 # [s] <- Wh/W = h
                     if time_to_use >= time_remaining:
                         on_offL1 = load1.turn_on()
-                    elif energy <= 0:
+                    elif energy1h <= 0:
                         on_offL1 = load1.turn_off()
             #endregion
 

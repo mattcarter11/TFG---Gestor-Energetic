@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>1082</width>
-    <height>770</height>
+    <height>766</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -511,19 +511,29 @@ p, li { white-space: pre-wrap; }
           <widget class="QWidget" name="page">
            <layout class="QVBoxLayout" name="verticalLayout_3">
             <item>
-             <widget class="QCheckBox" name="predict_final_energy">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
+             <widget class="QLabel" name="label_11">
               <property name="text">
                <string>Predict Final Energy</string>
               </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="predict_final_energy">
+              <item>
+               <property name="text">
+                <string>Disabled</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Average Power</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>Project Current Power</string>
+               </property>
+              </item>
              </widget>
             </item>
             <item>
@@ -726,7 +736,7 @@ p, li { white-space: pre-wrap; }
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="MplTwinxWidget" name="plot_dr">
            <attribute name="title">
@@ -1491,7 +1501,9 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Min On Use&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Time to consume&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. If the flag &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;predict final energy&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; is turned on, it will also predict the energy that it will probably generate during the time it's on. The equation is &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyEnd = energyA + timeLeft * powerG / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;in Wh.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Time to consume&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;predict final energy&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; modes which predicts how much energy that hour slot will probably yeald. This calculation value is calucalted every sample. There are two modes:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Average Power:  &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;avgP = energyA / (3600 - sec_remaining) -&amp;gt; energy1h = avg*3600&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Project Current Power: &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energy1h = energyA + timeLeft * powerG / 3600&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Because of how energy is calculated, at each hour the load doesn't always turn off. The formula is &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyA = ( powerG - powerC ) * Ts / 3600 + energyA, &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;which means we are supposing/&amp;quot;predicting&amp;quot; that after Ts will have produced&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; energyP = ( powerG - powerC ) * Ts / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Wh. If we instead did &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyP = ( powerG(-1) - powerC(-1) ) * Ts / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;and at t=0 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energy = 0&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of the fact that we don’t start at 0 Wh.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
@@ -1717,7 +1729,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>results</tabstop>
   <tabstop>Help</tabstop>
   <tabstop>time_limit</tabstop>
-  <tabstop>predict_final_energy</tabstop>
   <tabstop>data_line_style</tabstop>
   <tabstop>table_eb_t</tabstop>
   <tabstop>table_t</tabstop>
@@ -1922,22 +1933,6 @@ p, li { white-space: pre-wrap; }
     <hint type="sourcelabel">
      <x>110</x>
      <y>187</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>predict_final_energy</sender>
-   <signal>clicked()</signal>
-   <receiver>recalc_warn</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>110</x>
-     <y>188</y>
     </hint>
     <hint type="destinationlabel">
      <x>148</x>

@@ -21,8 +21,13 @@ class MinOnTimeConfig(AlgorithmConfig):
         self.type = AlgorithmsEnum.min_on_time
         self.min_on_time = min_on_time
 
+class PredictFinalEnergy(Enum):
+    disabled = 0
+    avarage_power = 1
+    project_current_power = 2
+
 class TimeToConsume(AlgorithmConfig):
-       def __init__(self, predict_final_energy:bool):
+       def __init__(self, predict_final_energy:PredictFinalEnergy):
         self.type = AlgorithmsEnum.time_to_consume
         self.predict_final_energy = predict_final_energy
 

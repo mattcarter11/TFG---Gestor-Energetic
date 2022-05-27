@@ -4,6 +4,7 @@ from .DataFrames import DataFrameOut
 class Results:
 
     def __init__(self, df:DataFrameOut):
+        df.fill_missing_power()
         self.dfI = df
         self.df_hour = pd.DataFrame()
         self.df_total = pd.DataFrame()

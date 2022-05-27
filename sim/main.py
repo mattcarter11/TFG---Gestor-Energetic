@@ -158,7 +158,7 @@ class App(QMainWindow):
         if 'time_limit' in keys:
             self.ui.time_limit.setValue(settings['time_limit'])
         if 'predict_final_energy' in keys:
-            self.ui.predict_final_energy.setChecked(settings['predict_final_energy'])
+            self.ui.predict_final_energy.setCurrentText(settings['predict_final_energy'])
 
         if 'use_data_bl' in keys:
             self.ui.use_data_bl.setChecked(settings['use_data_bl'])
@@ -202,7 +202,7 @@ class App(QMainWindow):
 
         settings["algorithm"] = self.ui.algorithm.currentText()
         settings["time_limit"] = self.ui.time_limit.value()
-        settings["predict_final_energy"] = self.ui.predict_final_energy.isChecked()
+        settings["predict_final_energy"] = self.ui.predict_final_energy.currentText()
         settings["th_top1"] = self.ui.th_top1.value()
         settings["th_top2"] = self.ui.th_top2.value()
         settings["th_bottom1"] = self.ui.th_bottom1.value()
@@ -321,7 +321,7 @@ class App(QMainWindow):
                 for line in lines:
                     line.set_linestyle(linestyle)
                     line.set_marker(marker)
-                self.data_prev_ls = text
+                prev = text
                 plot.draw()
     #endregion
 
@@ -422,6 +422,7 @@ class App(QMainWindow):
                 None if isinstance(self.dfI, df.DataFrameOut) and self.ui.use_data_bl.isChecked() else self.ui.base_load.value()
             )
         except Exception as e:
+            print(e)
             QMessageBox.warning(self, "Error", f"Date & Time interval must be at least 5 min", QMessageBox.Ok)
         else:
             self.ui.n_samples.setText(f'Simulation duration {self.sim.simulated_nsec/3600:.3f} h ({self.sim.simulated_nsec} Samples)')
@@ -439,7 +440,11 @@ class App(QMainWindow):
             case 1:
                 return ac.MinOnTimeConfig( self.ui.time_limit.value() )
             case 2:
-                return ac.TimeToConsume( self.ui.predict_final_energy.isChecked() )
+                match self.ui.predict_final_energy.currentIndex():
+                    case 0: predict = ac.PredictFinalEnergy.disabled
+                    case 1: predict = ac.PredictFinalEnergy.avarage_power
+                    case 2: predict = ac.PredictFinalEnergy.project_current_power
+                return ac.TimeToConsume( predict )
     #endregion
 
     #region ->  Plots

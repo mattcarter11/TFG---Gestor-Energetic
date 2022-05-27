@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1082, 770)
+        MainWindow.resize(1082, 766)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -277,11 +277,16 @@ class Ui_MainWindow(object):
         self.page.setObjectName(u"page")
         self.verticalLayout_3 = QVBoxLayout(self.page)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
-        self.predict_final_energy = QCheckBox(self.page)
+        self.label_11 = QLabel(self.page)
+        self.label_11.setObjectName(u"label_11")
+
+        self.verticalLayout_3.addWidget(self.label_11)
+
+        self.predict_final_energy = QComboBox(self.page)
+        self.predict_final_energy.addItem("")
+        self.predict_final_energy.addItem("")
+        self.predict_final_energy.addItem("")
         self.predict_final_energy.setObjectName(u"predict_final_energy")
-        sizePolicy3.setHeightForWidth(self.predict_final_energy.sizePolicy().hasHeightForWidth())
-        self.predict_final_energy.setSizePolicy(sizePolicy3)
-        self.predict_final_energy.setChecked(True)
 
         self.verticalLayout_3.addWidget(self.predict_final_energy)
 
@@ -846,8 +851,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.simulate, self.results)
         QWidget.setTabOrder(self.results, self.Help)
         QWidget.setTabOrder(self.Help, self.time_limit)
-        QWidget.setTabOrder(self.time_limit, self.predict_final_energy)
-        QWidget.setTabOrder(self.predict_final_energy, self.data_line_style)
+        QWidget.setTabOrder(self.time_limit, self.data_line_style)
         QWidget.setTabOrder(self.data_line_style, self.table_eb_t)
         QWidget.setTabOrder(self.table_eb_t, self.table_t)
         QWidget.setTabOrder(self.table_t, self.show_values_t)
@@ -877,7 +881,6 @@ class Ui_MainWindow(object):
         self.load1.valueChanged.connect(self.recalc_warn.show)
         self.load2.valueChanged.connect(self.recalc_warn.show)
         self.time_limit.valueChanged.connect(self.recalc_warn.show)
-        self.predict_final_energy.clicked.connect(self.recalc_warn.show)
         self.algorithm.currentIndexChanged.connect(self.algorithm_options.setCurrentIndex)
         self.use_data_bl.toggled.connect(self.recalc_warn.show)
         self.load_file.clicked.connect(self.recalc_warn.show)
@@ -885,7 +888,7 @@ class Ui_MainWindow(object):
         self.algorithm_options.setCurrentIndex(0)
         self.simulate.setDefault(False)
         self.results.setDefault(False)
-        self.Help.setCurrentIndex(1)
+        self.Help.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -927,7 +930,11 @@ class Ui_MainWindow(object):
         self.time_limit.setSuffix(QCoreApplication.translate("MainWindow", u" s", None))
         self.time_limit.setPrefix("")
         self.wh_eq.setText(QCoreApplication.translate("MainWindow", u"= Wh", None))
-        self.predict_final_energy.setText(QCoreApplication.translate("MainWindow", u"Predict Final Energy", None))
+        self.label_11.setText(QCoreApplication.translate("MainWindow", u"Predict Final Energy", None))
+        self.predict_final_energy.setItemText(0, QCoreApplication.translate("MainWindow", u"Disabled", None))
+        self.predict_final_energy.setItemText(1, QCoreApplication.translate("MainWindow", u"Average Power", None))
+        self.predict_final_energy.setItemText(2, QCoreApplication.translate("MainWindow", u"Project Current Power", None))
+
         self.bload_l.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\">Loads</p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.label.setToolTip(QCoreApplication.translate("MainWindow", u"External / Not controled", None))
@@ -1010,58 +1017,60 @@ class Ui_MainWindow(object):
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Min On Use</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent"
                         ":0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Time to consume</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. If the flag </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">predict final energy</span><span style=\" font-family:'Segoe UI','sans-serif';\"> is turned on, it will also predict the energy that it will probably generate during the time it's on. The equation is </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energyEnd = energyA + timeLeft * powerG / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">in Wh.</span> </p>\n"
-""
-                        "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Because of how energy is calculated, at each hour the load doesn't always turn off. The formula is </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energyA = ( powerG - powerC ) * Ts / 3600 + energyA, </span><span style=\" font-family:'Segoe UI','sans-serif';\">which means we are supposing/&quot;predicting&quot; that after Ts will have produced</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> energyP = ( powerG - powerC ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">Wh. If we instead did </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style"
-                        ":italic;\">energyP = ( powerG(-1) - powerC(-1) ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">and at t=0 </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energy = 0</span><span style=\" font-family:'Segoe UI','sans-serif';\"> we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of the fact that we don\u2019t start at 0 Wh.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Time to consume</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">predict final energy</span><span style=\" font-family:'Segoe UI','sans-serif';\"> modes which predicts how much energy that hour slot will probably yeald. This calculation value is calucalted every sample. There are two modes:</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Sego"
+                        "e UI','sans-serif';\">- Average Power:  </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">avgP = energyA / (3600 - sec_remaining) -&gt; energy1h = avg*3600</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Project Current Power: </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energy1h = energyA + timeLeft * powerG / 3600</span></p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Because of how energy is calculated, at each hour the load doesn't always turn off. The formula is </span><spa"
+                        "n style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energyA = ( powerG - powerC ) * Ts / 3600 + energyA, </span><span style=\" font-family:'Segoe UI','sans-serif';\">which means we are supposing/&quot;predicting&quot; that after Ts will have produced</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> energyP = ( powerG - powerC ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">Wh. If we instead did </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energyP = ( powerG(-1) - powerC(-1) ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">and at t=0 </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">energy = 0</span><span style=\" font-family:'Segoe UI','sans-serif';\"> we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of "
+                        "the fact that we don\u2019t start at 0 Wh.</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;\">Loads</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-l"
-                        "eft:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Depending on the number of loads that the algorithm supports, the fields get disabled.</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- </span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Base Load</span><span style=\" font-family:'Segoe UI','sans-serif';\"> represent the constant power draw of a building. It can be 0 if needed to not factor it.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Depending on the number of loads that the algorithm supports, the fields get disabled.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- </span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underli"
+                        "ne;\">Base Load</span><span style=\" font-family:'Segoe UI','sans-serif';\"> represent the constant power draw of a building. It can be 0 if needed to not factor it.</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sa"
-                        "ns-serif'; font-size:11pt; font-weight:700;\">Tabs</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\u231a</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Data Range/In</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Used to seeing the input data (power generated) from the .csv and to also easily changing the date and time interval by:</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;\">Tabs</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\u231a</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Data Range/In</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Used to seeing the input data (power"
+                        " generated) from the .csv and to also easily changing the date and time interval by:</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Select a date line to move it <br />- Pres ESC to cancel the move</span></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</"
-                        "span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; font-weight:700;\">\ud83d\udcca</span><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Summary</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After simulating or calculating results, this tab contains the important results. It also has two plot options that are very useful:</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; font-weight:700;\">\ud83d\udcca</span><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Summary</span><span style=\" font-family:'Segoe UI','sans-ser"
+                        "if';\"> After simulating or calculating results, this tab contains the important results. It also has two plot options that are very useful:</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Show values</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> displays a label next to each bar/area value.</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-"
-                        "left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">- </span><span style=\" font-family:'Segoe UI','sans-serif';\">Subdivide</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> each bar is subdivided in its relevant data parts.</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;\">\ud83d\udcc9</span><span style=\" font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;\"> </span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Simulation</span><span style=\" f"
-                        "ont-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, is filled with a plot of the simulated data.</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Power Consumed by Loads</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> shows the loads plots as a stacked area, this helps see the components of Power Consumed.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">- </span><span style=\" font-family:'Segoe UI','sans-serif';\">Subdivide</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> each bar is subdivided in its relevant data parts.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><s"
+                        "pan style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;\">\ud83d\udcc9</span><span style=\" font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;\"> </span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Simulation</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, is filled with a plot of the simulated data.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Power Consumed by Loads</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> shows the loads plots as a stacked area, this helps see the "
+                        "components of Power Consumed.</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Power Produced</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> shows all the energy produced which is equal to energyC + energyA.</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-"
-                        "family:'Segoe UI','sans-serif';\">- Show threshold</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> displays horizontal lines corresponding to each threshold (works in &quot;hysteresis&quot; and in &quot;min on use&quot;).</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">- Show threshold</span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\"> displays horizontal lines corresponding to each threshold (works in &quot;hysteresis&quot; and in &quot;min on use&quot;).</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;\">\ud83d\udcca</span><span style=\" font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;\"> </span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Energy Balance</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, conta"
-                        "ins the hourly breakdown of the energy balance (the sum of this breakdown is shown in summary). Both plot options in summary are also available here.</span> </p>\n"
+"<p style=\" mar"
+                        "gin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;\">\ud83d\udcca</span><span style=\" font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;\"> </span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Energy Balance</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, contains the hourly breakdown of the energy balance (the sum of this breakdown is shown in summary). Both plot options in summary are also available here.</span> </p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Data In</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After importing the .csv, it shows the table with the document data.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe U"
+                        "I Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Data In</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After importing the .csv, it shows the table with the document data.</span> </p>\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-r"
-                        "ight:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Simulation</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, it contains the table of all the simulated data (which is plotted at the other simulation tab)</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Simulation</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, it contains the table of all the simulated data (which is plotted at the other simulation tab)</span> </p>\n"
+"<p style=\" margin-"
+                        "top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Energy Balance</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After  simulating or calculating results, it shows the table of all the energy balance data (which is plotted at the energy balance tab).</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;\">\ud83d\udcc5</span><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\"> Energy Balance</span><span style=\" font-family:'Seg"
-                        "oe UI','sans-serif';\"> After  simulating or calculating results, it shows the table of all the energy balance data (which is plotted at the energy balance tab).</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;\">Plots</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-"
+                        "indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;\">Plots</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">The plots have the standard </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">maptlotlib</span><span style=\" font-family:'Segoe UI','sans-serif';\"> functionally plus some extra options. </span></p>\n"
-"<p style=\""
-                        " margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Cross Hair Cursor</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Toggled by selecting the toolbar buttons + it displays a cross hair which snaps to the closest point of the data line. To change the line it snaps, you simply have to select it.</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
-"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans"
-                        "-serif'; text-decoration: underline;\">Line Style</span><span style=\" font-family:'Segoe UI','sans-serif';\"> A input that accepts any </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">matplotlib </span><span style=\" font-family:'Segoe UI','sans-serif';\">line style and marker to apply to the displayed lines.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Cross Hair Cursor</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Toggled by se"
+                        "lecting the toolbar buttons + it displays a cross hair which snaps to the closest point of the data line. To change the line it snaps, you simply have to select it.</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Line Style</span><span style=\" font-family:'Segoe UI','sans-serif';\"> A input that accepts any </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic;\">matplotlib </span><span style=\" font-family:'Segoe UI','sans-serif';\">line style and marker to apply to the displayed lines.</span> </p>\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><s"
+                        "pan style=\" font-family:'Segoe UI','sans-serif';\">\u00a0</span> </p>\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif'; text-decoration: underline;\">Hide lines</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Any line in a plot can be hidden by pressing the lines in the legend. Hidden lines still show in the legend but more transparent.</span> </p>\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top"
-                        ":12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
+"<p style=\"-qt-paragraph-type:empty; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
         self.Help.setTabText(self.Help.indexOf(self.tab_3), QCoreApplication.translate("MainWindow", u"\u2139 Help", None))
         self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
         self.sampling_rate.setText(QCoreApplication.translate("MainWindow", u"Sample Rate", None))
