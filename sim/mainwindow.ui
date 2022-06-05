@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1082</width>
-    <height>766</height>
+    <width>1192</width>
+    <height>800</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -162,7 +162,7 @@ p, li { white-space: pre-wrap; }
             </item>
             <item>
              <property name="text">
-              <string>Min On Time (Arnau)</string>
+              <string>Min On Time</string>
              </property>
             </item>
             <item>
@@ -274,7 +274,7 @@ p, li { white-space: pre-wrap; }
                  <number>99999</number>
                 </property>
                 <property name="singleStep">
-                 <number>25</number>
+                 <number>10</number>
                 </property>
                 <property name="value">
                  <number>50</number>
@@ -315,7 +315,7 @@ p, li { white-space: pre-wrap; }
                  <number>99999</number>
                 </property>
                 <property name="singleStep">
-                 <number>25</number>
+                 <number>10</number>
                 </property>
                 <property name="value">
                  <number>0</number>
@@ -356,7 +356,7 @@ p, li { white-space: pre-wrap; }
                  <number>99999</number>
                 </property>
                 <property name="singleStep">
-                 <number>25</number>
+                 <number>10</number>
                 </property>
                 <property name="value">
                  <number>50</number>
@@ -397,7 +397,7 @@ p, li { white-space: pre-wrap; }
                  <number>99999</number>
                 </property>
                 <property name="singleStep">
-                 <number>25</number>
+                 <number>10</number>
                 </property>
                 <property name="value">
                  <number>0</number>
@@ -537,17 +537,83 @@ p, li { white-space: pre-wrap; }
              </widget>
             </item>
             <item>
-             <spacer name="verticalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
+             <layout class="QFormLayout" name="formLayout_6">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_18">
+                <property name="toolTip">
+                 <string>External / Not controled</string>
+                </property>
+                <property name="text">
+                 <string>End at</string>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QSpinBox" name="ttc_end_at">
+                <property name="suffix">
+                 <string> Wh</string>
+                </property>
+                <property name="maximum">
+                 <number>999</number>
+                </property>
+                <property name="singleStep">
+                 <number>5</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_19">
+                <property name="text">
+                 <string>Time Factor</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_20">
+                <property name="text">
+                 <string>On min</string>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="ttc_on_min">
+                <property name="suffix">
+                 <string> Wh</string>
+                </property>
+                <property name="maximum">
+                 <number>9999</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="value">
+                 <number>100</number>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="ttc_time_factor">
+                <property name="prefix">
+                 <string/>
+                </property>
+                <property name="suffix">
+                 <string> s</string>
+                </property>
+                <property name="maximum">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="singleStep">
+                 <double>0.100000000000000</double>
+                </property>
+                <property name="value">
+                 <double>1.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </item>
            </layout>
           </widget>
@@ -670,6 +736,9 @@ p, li { white-space: pre-wrap; }
           <property name="flat">
            <bool>false</bool>
           </property>
+          <property name="dataValidEnable" stdset="0">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -678,7 +747,7 @@ p, li { white-space: pre-wrap; }
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Results</string>
+           <string>Data In Results</string>
           </property>
           <property name="autoDefault">
            <bool>false</bool>
@@ -723,9 +792,9 @@ p, li { white-space: pre-wrap; }
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="plots">
+       <layout class="QVBoxLayout" name="data">
         <item>
-         <widget class="QTabWidget" name="Help">
+         <widget class="QTabWidget" name="tabs">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -738,67 +807,196 @@ p, li { white-space: pre-wrap; }
           <property name="currentIndex">
            <number>0</number>
           </property>
-          <widget class="MplTwinxWidget" name="plot_dr">
+          <property name="elideMode">
+           <enum>Qt::ElideNone</enum>
+          </property>
+          <widget class="QWidget" name="daterange_t">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
            <attribute name="title">
             <string>⌚ Data Range/In</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_7">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>1</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QLabel" name="label_10">
-              <property name="text">
-               <string>Line Style</string>
+             <widget class="QTabWidget" name="tabWidget">
+              <property name="styleSheet">
+               <string notr="true">QTabWidget::pane { /* The tab widget frame */
+	left:-1px;
+	top: -1px;
+    bottom: -3px;
+	right: -3px;
+}</string>
               </property>
+              <property name="tabPosition">
+               <enum>QTabWidget::North</enum>
+              </property>
+              <property name="tabShape">
+               <enum>QTabWidget::Rounded</enum>
+              </property>
+              <property name="currentIndex">
+               <number>0</number>
+              </property>
+              <widget class="MplTwinxWidget" name="plot_dr">
+               <attribute name="title">
+                <string>📈 Grapth</string>
+               </attribute>
+               <layout class="QHBoxLayout" name="horizontalLayout_10">
+                <property name="spacing">
+                 <number>6</number>
+                </property>
+                <property name="leftMargin">
+                 <number>9</number>
+                </property>
+                <property name="topMargin">
+                 <number>9</number>
+                </property>
+                <property name="rightMargin">
+                 <number>9</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>9</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_10">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Line Style</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="data_line_style">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="inputMask">
+                   <string/>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="maxLength">
+                   <number>5</number>
+                  </property>
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_8">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="table_dr_t">
+               <attribute name="title">
+                <string>📅 Table [W, Wh]</string>
+               </attribute>
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QTableView" name="table_in">
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::PreventContextMenu</enum>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectItems</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="data_line_style">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="inputMask">
-               <string/>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="maxLength">
-               <number>5</number>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_5">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
           <widget class="QWidget" name="global_results">
            <attribute name="title">
-            <string>📊📅 Summary</string>
+            <string>📊📅 Results</string>
            </attribute>
            <layout class="QVBoxLayout" name="verticalLayout_6">
             <property name="spacing">
@@ -843,64 +1041,6 @@ p, li { white-space: pre-wrap; }
                   </property>
                  </spacer>
                 </item>
-                <item alignment="Qt::AlignRight">
-                 <widget class="QTableView" name="table_loads_aprox">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="maximumSize">
-                   <size>
-                    <width>200</width>
-                    <height>10000000</height>
-                   </size>
-                  </property>
-                  <property name="contextMenuPolicy">
-                   <enum>Qt::PreventContextMenu</enum>
-                  </property>
-                  <property name="frameShape">
-                   <enum>QFrame::NoFrame</enum>
-                  </property>
-                  <property name="frameShadow">
-                   <enum>QFrame::Plain</enum>
-                  </property>
-                  <property name="lineWidth">
-                   <number>0</number>
-                  </property>
-                  <property name="sizeAdjustPolicy">
-                   <enum>QAbstractScrollArea::AdjustToContents</enum>
-                  </property>
-                  <property name="alternatingRowColors">
-                   <bool>true</bool>
-                  </property>
-                  <property name="selectionBehavior">
-                   <enum>QAbstractItemView::SelectRows</enum>
-                  </property>
-                  <property name="textElideMode">
-                   <enum>Qt::ElideNone</enum>
-                  </property>
-                  <property name="sortingEnabled">
-                   <bool>false</bool>
-                  </property>
-                  <property name="wordWrap">
-                   <bool>true</bool>
-                  </property>
-                  <attribute name="horizontalHeaderCascadingSectionResizes">
-                   <bool>false</bool>
-                  </attribute>
-                  <attribute name="horizontalHeaderStretchLastSection">
-                   <bool>true</bool>
-                  </attribute>
-                  <attribute name="verticalHeaderVisible">
-                   <bool>true</bool>
-                  </attribute>
-                  <attribute name="verticalHeaderMinimumSectionSize">
-                   <number>10</number>
-                  </attribute>
-                 </widget>
-                </item>
                 <item alignment="Qt::AlignHCenter">
                  <widget class="QTableView" name="table_eb_t">
                   <property name="sizePolicy">
@@ -934,7 +1074,7 @@ p, li { white-space: pre-wrap; }
                    <bool>true</bool>
                   </property>
                   <property name="selectionBehavior">
-                   <enum>QAbstractItemView::SelectRows</enum>
+                   <enum>QAbstractItemView::SelectItems</enum>
                   </property>
                   <property name="textElideMode">
                    <enum>Qt::ElideNone</enum>
@@ -1009,7 +1149,7 @@ p, li { white-space: pre-wrap; }
                <bool>true</bool>
               </property>
               <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
+               <enum>QAbstractItemView::SelectItems</enum>
               </property>
               <property name="sortingEnabled">
                <bool>false</bool>
@@ -1030,7 +1170,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QCheckBox" name="show_values_t">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Show values (rounded)</string>
@@ -1056,7 +1196,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <widget class="QCheckBox" name="subdivide_t">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Subdivide</string>
@@ -1083,253 +1223,237 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </widget>
-          <widget class="MplTwinxWidget" name="plot_s">
+          <widget class="QWidget" name="simulation_t">
            <attribute name="title">
             <string>📉 Simulation</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>1</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
-             <widget class="QLabel" name="label_9">
-              <property name="text">
-               <string>Line Style</string>
+             <widget class="QTabWidget" name="tabWidget_2">
+              <property name="styleSheet">
+               <string notr="true">QTabWidget::pane { /* The tab widget frame */
+	left:-1px;
+	top: -1px;
+    bottom: -3px;
+	right: -3px;
+}</string>
               </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLineEdit" name="sim_line_style">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="maximumSize">
-               <size>
-                <width>50</width>
-                <height>16777215</height>
-               </size>
-              </property>
-              <property name="inputMask">
-               <string/>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-              <property name="maxLength">
-               <number>5</number>
-              </property>
-              <property name="readOnly">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="Line" name="line_6">
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
+              <property name="currentIndex">
                <number>0</number>
               </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
+              <widget class="MplTwinxWidget" name="plot_s">
+               <attribute name="title">
+                <string>📈 Grapth</string>
+               </attribute>
+               <layout class="QHBoxLayout" name="horizontalLayout_14">
+                <property name="leftMargin">
+                 <number>9</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>Line Style</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="sim_line_style">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>50</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="inputMask">
+                   <string/>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="maxLength">
+                   <number>5</number>
+                  </property>
+                  <property name="readOnly">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_6">
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="show_loads_area">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Power Consumed by Load</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_4">
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="energyP_s">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Energy Produced</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_12">
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="show_th">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Show Thresholds</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="table_s_t">
+               <attribute name="title">
+                <string>📅 Table [W, Wh]</string>
+               </attribute>
+               <layout class="QHBoxLayout" name="horizontalLayout_15">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QTableView" name="table_s">
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::PreventContextMenu</enum>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectItems</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="show_loads_area">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Power Consumed by Load</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="Line" name="line_4">
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
-               <number>0</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="energyP_s">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Energy Produced</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="Line" name="line_12">
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
-               <number>0</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="show_th">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Show Thresholds</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </widget>
-          <widget class="MplWidget" name="plot_eb">
+          <widget class="QWidget" name="eb_t">
            <attribute name="title">
             <string>📊 Enegry Balance</string>
            </attribute>
            <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QCheckBox" name="show_values_eb">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Show values (rounded)</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="Line" name="line_5">
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
-               <number>0</number>
-              </property>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QCheckBox" name="subdivide_eb">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="text">
-               <string>Subdivide</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab3">
-           <attribute name="title">
-            <string>📅 Data In</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="QTableView" name="table_in">
-              <property name="contextMenuPolicy">
-               <enum>Qt::PreventContextMenu</enum>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
-               <number>0</number>
-              </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QAbstractScrollArea::AdjustToContents</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="sortingEnabled">
-               <bool>false</bool>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>📅 Simulation</string>
-           </attribute>
-           <layout class="QHBoxLayout" name="horizontalLayout_6">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -1337,7 +1461,7 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <property name="topMargin">
-             <number>0</number>
+             <number>1</number>
             </property>
             <property name="rightMargin">
              <number>0</number>
@@ -1346,107 +1470,484 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <item>
-             <widget class="QTableView" name="table_s">
-              <property name="contextMenuPolicy">
-               <enum>Qt::PreventContextMenu</enum>
+             <widget class="QTabWidget" name="tabWidget_3">
+              <property name="styleSheet">
+               <string notr="true">QTabWidget::pane { /* The tab widget frame */
+	left:-1px;
+	top: -1px;
+    bottom: -3px;
+	right: -3px;
+}</string>
               </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
+              <property name="currentIndex">
                <number>0</number>
               </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QAbstractScrollArea::AdjustToContents</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="sortingEnabled">
-               <bool>false</bool>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
+              <widget class="MplWidget" name="plot_eb">
+               <attribute name="title">
+                <string>📊 Grapth</string>
+               </attribute>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <widget class="QCheckBox" name="show_values_eb">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Show values (rounded)</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_5">
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="subdivide_eb">
+                  <property name="enabled">
+                   <bool>true</bool>
+                  </property>
+                  <property name="text">
+                   <string>Subdivide</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="tab_2">
+               <attribute name="title">
+                <string>📅 Table [Wh]</string>
+               </attribute>
+               <layout class="QHBoxLayout" name="horizontalLayout_16">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QTableView" name="table_eb">
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::PreventContextMenu</enum>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectItems</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>false</bool>
+                  </property>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_2">
+          <widget class="QWidget" name="optimise_t">
            <attribute name="title">
-            <string>📅 Energy Balance</string>
+            <string>📈 Optimize</string>
            </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_4">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
             <item>
-             <widget class="QTableView" name="table_eb">
-              <property name="contextMenuPolicy">
-               <enum>Qt::PreventContextMenu</enum>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::NoFrame</enum>
-              </property>
-              <property name="frameShadow">
-               <enum>QFrame::Plain</enum>
-              </property>
-              <property name="lineWidth">
+             <layout class="QHBoxLayout" name="op_settings">
+              <item>
+               <widget class="QLabel" name="label_14">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Setting:</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="op_setting">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="dataValidEnable" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Start</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="op_start">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="minimum">
+                 <number>-99999</number>
+                </property>
+                <property name="maximum">
+                 <number>99999</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="dataValidEnable" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_13">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>End</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="op_end">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="minimum">
+                 <number>-99999</number>
+                </property>
+                <property name="maximum">
+                 <number>99999</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="dataValidEnable" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_15">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Step</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QSpinBox" name="op_step">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="suffix">
+                 <string/>
+                </property>
+                <property name="minimum">
+                 <number>-99999</number>
+                </property>
+                <property name="maximum">
+                 <number>99999</number>
+                </property>
+                <property name="singleStep">
+                 <number>10</number>
+                </property>
+                <property name="dataValidEnable" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="op_calculate">
+                <property name="enabled">
+                 <bool>false</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="text">
+                 <string>Calculate</string>
+                </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
+                </property>
+                <property name="dataValidEnable" stdset="0">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="op_recalc_warn">
+                <property name="enabled">
+                 <bool>true</bool>
+                </property>
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="minimumSize">
+                 <size>
+                  <width>134</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>134</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700; color:#f4b300;&quot;&gt;⚠&lt;/span&gt;&lt;span style=&quot; color:#f4b300;&quot;&gt; Recalculate ⚠&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <widget class="QTabWidget" name="tabWidget_4">
+              <property name="currentIndex">
                <number>0</number>
               </property>
-              <property name="sizeAdjustPolicy">
-               <enum>QAbstractScrollArea::AdjustToContents</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionBehavior">
-               <enum>QAbstractItemView::SelectRows</enum>
-              </property>
-              <property name="sortingEnabled">
-               <bool>false</bool>
-              </property>
-              <property name="wordWrap">
-               <bool>false</bool>
-              </property>
-              <attribute name="horizontalHeaderCascadingSectionResizes">
-               <bool>false</bool>
-              </attribute>
-              <attribute name="horizontalHeaderStretchLastSection">
-               <bool>true</bool>
-              </attribute>
-              <attribute name="verticalHeaderVisible">
-               <bool>false</bool>
-              </attribute>
+              <widget class="MplTwinxWidget" name="plot_op">
+               <attribute name="title">
+                <string>📈 Grapth</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_8">
+                <item>
+                 <layout class="QHBoxLayout" name="horizontalLayout_11">
+                  <item>
+                   <widget class="QLabel" name="label_16">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Left Axis</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="op_ax_left">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <spacer name="horizontalSpacer_5">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item>
+                   <widget class="QLabel" name="label_17">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>Right Axis</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QComboBox" name="op_ax_right">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="table_op_t">
+               <attribute name="title">
+                <string>📅 Table [W, Wh]</string>
+               </attribute>
+               <layout class="QVBoxLayout" name="verticalLayout_9">
+                <property name="spacing">
+                 <number>0</number>
+                </property>
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>2</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QTableView" name="table_op">
+                  <property name="contextMenuPolicy">
+                   <enum>Qt::PreventContextMenu</enum>
+                  </property>
+                  <property name="frameShape">
+                   <enum>QFrame::NoFrame</enum>
+                  </property>
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="sizeAdjustPolicy">
+                   <enum>QAbstractScrollArea::AdjustToContents</enum>
+                  </property>
+                  <property name="alternatingRowColors">
+                   <bool>true</bool>
+                  </property>
+                  <property name="selectionBehavior">
+                   <enum>QAbstractItemView::SelectItems</enum>
+                  </property>
+                  <property name="sortingEnabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="wordWrap">
+                   <bool>true</bool>
+                  </property>
+                  <attribute name="horizontalHeaderCascadingSectionResizes">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="horizontalHeaderStretchLastSection">
+                   <bool>true</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderVisible">
+                   <bool>false</bool>
+                  </attribute>
+                  <attribute name="verticalHeaderMinimumSectionSize">
+                   <number>10</number>
+                  </attribute>
+                  <attribute name="verticalHeaderHighlightSections">
+                   <bool>false</bool>
+                  </attribute>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tab_3">
+          <widget class="QWidget" name="help_t">
            <attribute name="title">
             <string>ℹ Help</string>
            </attribute>
@@ -1468,15 +1969,18 @@ p, li { white-space: pre-wrap; }
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;What is this&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;This is a simulator/analyzer of a load manager for a very specific and neash area.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;This is a load manager simulator/analyzer or a very specific and neash area.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;In Spain, the energy bill goes as follows. At the end of every hour a energy balance is calculated, &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyConsumed - energyGenerated.&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; If you have consumed more energy that produced, you must pay that difference. If instead you have produced more that consumed, the company has to pay you.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;In Spain, the energy bill goes as follows:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- At the end of every hour your energy balance is calculated &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;(energyConsumed - energyGenerated).&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;  a. If you have consumed more energy that produced, you must pay that difference. Which can get very expensive depending on the hour.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;  b. If instead you have produced more that consumed, the company has to pay. But, the price they pay is arround half of the lowest hour price, which is not very good.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Thanks to this hour slot system, you can for example consume 1 KWh of energy in the first 10 min and then produce 1KWh during 20 min thus having a net zero consumption and not paying anything.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Thanks to this hour slot system you can, for example, consume 1 KWh of energy in the first 10 min and then produce 1KWh during 20 min, thus having a net zero consumption and not paying anything.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Segoe UI','sans-serif';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;This project aims to create an intelligent system that manages loads adequately so to achieve or at least get close to a neat zero o even positive income (produce more that consumed) system. &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Load File&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Load File&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Select a .csv file to load the data. If simulating, it must at least have the columns:&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;timestamp -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;string of datetime (ex: 2022-02-01 15:57:50)&lt;/span&gt; &lt;/p&gt;
@@ -1484,10 +1988,18 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;If loading it for calculating the results of real data, it must have the previous columns plus:&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;energyA -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for energyAvailable)&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;powerC -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for powerConsumed)&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;powerL1 -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for powerLoad1)&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;on_offL1 -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;[0, 1, -1] (no change, turned on, turned off)&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;powerL1 -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for powerLoad1)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;powerL2 -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for powerLoad2)&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;on_offL1 -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;[0, 1, -1] (no change, turned on, turned off)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;on_offL2 -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;[0, 1, -1] (no change, turned on, turned off)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;The optional columns for calculating the reesult of real data, which speed the calculations since it doesn't have to calculate them, are:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Segoe UI','sans-serif';&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;energyA -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for energyAvailable)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;energyP -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for energyProduced)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;energyG -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for energyGrid) (= negative values of energyA with sign changed)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;powerLB -&amp;gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;float (stands for powerLoadBase)&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Date &amp;amp; Time&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Indicates the day and time from where the simulation starts and ends. This values range are limited by the dataset give. &lt;/span&gt;&lt;/p&gt;
@@ -1501,36 +2013,39 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Min On Use&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Time to consume&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;predict final energy&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; modes which predicts how much energy that hour slot will probably yeald. This calculation value is calucalted every sample. There are two modes:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Time to consume&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;predict final energy&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; modes which predicts how much energy that hour slot will probably yield (&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energy1h&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;). This value is calculated every sample. There are two modes:&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Average Power:  &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;avgP = energyA / (3600 - sec_remaining) -&amp;gt; energy1h = avg*3600&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Project Current Power: &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energy1h = energyA + timeLeft * powerG / 3600&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;You can also configure:&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- End at &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;which indicates how much energyA should be left when the hour ends (recommended at 0 or more, so you don't pay/have a negative hour energy balance)&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- On Min&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; while the energyA is less than this value, the load can not turn on.&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Time Factor&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; this values gest multiplied to the time left to end the hour. This means, that if set to less than 1, it will turn on earlier since it &amp;quot;will think that is has less time&amp;quot;. This is useful, for example, if the prediction is off and a bunch more energy is produced, if this time shift wasn't applied that energy would be lost. &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Because of how energy is calculated, at each hour the load doesn't always turn off. The formula is &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyA = ( powerG - powerC ) * Ts / 3600 + energyA, &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;which means we are supposing/&amp;quot;predicting&amp;quot; that after Ts will have produced&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; energyP = ( powerG - powerC ) * Ts / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Wh. If we instead did &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyP = ( powerG(-1) - powerC(-1) ) * Ts / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;and at t=0 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energy = 0&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of the fact that we don’t start at 0 Wh.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Calculating energyA:&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Because of how energy is calculated, at each hour the load doesn't always turn off. The formula is &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyA = ( powerG - powerC ) * Ts / 3600 + energyA, &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;which means we are supposing/&amp;quot;predicting&amp;quot; that after Ts will have produced&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; energyP = ( powerG - powerC ) * Ts / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Wh. If we instead did &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energyP = ( powerG(-1) - powerC(-1) ) * Ts / 3600 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;and at t=0 &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;energy = 0&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of the fact that we don’t start at 0 Wh.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Loads&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Depending on the number of loads that the algorithm supports, the fields get disabled.&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Base Load&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; represent the constant power draw of a building. It can be 0 if needed to not factor it.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Loads&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;It's where you indicate the loads values for simulating. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Load X&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Depending on the number of loads that the algorithm supports, the fields get disabled.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Base Load&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; represent the constant power draw of a building. It can be 0 if needed to not factor it.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Use base load&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; If checked and the data you loaded has the &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;powerLB&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;, the simulation will use those values. If not checked or no values exist, it will use the number indicated.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Tabs&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;⌚&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Data Range/In&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Used to seeing the input data (power generated) from the .csv and to also easily changing the date and time interval by:&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;⌚&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Data Range/In&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; Used for seeing the input data (power generated) from the .csv and also easily change the date and time interval by:&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Select a date line to move it &lt;br /&gt;- Pres ESC to cancel the move&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; font-weight:700;&quot;&gt;📊&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;📅&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Summary&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After simulating or calculating results, this tab contains the important results. It also has two plot options that are very useful:&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; font-weight:700;&quot;&gt;📊&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;📅&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Results&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After simulating or calculating results, this tab contains the important results. It also has two plot options that are very useful:&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Show values&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; displays a label next to each bar/area value.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;- &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Subdivide&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; each bar is subdivided in its relevant data parts.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;&quot;&gt;📉&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Simulation&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After  simulating or calculating results, is filled with a plot of the simulated data.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;&quot;&gt;📉&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Simulation&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After simulating or calculating results, is filled with a plot of the simulated data.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Power Consumed by Loads&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; shows the loads plots as a stacked area, this helps see the components of Power Consumed.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Power Produced&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; shows all the energy produced which is equal to energyC + energyA.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;- Show threshold&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt; displays horizontal lines corresponding to each threshold (works in &amp;quot;hysteresis&amp;quot; and in &amp;quot;min on use&amp;quot;).&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; font-weight:700; text-decoration: underline;&quot;&gt;📊&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-weight:700; text-decoration: underline;&quot;&gt; &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt;Energy Balance&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After  simulating or calculating results, contains the hourly breakdown of the energy balance (the sum of this breakdown is shown in summary). Both plot options in summary are also available here.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;📅&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Data In&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After importing the .csv, it shows the table with the document data.&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;📅&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Simulation&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After  simulating or calculating results, it contains the table of all the simulated data (which is plotted at the other simulation tab)&lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI Emoji','sans-serif'; text-decoration: underline;&quot;&gt;📅&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; text-decoration: underline;&quot;&gt; Energy Balance&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After  simulating or calculating results, it shows the table of all the energy balance data (which is plotted at the energy balance tab).&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;📈 Optimize&lt;/span&gt; Used to simulate the dataset multiple times, each time incrementing by the &lt;span style=&quot; font-style:italic;&quot;&gt;step &lt;/span&gt;the indicated setting value&lt;span style=&quot; font-style:italic;&quot;&gt;.&lt;/span&gt; After that, a plot is displayed where you can contrast &lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;different relevant&lt;/span&gt; data &lt;span style=&quot; font-style:italic;&quot;&gt;(checkboxes)&lt;/span&gt;. This is very &lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;useful&lt;/span&gt; for finding the best algorithm configuration for your case.&lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; &lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-size:11pt; font-weight:700;&quot;&gt;Plots&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;The plots have the standard &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic;&quot;&gt;maptlotlib&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; functionally plus some extra options. &lt;/span&gt;&lt;/p&gt;
@@ -1553,134 +2068,134 @@ p, li { white-space: pre-wrap; }
      </layout>
     </item>
     <item row="1" column="0">
-     <layout class="QVBoxLayout" name="data_source">
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout">
-        <item>
-         <widget class="QPushButton" name="load_file">
-          <property name="text">
-           <string>Load File</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLineEdit" name="file_path">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
+       <widget class="QPushButton" name="load_file">
+        <property name="text">
+         <string>Load File</string>
+        </property>
+       </widget>
       </item>
       <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_4">
-        <item>
-         <widget class="QLabel" name="sampling_rate">
-          <property name="text">
-           <string>Sample Rate</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="date_range">
-          <property name="text">
-           <string>Date Range</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_2">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="simulation_time">
-          <property name="text">
-           <string>Simulation Time</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_3">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="plotting_time">
-          <property name="text">
-           <string>Plotting Time</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="Line" name="line_11">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="n_samples">
-          <property name="text">
-           <string>N Samples</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
+       <widget class="QPushButton" name="unload_file">
+        <property name="text">
+         <string>Unload File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="file_path">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="0">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="sampling_rate">
+        <property name="text">
+         <string>Sampling Rate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="date_range">
+        <property name="text">
+         <string>Date Range</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="calc_time">
+        <property name="text">
+         <string>Calculation Time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_3">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="plotting_time">
+        <property name="text">
+         <string>Plotting Time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_11">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="n_samples">
+        <property name="text">
+         <string>N Samples</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </item>
@@ -1691,7 +2206,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1082</width>
+     <width>1192</width>
      <height>22</height>
     </rect>
    </property>
@@ -1727,23 +2242,13 @@ p, li { white-space: pre-wrap; }
   <tabstop>load2</tabstop>
   <tabstop>simulate</tabstop>
   <tabstop>results</tabstop>
-  <tabstop>Help</tabstop>
+  <tabstop>tabs</tabstop>
   <tabstop>time_limit</tabstop>
-  <tabstop>data_line_style</tabstop>
   <tabstop>table_eb_t</tabstop>
   <tabstop>table_t</tabstop>
   <tabstop>show_values_t</tabstop>
   <tabstop>file_path</tabstop>
-  <tabstop>sim_line_style</tabstop>
   <tabstop>subdivide_t</tabstop>
-  <tabstop>show_loads_area</tabstop>
-  <tabstop>energyP_s</tabstop>
-  <tabstop>show_th</tabstop>
-  <tabstop>show_values_eb</tabstop>
-  <tabstop>subdivide_eb</tabstop>
-  <tabstop>table_in</tabstop>
-  <tabstop>table_s</tabstop>
-  <tabstop>table_eb</tabstop>
   <tabstop>textEdit</tabstop>
  </tabstops>
  <resources/>
@@ -1755,12 +2260,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>163</x>
-     <y>166</y>
+     <x>169</x>
+     <y>157</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1775,8 +2280,8 @@ p, li { white-space: pre-wrap; }
      <y>73</y>
     </hint>
     <hint type="destinationlabel">
-     <x>127</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1787,12 +2292,12 @@ p, li { white-space: pre-wrap; }
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>150</x>
-     <y>489</y>
+     <x>161</x>
+     <y>480</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1803,12 +2308,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>150</x>
-     <y>691</y>
+     <x>213</x>
+     <y>44</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1819,12 +2324,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>73</x>
-     <y>101</y>
+     <x>117</x>
+     <y>99</y>
     </hint>
     <hint type="destinationlabel">
-     <x>117</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1840,7 +2345,7 @@ p, li { white-space: pre-wrap; }
     </hint>
     <hint type="destinationlabel">
      <x>139</x>
-     <y>543</y>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1852,11 +2357,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>169</x>
-     <y>284</y>
+     <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1868,11 +2373,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>169</x>
-     <y>258</y>
+     <y>249</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1883,12 +2388,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>177</x>
-     <y>405</y>
+     <x>168</x>
+     <y>396</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1899,12 +2404,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>177</x>
-     <y>431</y>
+     <x>168</x>
+     <y>422</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1915,12 +2420,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>177</x>
-     <y>457</y>
+     <x>168</x>
+     <y>448</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1931,12 +2436,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>110</x>
-     <y>187</y>
+     <x>130</x>
+     <y>219</y>
     </hint>
     <hint type="destinationlabel">
-     <x>148</x>
-     <y>543</y>
+     <x>139</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1963,12 +2468,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>48</x>
-     <y>371</y>
+     <x>61</x>
+     <y>370</y>
     </hint>
     <hint type="destinationlabel">
-     <x>92</x>
-     <y>543</y>
+     <x>133</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -1979,12 +2484,156 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>63</x>
-     <y>698</y>
+     <x>75</x>
+     <y>46</y>
     </hint>
     <hint type="destinationlabel">
+     <x>139</x>
+     <y>534</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>op_setting</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>op_recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>335</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1174</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>op_start</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>op_recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>432</x>
+     <y>80</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1174</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>op_end</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>op_recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>651</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1174</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>op_step</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>op_recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>821</x>
+     <y>89</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1174</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>op_calculate</sender>
+   <signal>pressed()</signal>
+   <receiver>op_recalc_warn</receiver>
+   <slot>hide()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>975</x>
+     <y>91</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1174</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>predict_final_energy</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>71</x>
+     <y>220</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>51</x>
+     <y>535</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ttc_end_at</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>249</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>72</x>
+     <y>526</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ttc_time_factor</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>274</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>75</x>
+     <y>532</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>ttc_on_min</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
      <x>100</x>
-     <y>536</y>
+     <y>302</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>80</x>
+     <y>529</y>
     </hint>
    </hints>
   </connection>

@@ -46,7 +46,7 @@ class SnappingCursor:
             self._last_index = None
             need_redraw = self.set_cross_hair_visible(False)
             if need_redraw:
-                self.ax.figure.canvas.draw()
+                self.ax.figure.canvas.draw_idle()
         else:
             self.set_cross_hair_visible(True)
             x, y = event.xdata, event.ydata
@@ -62,7 +62,7 @@ class SnappingCursor:
             # update the line positions
             self.hline.set_ydata(y)
             self.vline.set_xdata(x)
-            self.ax.figure.canvas.draw()
+            self.ax.figure.canvas.draw_idle()
 
     def remove(self):
         try:
@@ -74,7 +74,7 @@ class SnappingCursor:
             self.fig.canvas.mpl_disconnect(self.cid)
         except Exception as e:
             print(e)
-        self.fig.canvas.draw()
+        self.fig.canvas.draw_idle()
 
 class PickStack:
     def __init__(self, stack, on_pick):
@@ -153,7 +153,7 @@ class Zoom:
                 rely = (cur_ylim[1] - ydata)/(cur_ylim[1] - cur_ylim[0])
                 if(self.yzoom): ax2.set_ylim([ydata - new_height * (1-rely), ydata + new_height * (rely)])
 
-            ax.figure.canvas.draw()
+            ax.figure.canvas.draw_idle()
             ax.figure.canvas.flush_events()
 
         def onKeyPress(event):
@@ -203,26 +203,27 @@ class MplWidget(QWidget):
         self.zp = Zoom()
         self.zp.zoom_factory(self.ax, base_scale = 1.1)
 
-        home = self.toolbar.home
-        def new_home(*args, **kwargs):
-            for ax in self.axes:
-                ax.relim()      # make sure all the data fits
-                ax.autoscale()  # auto-scale
-                self.draw()
-        self.toolbar.home = new_home
+        self.toolbar.home = self.draw_idle
 
         # Custom coords format
         if not isinstance(self, MplTwinxWidget):
             self.ax.format_coord = self.make_format()
-    
-    def draw(self):
+
+    def draw_idle(self):
+        for ax in self.axes:
+            ax.relim()      # make sure all the data fits
+            ax.autoscale()  # auto-scale
         self.fig.tight_layout()
-        self.fig.canvas.draw()
+        self.fig.canvas.draw_idle()
     
     def on_resize(self, _):
         self.fig.tight_layout()
-        self.fig.canvas.draw()
+        self.fig.canvas.draw_idle()
     
+    def clear(self):
+        for ax in self.axes:
+            ax.clear()
+
     # Show/Hide lines if selected in legend
     def toggable_legend_lines(self):
         lines = []
@@ -247,7 +248,7 @@ class MplWidget(QWidget):
                         break
                 break
         legline.set_alpha(1.0 if visible else 0.2)
-        self.fig.canvas.draw()
+        self.fig.canvas.draw_idle()
     
     # Display XY coords
     def make_format(self):

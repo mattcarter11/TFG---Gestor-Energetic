@@ -27,8 +27,11 @@ class PredictFinalEnergy(Enum):
     project_current_power = 2
 
 class TimeToConsume(AlgorithmConfig):
-       def __init__(self, predict_final_energy:PredictFinalEnergy):
+       def __init__(self, predict_final_energy:PredictFinalEnergy, end_at_energy:float, on_min_energy:float, fime_factor:float):
         self.type = AlgorithmsEnum.time_to_consume
         self.predict_final_energy = predict_final_energy
+        self.end_at_energy = end_at_energy
+        self.on_min_energy = on_min_energy
+        self.time_factor = min(1, max(0.01, fime_factor))
 
     

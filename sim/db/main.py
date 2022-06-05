@@ -1,8 +1,7 @@
 from importlib.metadata import files
+from numpy import int64
 import pandas as pd
 import datetime as dt
-
-from rx import start
 
 def G_merge_LB(fileG, fileLB, fileSave):
     df1 = pd.read_csv(fileG, parse_dates=['timestamp'])
@@ -31,11 +30,17 @@ def proces_jordi(fileOpen, fileSave, start, end):
     end_mask = dt.datetime.strptime(end, "%Y-%m-%d")
     mask = (df['timestamp'] > start_mask) & (df['timestamp'] <= end_mask)
     df = df.loc[mask]
-    df = df.fillna(0)
+    mask = (20 <= df['timestamp'].dt.hour) | (df['timestamp'].dt.hour <= 2)
+    df.loc[mask, 'powerC'] = 150
     df.to_csv(f'{start}..{end} {fileSave}', index=False)
 
 if __name__ == "__main__":
     # G_merge_LB('2022-02-1..8 (G).csv', 'consumed.csv', '2022-02-1..8 (G+LB).csv')
     # process_paco('2022-03-11..13.csv', '2022-03-11..13 Pluja (G).csv')
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-05-01")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-04-27")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-27", "2022-05-02")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-08", "2022-05-13")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-17", "2022-05-22")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-22", "2022-05-27")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-05-27") # All
 

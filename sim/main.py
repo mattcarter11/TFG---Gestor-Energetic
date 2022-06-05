@@ -1,17 +1,17 @@
-import sys, json, PySide6
+import sys, json, traceback
 from time import time
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView, QItemDelegate, QCheckBox, QTableView
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView, QItemDelegate, QCheckBox, QTableView, QDateTimeEdit, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit, QWidget
 from PySide6.QtCore import QFile, QIODevice, QDateTime, QCoreApplication, Qt
 from lib.sim.Simulator import Simulator
 from lib.sim.Load import Load
 from lib.sim.Results import Results
+from lib.sim.Optimize import Optimize
 import lib.sim.AlgorithmsConfig as ac
 import lib.sim.DataFrames as df
 import lib.myQT.QMplWidgets as mw
 import lib.myQT.QPandasWidgets as pw
 import pandas as pd
-import numpy as np
 import matplotlib as mp
 
 # To hide constants
@@ -45,6 +45,37 @@ if True:
         'energyL'   :{"color":'#e15f4b', "translate": ('Energy Lost',' Lost')}, 
     }
 
+    SettingsQDateTimeEdits = ('start_date', 'end_date')
+    SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'op_setting', 'op_ax_right', 'op_ax_left')
+    SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'op_start', 'op_end', 'op_step', 'ttc_end_at', 'ttc_on_min')
+    SettingsQDoubleSpinBox = ['ttc_time_factor']
+    SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'subdivide_eb', 'show_values_t', 'subdivide_t')
+    SettingsQLineEdits = ('data_line_style', 'sim_line_style')
+
+    OpAxList = ['None', 'Efficiency', 'Daily Commutations', 'Daily Commutations Load 1', 'Daily Commutations Load 2', 'Daily Hours On Load 1', 'Daily Hours On Load 2', 'Energy Grid']
+
+    OpAlgorithm = {
+        'Hysteresis':{
+            'Threshold Top L1':'th_top1',
+            'Threshold Bottom L1':'th_bottom1',
+            'Threshold Top L2':'th_top2',
+            'Threshold Bottom L2':'th_bottom2',
+        },
+        'Min Time On': {
+            'Time Limit':'time_limit'
+        },
+        'Time To Consume': {
+            'End at [Wh]':'ttc_end_at', 
+            'Time factor':'ttc_time_factor', 
+            'On Min [Wh]':'ttc_on_min', 
+        },
+        'Shared':{
+            'Base Load [Wh]':'base_load',
+            'Load 1 [Wh]':'load1',
+            'Load 2 [Wh]':'load2',
+        }
+    }
+
 class AlignDelegate(QItemDelegate):
     def paint(self, painter, option, index):
         option.displayAlignment = Qt.AlignCenter
@@ -73,49 +104,68 @@ def df_plot_col(df, xcol, ycol, ax):
 class App(QMainWindow):
     #region -> Init
     def __init__(self):
+        start = time()
         super().__init__()
-        self.sim_prev_ls = self.data_prev_ls = ''
         self.load_ui()
-        self.load_prev_settings()
-        self.sig_init()
+        self.sim_prev_ls = self.data_prev_ls = ''
+        self.th_lines = self.sim_areas = self.sim_lines = self.data_lines = self.date_range_lines = []
+        self.sim = self.results = self.optimize = None
         # Tables view style
-        for name in ['table_in', 'table_s', 'table_eb', 'table_loads_aprox', 'table_eb_t', 'table_t']:
-            table = self.ui.findChild(QTableView, name)
+        for table in self.ui.findChildren(QTableView):
             table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
             table.setItemDelegate(AlignDelegate())
-        for name in ['table_loads_aprox', 'table_eb_t', 'table_t']:
+        for name in ['table_eb_t', 'table_t']:
             table = self.ui.findChild(QTableView, name)
             table.verticalHeader().setDefaultAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
-            
+        # Warning Optimize not resize on hiden
+        pol = self.ui.op_recalc_warn.sizePolicy()
+        pol.setRetainSizeWhenHidden(True)
+        self.ui.op_recalc_warn.setSizePolicy(pol) 
+        # List Optimze Axes values
+        for item in OpAxList:
+            self.ui.op_ax_left.addItem(item)
+            self.ui.op_ax_right.addItem(item)
+        self.load_prev_settings()
+        self.sig_init()
+        self.ui.calc_time.setText(f'Program loaded in {time()-start:.3f} s')
+        
     def sig_init(self):
-        # Options
+        # Date Time
+        self.ui.start_date.dateTimeChanged.connect(self.datetime_changed)
+        self.ui.end_date.dateTimeChanged.connect(self.datetime_changed)
+        # Algorithm
         self.ui.algorithm.currentIndexChanged.connect(self.algorithm_changed)
-        self.ui.load_file.clicked.connect(self.load_file)
-        self.ui.simulate.clicked.connect(self.simulate_press)
-        self.ui.results.clicked.connect(self.results_press)
+        self.load_op_settings(self.ui.algorithm.currentIndex())
         self.ui.time_limit.valueChanged.connect(self.time_limit_changed)
         self.ui.load1.valueChanged.connect(self.time_limit_changed)
         self.time_limit_changed()
-        self.ui.load1.valueChanged.connect(self.th_disable)
-        self.ui.load2.valueChanged.connect(self.th_disable)
-        self.th_disable()
-        self.ui.start_date.dateTimeChanged.connect(self.datetime_changed)
-        self.ui.end_date.dateTimeChanged.connect(self.datetime_changed)
-        # Data Range
+        # Loads
+        self.ui.load1.valueChanged.connect(self.th1_disable)
+        self.ui.load2.valueChanged.connect(self.th2_disable)
+        self.th1_disable()
+        self.th2_disable()
+        # Line Style
         self.ui.data_line_style.textChanged.connect(self.data_line_style)
-        # Simulation Plot
         self.ui.sim_line_style.textChanged.connect(self.sim_line_style)
-        # Checkboxes
-        connections = {
-            self.plot_general: ['energyP_s'],
-            self.toggle_th: ['show_th'],
-            self.toggle_loads_area: ['show_loads_area'],
-            self.plot_eb: ['show_values_eb', 'subdivide_eb'],
-            self.plot_t: ['show_values_t', 'subdivide_t']
-        }
-        for fun, names in connections.items():
-            for name in names:
-                self.ui.findChild(QCheckBox, name).stateChanged.connect(fun)
+        # Simulation plot
+        self.ui.show_loads_area.stateChanged.connect( self.toggle_loads_area)
+        self.ui.energyP_s.stateChanged.connect( self.toggle_energyP)
+        self.ui.show_th.stateChanged.connect( self.toggle_th)
+        # Energy balance plot
+        self.ui.show_values_eb.stateChanged.connect( self.plot_eb)
+        self.ui.subdivide_eb.stateChanged.connect( self.plot_eb)
+        # Summary balance plot
+        self.ui.show_values_t.stateChanged.connect( self.plot_t)
+        self.ui.subdivide_t.stateChanged.connect( self.plot_t)
+        # Buttons
+        self.ui.load_file.clicked.connect(self.load_file)
+        self.ui.unload_file.clicked.connect(self.unload_file)
+        self.ui.simulate.clicked.connect(self.simulate_press)
+        self.ui.results.clicked.connect(self.results_press)
+        # Optimize
+        self.ui.op_calculate.clicked.connect(self.optimize_press)
+        self.ui.op_ax_left.currentIndexChanged.connect(self.plot_op)
+        self.ui.op_ax_right.currentIndexChanged.connect(self.plot_op)
         # Trigger settings save on window close
         app.aboutToQuit.connect(self.close_save)
         
@@ -138,58 +188,27 @@ class App(QMainWindow):
     def load_prev_settings(self):
         with open('prev_settings.json', 'r') as f:
             settings = json.load(f)
-
         keys = settings.keys()
-        if 'start_date' in keys:
-            self.ui.start_date.setDateTime(QDateTime.fromString(settings['start_date'], DT_FORMAT))
-        if 'end_date' in keys:
-            self.ui.end_date.setDateTime(QDateTime.fromString(settings['end_date'], DT_FORMAT))
-        if 'algorithm' in keys:
-            self.ui.algorithm.setCurrentText(settings['algorithm'])
-            
-        if 'th_top1' in keys:
-            self.ui.th_top1.setValue(settings['th_top1'])
-        if 'th_top2' in keys:
-            self.ui.th_top2.setValue(settings['th_top2'])
-        if 'th_bottom1' in keys:
-            self.ui.th_bottom1.setValue(settings['th_bottom1'])
-        if 'th_bottom2' in keys:
-            self.ui.th_bottom2.setValue(settings['th_bottom2'])
-        if 'time_limit' in keys:
-            self.ui.time_limit.setValue(settings['time_limit'])
-        if 'predict_final_energy' in keys:
-            self.ui.predict_final_energy.setCurrentText(settings['predict_final_energy'])
 
-        if 'use_data_bl' in keys:
-            self.ui.use_data_bl.setChecked(settings['use_data_bl'])
-        if 'base_load' in keys:
-            self.ui.base_load.setValue(settings['base_load'])
-        if 'load1' in keys:
-            self.ui.load1.setValue(settings['load1'])
-        if 'load2' in keys:
-            self.ui.load2.setValue(settings['load2'])
+        for name in SettingsQDateTimeEdits:
+            if name in keys:
+                self.ui.findChild(QDateTimeEdit, name).setDateTime(QDateTime.fromString(settings[name], DT_FORMAT))
 
-        if 'data_line_style' in keys:
-            self.ui.data_line_style.setText(settings['data_line_style'])
+        for name in SettingsQComboBoxes:
+            if name in keys:
+                self.ui.findChild(QComboBox, name).setCurrentText(settings[name])
 
-        if 'sim_line_style' in keys:
-            self.ui.sim_line_style.setText(settings['sim_line_style'])
-        if 'show_loads_area' in keys:
-            self.ui.show_loads_area.setChecked(settings['show_loads_area'])
-        if 'show_th' in keys:
-            self.ui.show_th.setChecked(settings['show_th'])
-        if 'energyP_s' in keys:
-            self.ui.energyP_s.setChecked(settings['energyP_s'])
+        for name in SettingsQSpinBoxes:
+            if name in keys:
+                self.ui.findChild(QSpinBox, name).setValue(settings[name])
+                
+        for name in SettingsQDoubleSpinBox:
+            if name in keys:
+                self.ui.findChild(QDoubleSpinBox, name).setValue(settings[name])
 
-        if 'subdivide_eb' in keys:
-            self.ui.subdivide_eb.setChecked(settings['subdivide_eb'])
-        if 'subdivide_eb' in keys:
-            self.ui.subdivide_eb.setChecked(settings['subdivide_eb'])
-
-        if 'show_values_t' in keys:
-            self.ui.show_values_t.setChecked(settings['show_values_t'])
-        if 'subdivide_eb' in keys:
-            self.ui.subdivide_eb.setChecked(settings['subdivide_eb'])
+        for name in SettingsQLineEdits:
+            if name in keys:
+                self.ui.findChild(QLineEdit, name).setText(settings[name])
 
         if 'file_path' in keys and settings['file_path'] != '':
             self.load_csv(settings['file_path'])
@@ -197,34 +216,24 @@ class App(QMainWindow):
     def close_save(self):
         settings = {}
         settings["file_path"] = self.ui.file_path.text()
-        settings["start_date"] = self.ui.start_date.dateTime().toString(DT_FORMAT)
-        settings["end_date"] = self.ui.end_date.dateTime().toString(DT_FORMAT)
 
-        settings["algorithm"] = self.ui.algorithm.currentText()
-        settings["time_limit"] = self.ui.time_limit.value()
-        settings["predict_final_energy"] = self.ui.predict_final_energy.currentText()
-        settings["th_top1"] = self.ui.th_top1.value()
-        settings["th_top2"] = self.ui.th_top2.value()
-        settings["th_bottom1"] = self.ui.th_bottom1.value()
-        settings["th_bottom2"] = self.ui.th_bottom2.value()
+        for name in SettingsQDateTimeEdits:
+            settings[name]= self.ui.findChild(QDateTimeEdit, name).dateTime().toString(DT_FORMAT)
 
-        settings["use_data_bl"] = self.ui.use_data_bl.isChecked()
-        settings["base_load"] = self.ui.base_load.value()
-        settings["load1"] = self.ui.load1.value()
-        settings["load2"] = self.ui.load2.value()
+        for name in SettingsQComboBoxes:
+            settings[name] = self.ui.findChild(QComboBox, name).currentText()
 
-        settings["data_line_style"] = self.ui.data_line_style.text()
+        for name in SettingsQSpinBoxes:
+            settings[name] = self.ui.findChild(QSpinBox, name).value()
 
-        settings["sim_line_style"] = self.ui.sim_line_style.text()
-        settings["show_loads_area"] = self.ui.show_loads_area.isChecked()
-        settings["energyP_s"] = self.ui.energyP_s.isChecked()
-        settings["show_th"] = self.ui.show_th.isChecked()
+        for name in SettingsQDoubleSpinBox:
+            settings[name] = self.ui.findChild(QDoubleSpinBox, name).value()
+                
+        for name in SettingsQCheckBoxes:
+            settings[name] = self.ui.findChild(QCheckBox, name).isChecked()
 
-        settings["show_values_eb"] = self.ui.show_values_eb.isChecked()
-        settings["subdivide_eb"] = self.ui.subdivide_eb.isChecked()
-
-        settings["show_values_t"] = self.ui.show_values_t.isChecked()
-        settings["subdivide_eb"] = self.ui.subdivide_eb.isChecked()
+        for name in SettingsQLineEdits:
+            settings[name] = self.ui.findChild(QLineEdit, name).text()
 
         with open('prev_settings.json', 'w') as f:
             json.dump(settings, f, indent=4)
@@ -237,45 +246,52 @@ class App(QMainWindow):
             self.load_csv(path)
 
     def load_csv(self, path):
-        l = [self.ui.simulate, self.ui.data_line_style]
+        start = time()
         try:
-            self.dfI = df.DataFrameIn(pd.read_csv(path, parse_dates=['timestamp']))
-            try:
-                self.dfI = df.DataFrameOut(self.dfI.df)
-            except:
-                pass
-            else:
-                self.ui.results.setEnabled(True)
+            dataframe = pd.read_csv(path, parse_dates=['timestamp'])
+            self.dfI = df.DataFrameIn(dataframe)
+            try:    self.dfI = df.DataFrameOut(dataframe)
+            except: self.ui.results.setEnabled(False)
+            else:   self.ui.results.setEnabled(True)
 
-        except Exception as err:
-            if self.ui.file_path.text() == "":
-                self.ui.results.setEnabled(False)
-                for e in l:
-                    e.setEnabled(False)
-            QMessageBox.warning(self, "Error", str(err), QMessageBox.Ok)
+        except Exception as ex:
+            self.unload_file()
+            print(f"[{type(ex).__name__}] {ex} \n\n {traceback.format_exc()}")
+            QMessageBox.warning(self, "Error", f"{ex}", QMessageBox.Ok)
 
         else:
             self.sim = Simulator(self.dfI)
             # Enable options
-            for e in l:
-                e.setEnabled(True)
+            self.ui.simulate.setEnabled(True)
+            self.ui.op_calculate.setEnabled(True)
             # Update UI
             self.ui.file_path.setText(path)
             self.limit_datarange_selectors()
-            self.ui.sampling_rate.setText(f'Sampling Rate: {self.sim.Ts} s')
+            self.ui.sampling_rate.setText(f'Sampling rate: {self.sim.Ts} s')
             # Update table
-            model = QPandasModelPlus(self.dfI.df, i=0)
-            self.ui.table_in.setModel(model)
+            self.ui.table_in.setModel(QPandasModelPlus(self.dfI.df, i=0))
+            start2 = time()
             self.plot_in_data()
+            self.ui.plotting_time.setText(f'Data loaded in {time()-start:.3f} s. Plotted in {time()-start2:.3f} s')
     
     def limit_datarange_selectors(self):
-        self.min_date = self.dfI.df['timestamp'].min()
-        self.max_date = self.dfI.df['timestamp'].max()
-        self.ui.date_range.setText(f'Min Date: {self.min_date}  -  Max Date: {self.max_date}')
-        self.ui.start_date.setMinimumDateTime(self.min_date)
-        self.ui.end_date.setMinimumDateTime(self.min_date)
-        self.ui.start_date.setMaximumDateTime(self.max_date)
-        self.ui.end_date.setMaximumDateTime(self.max_date)
+        min_date = self.dfI.df['timestamp'].min()
+        max_date = self.dfI.df['timestamp'].max()
+        format = '%Y-%m-%d %H:%M:%S'
+        self.ui.date_range.setText(f'Date Range: {min_date.strftime(format)} - {max_date.strftime(format)} ({self.dfI.nsamples} Samples)')
+        self.ui.start_date.setMinimumDateTime(min_date)
+        self.ui.end_date.setMinimumDateTime(min_date)
+        self.ui.start_date.setMaximumDateTime(max_date)
+        self.ui.end_date.setMaximumDateTime(max_date)
+    
+    def unload_file(self):
+        self.ui.file_path.setText('')
+        self.ui.simulate.setEnabled(False)
+        self.ui.results.setEnabled(False)
+        self.ui.op_calculate.setEnabled(False)
+        self.data_lines = self.date_range_lines = []
+        self.ui.plot_dr.clear()
+        self.ui.plot_dr.draw_idle()
     #endregion
 
     #region -> Simulation Settings
@@ -285,175 +301,113 @@ class App(QMainWindow):
 
     def algorithm_changed(self, i):
         self.ui.load2.setEnabled(i == 0)
+        self.load_op_settings(i)
 
-    def th_disable(self):
+    def load_op_settings(self, i):
+        self.ui.op_setting.clear()
+        key = list(OpAlgorithm)[i]
+        self.ui.op_setting.addItems(list(OpAlgorithm[key]))
+        self.ui.op_setting.addItems(list(OpAlgorithm['Shared']))
+
+    def th1_disable(self):
         status_l1 = (self.ui.load1.value() > 0)
         self.ui.th_top1.setEnabled(status_l1)
         self.ui.th_bottom1.setEnabled(status_l1)
+
+    def th2_disable(self):
         status_l2 = (self.ui.load2.value() > 0)
         self.ui.th_top2.setEnabled(status_l2)
         self.ui.th_bottom2.setEnabled(status_l2)
     #endregion
 
-    #region ->  Line style
-    def data_line_style(self, text):
-        self.set_line_style(self.ui.plot_dr, self.data_lines, text, self.data_prev_ls, self.ui.data_line_style)
-        
-    def sim_line_style(self, text):
-        self.set_line_style(self.ui.plot_s, self.sim_lines, text, self.sim_prev_ls, self.ui.sim_line_style)
-    
-    def set_line_style(self, plot, lines, text, prev, ui_input):
-        if text == "":
-            return
-        try:
-            mp.axes._base._process_plot_format(text)
-        except Exception as e:
-            QMessageBox.warning(self, "Error", str(e), QMessageBox.Ok)
-            ui_input.setText(prev)
-        else:
-            if prev != text:
-                linestyle = text
-                for e in mp.lines.lineMarkers.keys():
-                    linestyle = linestyle.replace(str(e), '')
-                marker = text
-                for e in mp.lines.lineStyles.keys():
-                    marker = marker.replace(e, '')
-                for line in lines:
-                    line.set_linestyle(linestyle)
-                    line.set_marker(marker)
-                prev = text
-                plot.draw()
-    #endregion
-
-    #region ->  Data range selection
-    def datetime_changed(self, _):
-        self.date_range_lines[0].set_xdata(self.ui.start_date.dateTime().toPython())
-        self.date_range_lines[1].set_xdata(self.ui.end_date.dateTime().toPython())
-        self.ui.plot_dr.draw()
-    #endregion
-
-    #region ->  Toggle Options
-    def toggle_th(self, val):
-        if val:
-            for line in self.th_lines:
-                line.set_linestyle(':')
-        else:
-            for line in self.th_lines:
-                line.set_linestyle('None')
-        self.ui.plot_s.draw()
-
-    def toggle_loads_area(self, val):
-        self.toggle_areas(val, self.sim_areas)
-
-    def toggle_areas(self, val, areas):
-        for area in areas:
-            area.set_visible(val)
-            label = area.get_label()
-            label = '_'+label if not val else label[1:] if label[0] == "_" else label
-            area.set_label(label)
-
-        plot = self.ui.plot_s
-        handles, labels = plot.ax.get_legend_handles_labels()
-        legend = plot.ax.get_legend()
-        plot.ax.legend(handles, labels)._set_loc(legend._loc)
-        plot.draw()
-    #endregion
-
-    #region ->  Date Range Selection lines
-    def data_lines_on_pick(self, event):
-        line = event.artist
-        x, _ = line.get_data()
-        x = x[0] if isinstance(x, list) else x
-        self.initial_date = mp.dates.date2num(x) if isinstance(x, float) else x
-
-        fig = self.ui.plot_dr.ax.figure
-        if self.date_line == None:
-            self.date_line = event.artist
-            self.on_move_cid = fig.canvas.mpl_connect('motion_notify_event', self.data_lines_on_move)
-            self.on_keypress_cid = fig.canvas.mpl_connect('key_press_event', self.data_lines_on_keypress)
-        else:
-            self.data_lines_exit(mp.dates.num2date(self.date_range))
-
-    def data_lines_on_keypress(self, event):
-        if event.key == "escape":
-            self.data_lines_exit(self.initial_date, True)
-    
-    def data_lines_exit(self, date, reset=False):
-        if reset:
-            self.date_line.set_xdata(mp.dates.date2num(date))
-            self.ui.plot_dr.draw()
-        else:
-            if 'Start' in self.date_line.get_label():
-                self.ui.start_date.setDateTime(date)
-            else:
-                self.ui.end_date.setDateTime(date)
-        self.date_line = None
-        fig = self.ui.plot_dr.ax.figure
-        fig.canvas.mpl_disconnect(self.on_move_cid)
-        fig.canvas.mpl_disconnect(self.on_keypress_cid)
-
-    def data_lines_on_move(self, event):
-        if event.inaxes:
-            self.date_range = event.xdata
-            self.date_line.set_xdata(event.xdata)
-            self.ui.plot_dr.draw()
-    #endregion
-
-    #region -> Simulation/Results
+    #region -> Simulation/Results/Optimize
     def results_press(self):
-        self.is_sim = False
         start = time()
         startDT = self.ui.start_date.dateTime().toString()
         endDT = self.ui.end_date.dateTime().toString()
-        self.results = Results(self.dfI.select_daterange(startDT, endDT, 300))
-        self.ui.simulation_time.setText(f'Results Time: {time()-start:.3f} s')
-        self.show_results()
+        self.results = Results(self.dfI.select_daterange(startDT, endDT))
+        self.ui.calc_time.setText(f'Results calculated in {time()-start:.3f} s')
+        self.show_results(self.results.dfI.df)
 
     def simulate_press(self):
-        self.is_sim = True
         start = time()
+        err = self.simulate()
+        start2 = time()
+        if not err:
+            self.results = Results(df.DataFrameOut(self.sim.df_out))
+        self.ui.calc_time.setText(f'Simulated in {time()-start:.3f} s. Results calculated in {time()-start2:.3f} s')
+        self.print_sim_duration()
+        self.show_results(self.sim.df_out)
+
+    def optimize_press(self):
+        start = time()
+        self.optimize = Optimize(self.ui.op_setting.currentText(), OpAxList[1:])
+        values = range(self.ui.op_start.value(), self.ui.op_end.value()+self.ui.op_step.value(), self.ui.op_step.value()) 
+        for value in values:
+            err = self.simulate(value)
+            if err: 
+                break
+            self.optimize.add_results(value, Results(df.DataFrameOut(self.sim.df_out)))
+        self.ui.calc_time.setText(f'Optimize calculations in {time()-start:.3f} s')
+        self.print_sim_duration()
+        self.show_optimitzation_results()
+
+    def simulate(self, value=None):
+        # when optimizing set the corresponding value
+        alI = self.ui.algorithm.currentIndex()
+        opI = self.ui.op_setting.currentIndex()
+        alKey = list(OpAlgorithm)[alI]
+        opKey = list( OpAlgorithm[alKey] )[opI]
+        element = OpAlgorithm[alKey][opKey]
+            
+        def get_algorithm_config():
+            match self.ui.algorithm.currentIndex():
+                case 0: 
+                    th_top1     = value if value is not None and element == 'th_top1' else self.ui.th_top1.value()
+                    th_bottom1  = value if value is not None and element == 'th_bottom1' else self.ui.th_bottom1.value()
+                    th_top2     = value if value is not None and element == 'th_top2' else self.ui.th_top2.value()
+                    th_bottom2  = value if value is not None and element == 'th_bottom2' else self.ui.th_bottom2.value()
+                    th_bottom2  = value if value is not None and element == 'th_bottom2' else self.ui.th_bottom2.value()
+                    return ac.HysteresisConfig(th_top1, th_bottom1, th_top2, th_bottom2)
+                case 1: 
+                    time_limit  = value if value is not None and element == 'time_limit' else self.ui.time_limit.value()
+                    return ac.MinOnTimeConfig(time_limit)
+                case 2:
+                    end_at       = value if value is not None and element == 'ttc_end_at' else self.ui.ttc_end_at.value()
+                    on_min       = value if value is not None and element == 'ttc_on_min' else self.ui.ttc_on_min.value()
+                    time_factor  = value if value is not None and element == 'ttc_time_factor' else self.ui.ttc_time_factor.value()
+                    match self.ui.predict_final_energy.currentIndex():
+                        case 0: predict = ac.PredictFinalEnergy.disabled
+                        case 1: predict = ac.PredictFinalEnergy.avarage_power
+                        case 2: predict = ac.PredictFinalEnergy.project_current_power
+                    return ac.TimeToConsume(predict, end_at, on_min, time_factor)
+
+        load1 = value if value is not None and element == 'load1' else self.ui.load1.value()
+        load2 = value if value is not None and element == 'load2' else self.ui.load2.value()
         try:
             self.sim.simulate(
                 self.ui.start_date.dateTime().toString(),
                 self.ui.end_date.dateTime().toString(),
-                self.get_algorithm_config(),
-                Load(self.ui.load1.value()), 
-                Load(self.ui.load2.value()),
+                get_algorithm_config(),
+                Load(load1),
+                Load(load2),
                 None if isinstance(self.dfI, df.DataFrameOut) and self.ui.use_data_bl.isChecked() else self.ui.base_load.value()
             )
-        except Exception as e:
-            print(e)
+        except Exception as ex:
+            print(f"[{type(ex).__name__}] {ex} \n\n {traceback.format_exc()}")
             QMessageBox.warning(self, "Error", f"Date & Time interval must be at least 5 min", QMessageBox.Ok)
-        else:
-            self.ui.n_samples.setText(f'Simulation duration {self.sim.simulated_nsec/3600:.3f} h ({self.sim.simulated_nsec} Samples)')
-            self.ui.simulation_time.setText(f'Simulation Time: {time()-start:.3f} s')
-            self.results = Results(df.DataFrameOut(self.sim.df_out))
-            self.show_results()
-
-    def get_algorithm_config(self):
-        match self.ui.algorithm.currentIndex():
-            case 0: 
-                return ac.HysteresisConfig(
-                    self.ui.th_top1.value(), self.ui.th_bottom1.value(),
-                    self.ui.th_top2.value(), self.ui.th_bottom2.value(),
-                )
-            case 1:
-                return ac.MinOnTimeConfig( self.ui.time_limit.value() )
-            case 2:
-                match self.ui.predict_final_energy.currentIndex():
-                    case 0: predict = ac.PredictFinalEnergy.disabled
-                    case 1: predict = ac.PredictFinalEnergy.avarage_power
-                    case 2: predict = ac.PredictFinalEnergy.project_current_power
-                return ac.TimeToConsume( predict )
+            return 1
+        return 0
+    
+    def print_sim_duration(self):
+        self.ui.n_samples.setText(f'Simulating {self.sim.simulated_nsec/3600:.3f} h ({self.sim.simulated_nsec} Samples)')
     #endregion
 
-    #region ->  Plots
+    #region -> Plots
     def plot_in_data(self):
-        start = time()
         plot = self.ui.plot_dr
         ax1, ax2 = plot.ax1, plot.ax2
-        ax1.clear()
-        ax2.clear()
+        plot.clear()
         df = self.dfI.df
 
         # Plot Data
@@ -482,17 +436,17 @@ class App(QMainWindow):
         plot.fig.autofmt_xdate()
         plot.align_yaxis()
         plot.toggable_legend_lines()
-        plot.draw()
+        plot.draw_idle()
         self.data_line_style(self.ui.data_line_style.text())
-        self.ui.plotting_time.setText(f'Plotting Time: {time()-start:.3f} s')
 
-    def plot_general(self):
+    def plot_general(self, df):
+        if df is None:
+            return
+
         start = time()
         plot = self.ui.plot_s
         ax1, ax2 = plot.ax1, plot.ax2
-        ax1.clear()
-        ax2.clear()
-        df = self.sim.df_out if self.is_sim else self.results.dfI.df
+        plot.clear()
 
         # Plot Power Lines
         self.sim_lines = df_plot_col(df, 'timestamp', 'powerC', ax1)
@@ -536,16 +490,22 @@ class App(QMainWindow):
         plot.fig.autofmt_xdate()
         plot.align_yaxis()
         plot.toggable_legend_lines()
-        plot.draw()
+        plot.draw_idle()
         self.sim_line_style(self.ui.sim_line_style.text())
-        self.ui.plotting_time.setText(f'Plotting Time: {time()-start:.3f} s')
+        self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
 
     def plot_eb(self):
+        if self.results is None:
+            return
+
         showV = self.ui.show_values_eb.isChecked()
         showD = self.ui.subdivide_eb.isChecked()
         self.plot_bars(self.results.df_hour, self.ui.plot_eb, showV, showD)
 
     def plot_t(self):
+        if self.results is None:
+            return
+            
         data = self.results.df_total
         data['timestamp'] = self.results.df_hour.iloc[-1]['timestamp']
         showV = self.ui.show_values_t.isChecked()
@@ -553,9 +513,12 @@ class App(QMainWindow):
         self.plot_bars(data, self.ui.plot_eb_t, showV, showD, None, 'horizontal', False)
 
     def plot_bars(self, data, plot, showV, showD, gaxis='both', lrot='vertical', xtimestamp = True):
+        if data is None:
+            return
+
         start = time()
         ax = plot.ax
-        ax.clear()
+        plot.clear()
 
         # Sum of each stacked type
         bars = ['energyC', 'energySY', 'energyA']
@@ -620,32 +583,168 @@ class App(QMainWindow):
         ax.set_ylabel('Energy [Wh]')
         ax.set_title('Energy Balance')
 
-        # Draw
-        plot.draw()
-        self.ui.plotting_time.setText(f'Plotting Time: {time()-start:.3f} s')
-    #endregion
-
-    #region ->  Show data
-    def show_results(self): 
-        df = self.sim.df_out if self.is_sim else self.results.dfI.df
-        self.ui.table_s.setModel( QPandasModelPlus(df, i=0) )
-        self.ui.table_eb.setModel( QPandasModelPlus(self.results.df_hour, i=0) )
-        self.ui.table_loads_aprox.setModel( QPandasModelPlus(self.results.df_load_aprox) )
-        self.ui.table_eb_t.setModel( QPandasModelPlus(self.results.df_total.T) )
-        self.ui.table_t.setModel( QPandasModelPlus(self.results.df_results.T))
+        # draw_idle
+        plot.draw_idle()
+        self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
+    
+    def plot_op(self):
+        if self.optimize is None:
+            return
 
         start = time()
-        self.plot_general()
+        plot = self.ui.plot_op
+        ax1, ax2 = plot.ax1, plot.ax2
+        plot.clear()
+
+        # Init
+        df = self.optimize.df
+        x = self.ui.op_setting.currentText()
+        if (y1 := self.ui.op_ax_left.currentText()) != 'None': 
+            ax1.plot(df[x], df[y1], color='#2176db', label=y1, marker='o')
+            ax1.set_ylabel(y1)
+            ax1.legend(loc="upper left")
+        if (y2 := self.ui.op_ax_right.currentText()) != 'None':
+            ax2.plot(df[x], df[y2], color='#f8a62a', label=y2, marker='o')
+            ax2.set_ylabel(y2)
+            ax2.legend(loc="upper right")
+        ax1.set_xlabel(x)
+        ax1.grid(True, linestyle=':')
+        plot.align_yaxis()
+
+        # draw_idle
+        plot.draw_idle()
+        self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
+    #endregion
+
+    #region -> Show results
+    def show_results(self, df): 
+        start = time()
+        self.ui.table_s.setModel( QPandasModelPlus(df, i=0) )
+        self.ui.table_eb.setModel( QPandasModelPlus(self.results.df_hour) )
+        self.ui.table_eb_t.setModel( QPandasModelPlus(self.results.df_total.T) )
+        self.ui.table_t.setModel( QPandasModelPlus(self.results.df_results))
+
+        self.plot_general(df)
         self.plot_eb()
         self.plot_t()
-        self.ui.plotting_time.setText(f'Plotting Time: {time()-start:.3f} s')
+        self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
 
         # Checkboxes enable
         for c in self.ui.findChildren(QCheckBox): 
             c.setEnabled(True)
         
         self.ui.sim_line_style.setEnabled(True)
+    
+    def show_optimitzation_results(self):
+        self.ui.table_op.setModel( QPandasModelPlus(self.optimize.df) )
+        self.plot_op()
     #endregion
+  
+    #region -> Simulation Plot Options
+    def toggle_loads_area(self, val):
+        if self.sim_areas: # List Not empty
+            for area in self.sim_areas:
+                area.set_visible(val)
+                label = area.get_label()
+                label = '_'+label if not val else label[1:] if label[0] == "_" else label
+                area.set_label(label)
+
+            plot = self.ui.plot_s
+            handles, labels = plot.ax.get_legend_handles_labels()
+            legend = plot.ax.get_legend()
+            plot.ax.legend(handles, labels)._set_loc(legend._loc)
+            plot.draw_idle()
+    
+    def toggle_energyP(self):
+        if self.sim is not None and self.sim.df_out is not None:
+            self.plot_general(self.sim.df_out)
+
+    def toggle_th(self, val):
+        if self.th_lines: # List Not empty
+            if val:
+                for line in self.th_lines:
+                    line.set_linestyle(':')
+            else:
+                for line in self.th_lines:
+                    line.set_linestyle('None')
+            self.ui.plot_s.draw_idle()
+    #endregion
+
+    #region -> Date Range Plot Selection lines
+    def datetime_changed(self, _):
+        if self.date_range_lines:
+            self.date_range_lines[0].set_xdata(self.ui.start_date.dateTime().toPython())
+            self.date_range_lines[1].set_xdata(self.ui.end_date.dateTime().toPython())
+            self.ui.plot_dr.draw_idle()
+
+    def data_lines_on_pick(self, event):
+        line = event.artist
+        x, _ = line.get_data()
+        x = x[0] if isinstance(x, list) else x
+        self.initial_date = mp.dates.date2num(x) if isinstance(x, float) else x
+
+        fig = self.ui.plot_dr.ax.figure
+        if self.date_line == None:
+            self.date_line = event.artist
+            self.on_move_cid = fig.canvas.mpl_connect('motion_notify_event', self.data_lines_on_move)
+            self.on_keypress_cid = fig.canvas.mpl_connect('key_press_event', self.data_lines_on_keypress)
+        else:
+            self.data_lines_exit(mp.dates.num2date(self.date_range))
+
+    def data_lines_on_keypress(self, event):
+        if event.key == "escape":
+            self.data_lines_exit(self.initial_date, True)
+    
+    def data_lines_exit(self, date, reset=False):
+        if reset:
+            self.date_line.set_xdata(mp.dates.date2num(date))
+            self.ui.plot_dr.draw_idle()
+        else:
+            if 'Start' in self.date_line.get_label():
+                self.ui.start_date.setDateTime(date)
+            else:
+                self.ui.end_date.setDateTime(date)
+        self.date_line = None
+        fig = self.ui.plot_dr.ax.figure
+        fig.canvas.mpl_disconnect(self.on_move_cid)
+        fig.canvas.mpl_disconnect(self.on_keypress_cid)
+
+    def data_lines_on_move(self, event):
+        if event.inaxes:
+            self.date_range = event.xdata
+            self.date_line.set_xdata(event.xdata)
+            self.ui.plot_dr.draw_idle()
+    #endregion
+
+    #region -> Plot Line style
+    def data_line_style(self, text):
+        self.set_line_style(self.ui.plot_dr, self.data_lines, text, self.data_prev_ls, self.ui.data_line_style)
+        
+    def sim_line_style(self, text):
+        self.set_line_style(self.ui.plot_s, self.sim_lines, text, self.sim_prev_ls, self.ui.sim_line_style)
+    
+    def set_line_style(self, plot, lines, text, prev, ui_input):
+        if text != "" and lines:
+            try:
+                mp.axes._base._process_plot_format(text)
+            except Exception as e:
+                QMessageBox.warning(self, "Error", str(e), QMessageBox.Ok)
+                ui_input.setText(prev)
+            else:
+                if prev != text:
+                    linestyle = text
+                    for e in mp.lines.lineMarkers.keys():
+                        linestyle = linestyle.replace(str(e), '')
+                    marker = text
+                    for e in mp.lines.lineStyles.keys():
+                        marker = marker.replace(e, '')
+                    for line in lines:
+                        line.set_linestyle(linestyle)
+                        line.set_marker(marker)
+                    prev = text
+                    plot.draw_idle()
+    #endregion
+
 
 
 if __name__ == "__main__":

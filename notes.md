@@ -54,3 +54,6 @@
 - Base de dades al arnau
 - Codi per fer el driver i parlar amb les plaques
 - Com fer el control de les càrregues
+
+# InfluxDB cli export csv
+- influx -host 10.10.10.100 -port 18086 -database 'gestor-energetic-SVC' -execute 'SELECT * FROM hysteresis' -format csv > test.csv

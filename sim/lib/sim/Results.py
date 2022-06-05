@@ -20,13 +20,13 @@ class Results:
         data_h_sum = data.sum()
 
         # Energy in system
-        self.df_hour.insert(1, 'energySY', (self.df_hour['energyP'] + self.df_hour['energyG']).values)
+        self.df_hour.insert(1, 'energySY', self.df_hour['energyP'].values + self.df_hour['energyG'].values)
 
         # General energyes
-        self.df_hour['energyC'] = (data_h_sum['powerC']*self.dfI.Ts/3600).values
-        self.df_hour['energyLB'] = (data_h_sum['powerLB']*self.dfI.Ts/3600).values
-        self.df_hour['energyL1'] = (data_h_sum['powerL1']*self.dfI.Ts/3600).values
-        self.df_hour['energyL2'] = (data_h_sum['powerL2']*self.dfI.Ts/3600).values
+        self.df_hour['energyC'] = data_h_sum['powerC'].values*self.dfI.Ts/3600
+        self.df_hour['energyLB'] = data_h_sum['powerLB'].values*self.dfI.Ts/3600
+        self.df_hour['energyL1'] = data_h_sum['powerL1'].values*self.dfI.Ts/3600
+        self.df_hour['energyL2'] = data_h_sum['powerL2'].values*self.dfI.Ts/3600
 
         # Energy Consumed Max
         dic = {'powerLB':0, 'powerL1':0, 'powerL2':0}
@@ -35,18 +35,19 @@ class Results:
             if (suma := df.sum()):
                 dic[k] = suma / df.count()
         energy_cm = sum(dic.values())
-        self.df_hour['energyCM'] = energy_cm
-        self.df_load_aprox = pd.DataFrame.from_dict(dic, orient='index')
-        self.df_load_aprox.rename(columns={ self.df_load_aprox.columns[0]: "Aprox. Power [W]" }, inplace = True)
+        tmp = self.df_hour['energyP'].copy()
+        tmp[self.df_hour['energyP'] >= energy_cm] = energy_cm
+        self.df_hour['energyCM'] = tmp
+        self.df_results = pd.DataFrame.from_dict(dic, orient='index')
+        self.df_results.rename(columns={ self.df_results.columns[0]: "Aprox. Value [W]" }, inplace = True)
 
         # Energy Surplus
-        energy_s = (self.df_hour['energyP'] - energy_cm).values
-        energy_s[energy_s < 0] = 0
+        energy_s = self.df_hour['energyP'].values - self.df_hour['energyCM'].values
         energy_s[self.df_hour['energyC'] > energy_cm] = 0
         self.df_hour['energyS'] = energy_s
 
         # Energy Lost
-        energy_l = (self.df_hour['energyA'] - energy_s).values
+        energy_l = self.df_hour['energyA'].values - energy_s
         energy_l[energy_l < 0] = 0
         self.df_hour['energyL'] = energy_l
 
@@ -60,23 +61,29 @@ class Results:
         self.df_total['Daily Total [Wh/day]'] = self.df_total['Total [Wh]'].mul(sim_days)
         self.df_total = self.df_total.T
 
+        # Efficiency
+        efficiency = 1 - self.df_total['energyL'].values[0]/self.df_total['energyCM'].values[0]
+        efficiency = {'Total':efficiency*100}
+
         # Commutations
-        dic = {'Base Load': 0}
+        dic = {'Base Load': None}
         dic['Load 1'] = self.dfI.df['on_offL1'].astype(bool).sum(axis=0)
         dic['Load 2'] = self.dfI.df['on_offL2'].astype(bool).sum(axis=0)
+        dic['Total'] = dic['Load 1'] + dic['Load 2']
         commutations = pd.Series(dic)
-        dayly_com = commutations*sim_days
+        daily_com = commutations*sim_days
 
         # Time On/Powered
         select = ['powerLB', 'powerL1', 'powerL2']
         name = ['Base Load', 'Load 1', 'Load 2']
         samples_on = self.dfI.df[select][self.dfI.df[select] > 0].count()
         samples_on.rename(dict(zip(select, name)), inplace = True)
+        self.df_results.rename(dict(zip(select, name)), inplace = True)
         hours_on = samples_on*self.dfI.Ts/3600
         hours_on_daily = hours_on*sim_days
 
         # Convert to dataframe
-        dic = {'Commutations':commutations, 'Daily Commutations':dayly_com, 'Time On [samples]':samples_on, 'Time On [h]':hours_on, 'Daily Time On [h/day]': hours_on_daily}
-        self.df_results = pd.DataFrame.from_dict(dic).T
+        dic = {'Efficiency':efficiency, 'Commutations':commutations, 'Daily Commutations':daily_com, 'Samples On':samples_on, 'Hours On':hours_on, 'Daily Hours On': hours_on_daily}
+        self.df_results = pd.concat([self.df_results, pd.DataFrame.from_dict(dic)], axis=1)
 
         
