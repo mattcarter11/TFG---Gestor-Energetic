@@ -435,8 +435,8 @@ class App(QMainWindow):
         ax1.set_title('Data Range/In')
         plot.fig.autofmt_xdate()
         plot.align_yaxis()
+        plot.home_view()
         plot.toggable_legend_lines()
-        plot.draw_idle()
         self.data_line_style(self.ui.data_line_style.text())
 
     def plot_general(self, df):
@@ -470,7 +470,7 @@ class App(QMainWindow):
                     self.th_lines.append( ax2.axhline(self.ui.th_top2.value(), color=COLOR_GR) )
                     self.th_lines.append( ax2.axhline(self.ui.th_bottom2.value(), color=COLOR_GR) )
             case 1:
-                ax2.axhline(self.tl_eq, color=COLOR_GR)
+                self.th_lines.append( ax2.axhline(self.tl_eq, color=COLOR_GR) )
         self.toggle_th(self.ui.show_th.isChecked())
 
         # Energy
@@ -488,29 +488,25 @@ class App(QMainWindow):
         ax2.set_ylabel('Energy [Wh]')
         ax1.set_title('Simulation')
         plot.fig.autofmt_xdate()
-        plot.align_yaxis()
         plot.toggable_legend_lines()
-        plot.draw_idle()
+        plot.align_yaxis()
+        plot.home_view()
         self.sim_line_style(self.ui.sim_line_style.text())
         self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
 
     def plot_eb(self):
-        if self.results is None:
-            return
-
-        showV = self.ui.show_values_eb.isChecked()
-        showD = self.ui.subdivide_eb.isChecked()
-        self.plot_bars(self.results.df_hour, self.ui.plot_eb, showV, showD)
+        if self.results is not None:
+            showV = self.ui.show_values_eb.isChecked()
+            showD = self.ui.subdivide_eb.isChecked()
+            self.plot_bars(self.results.df_hour, self.ui.plot_eb, showV, showD)
 
     def plot_t(self):
-        if self.results is None:
-            return
-            
-        data = self.results.df_total
-        data['timestamp'] = self.results.df_hour.iloc[-1]['timestamp']
-        showV = self.ui.show_values_t.isChecked()
-        showD = self.ui.subdivide_t.isChecked()
-        self.plot_bars(data, self.ui.plot_eb_t, showV, showD, None, 'horizontal', False)
+        if self.results is not None:
+            data = self.results.df_total
+            data['timestamp'] = self.results.df_hour.iloc[-1]['timestamp']
+            showV = self.ui.show_values_t.isChecked()
+            showD = self.ui.subdivide_t.isChecked()
+            self.plot_bars(data, self.ui.plot_eb_t, showV, showD, None, 'horizontal', False)
 
     def plot_bars(self, data, plot, showV, showD, gaxis='both', lrot='vertical', xtimestamp = True):
         if data is None:
@@ -571,20 +567,20 @@ class App(QMainWindow):
         
         # Visuals
         ax.margins(y=0.1)
+        ax.legend(loc="upper right")
+        ax.set_ylabel('Energy [Wh]')
+        ax.set_title('Energy Balance')
         if xtimestamp:
+            ax.set_xlabel('Date & Time')
             ax.set_xticklabels([x.strftime("%m-%d %H") for x in data['timestamp']], rotation=45)
             plot.fig.autofmt_xdate()
         else:
             ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
-        ax.legend(loc="best")
+            ax.set_xlim(left=-0.38, right=1.75)
         if gaxis != None:
+            ax.set_axisbelow(True)
             ax.grid(True, linestyle=':', axis=gaxis)
-        ax.set_xlabel('Date & Time')
-        ax.set_ylabel('Energy [Wh]')
-        ax.set_title('Energy Balance')
-
-        # draw_idle
-        plot.draw_idle()
+        plot.home_view()
         self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
     
     def plot_op(self):
@@ -610,9 +606,7 @@ class App(QMainWindow):
         ax1.set_xlabel(x)
         ax1.grid(True, linestyle=':')
         plot.align_yaxis()
-
-        # draw_idle
-        plot.draw_idle()
+        plot.home_view()
         self.ui.plotting_time.setText(f'Plotted in {time()-start:.3f} s')
     #endregion
 

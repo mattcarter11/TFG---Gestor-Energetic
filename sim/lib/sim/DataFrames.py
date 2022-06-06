@@ -74,6 +74,8 @@ class DataFrameOut (DataFrameIn):
         if 'powerC' in self.df.columns and 'powerLB' not in self.df.columns:
             # x50..100 Faster vs normal iteration
             self.df['powerLB'] = self.df.loc[:,'powerC'].values - self.df.loc[:,'powerL1'].values - self.df.loc[:,'powerL2'].values
+            mask = self.df['powerLB'].values < 0
+            self.df.loc[mask, 'powerLB'] = 0
 
     def fill_missing_power(self):
         if any([column not in self.df.columns or self.df[column].isna().any() for column in ['energyA', 'energyP']]):

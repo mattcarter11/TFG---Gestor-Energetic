@@ -32,6 +32,7 @@ def proces_jordi(fileOpen, fileSave, start, end):
     df = df.loc[mask]
     mask = (20 <= df['timestamp'].dt.hour) | (df['timestamp'].dt.hour <= 2)
     df.loc[mask, 'powerC'] = 150
+    df.loc[mask, ['powerL1', 'powerL2']] = 0
     df.to_csv(f'{start}..{end} {fileSave}', index=False)
 
 if __name__ == "__main__":

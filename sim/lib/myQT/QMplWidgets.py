@@ -203,16 +203,21 @@ class MplWidget(QWidget):
         self.zp = Zoom()
         self.zp.zoom_factory(self.ax, base_scale = 1.1)
 
-        self.toolbar.home = self.draw_idle
+        self.toolbar.home = self.home_view
 
         # Custom coords format
         if not isinstance(self, MplTwinxWidget):
             self.ax.format_coord = self.make_format()
 
     def draw_idle(self):
-        for ax in self.axes:
-            ax.relim()      # make sure all the data fits
-            ax.autoscale()  # auto-scale
+        self.fig.canvas.draw_idle()
+    
+    def home_view(self):
+        # for ax in self.axes:
+        #     ax.relim()      # make sure all the data fits
+        #     ax.autoscale()  # auto-scale
+        if isinstance(self, MplTwinxWidget):
+            self.align_yaxis()
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
     
@@ -326,7 +331,8 @@ class MplTwinxWidget(MplWidget):
 
         extrema[0,1] = extrema[0,0] + tot_span * (extrema[0,1] - extrema[0,0])
         extrema[1,0] = extrema[1,1] + tot_span * (extrema[1,0] - extrema[1,1])
-        [axes[i].set_ylim(*extrema[i]) for i in range(2)]
+        for i in range(2):
+            axes[i].set_ylim(*extrema[i]) 
 
     def make_format(self, current, other):
         # current and other are axes
