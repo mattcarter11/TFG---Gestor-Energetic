@@ -16,12 +16,21 @@ COL_ORDER =[
 
 class DataFrameIn:
 
-    def __init__(self, df:pd.DataFrame):
-        self._set_col_dtype()
-        if not self._validate(df):
-            raise Exception(f'DataFrame must have the colums {self.columns} with types {self.dtypes}')
-        self.df = df[self.columns].fillna(0)
-        self.df["powerG"] = self.df["powerG"].values.clip(min=0) # x.8 Faster instead of no .values
+    def __init__(self, df:pd.DataFrame, _correct=True):
+        if _correct:
+            self._set_col_dtype()
+            if not self._validate(df):
+                raise Exception(f'DataFrame must have the colums {self.columns} with types {self.dtypes}')
+            # df = df[self.columns].copy()
+
+            mask = df['powerG'].values < 0
+            if mask.any(): # Check is x10 times faster than directly doing the substiution
+                df.loc[mask, "powerG"] = 0 # Fastest
+
+            if df.isna().values.any(): # Check is x100 times faster than filling
+                df = df.fillna(0)
+
+        self.df = df
         self.Ts = self.calc_Ts()
         self.nsamples = len(df.index)
         self.nsec = self.nsamples*self.Ts
@@ -47,24 +56,22 @@ class DataFrameIn:
         energy_g = self.df['energyA'].copy()
         energy_g[energy_g.values > 0] = 0
         self.df['energyG'] = -energy_g
-        self.df['energyA'] = self.df['energyA'].mask(self.df['energyA'].values < 0, 0)
+        self.df.loc[self.df['energyA'].values < 0, 'energyA'] = 0 # Fastest
 
     def select_daterange(self, start:str, end:str, min_sec:int=300):
+        if self.nsamples <= (min_sec/self.Ts):
+            raise Exception(self, "Error", f"Date & Time interval must be at least {min_sec} s")
+
         df = self.df[self.df['timestamp'].between(start, end)].copy()
         if isinstance(self, DataFrameOut):
-            df = DataFrameOut(df)
-        else:
-            df = DataFrameIn(df)
-        if df.nsamples <= (min_sec/df.Ts):
-            raise Exception(self, "Error", f"Date & Time interval must be at least {min_sec} s")
-        return df
+            return DataFrameOut(df, False)
+        return DataFrameIn(df, False)
 
 class DataFrameOut (DataFrameIn):
 
-    def __init__(self, df:pd.DataFrame):
-        super().__init__(df)
+    def __init__(self, df:pd.DataFrame, _correct=True):
+        super().__init__(df, _correct)
         self._fill_missing_LB()
-        self.fill_missing_power()
 
     def _set_col_dtype(self):
         self.columns = ['timestamp', 'powerG', 'powerC', 'powerL1', 'powerL2', 'on_offL1', 'on_offL2']
@@ -74,8 +81,7 @@ class DataFrameOut (DataFrameIn):
         if 'powerC' in self.df.columns and 'powerLB' not in self.df.columns:
             # x50..100 Faster vs normal iteration
             self.df['powerLB'] = self.df.loc[:,'powerC'].values - self.df.loc[:,'powerL1'].values - self.df.loc[:,'powerL2'].values
-            mask = self.df['powerLB'].values < 0
-            self.df.loc[mask, 'powerLB'] = 0
+            self.df.loc[self.df['powerLB'].values < 0, 'powerLB'] = 0
 
     def fill_missing_power(self):
         if any([column not in self.df.columns or self.df[column].isna().any() for column in ['energyA', 'energyP']]):
@@ -103,5 +109,3 @@ class DataFrameOut (DataFrameIn):
 
         if 'energyG' not in self.df.columns or self.df['energyG'].isna().any():
             self.split_energyA()
-        
-

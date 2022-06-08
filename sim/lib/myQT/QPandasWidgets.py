@@ -1,14 +1,15 @@
 import pandas as pd
 from PySide6.QtWidgets import QTableView, QApplication
 from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
-import sys
+import sys, datetime
 
 class QPandasModel(QAbstractTableModel):
     """A model to interface a Qt view with pandas dataframe """
 
-    def __init__(self, dataframe: pd.DataFrame, parent=None):
+    def __init__(self, dataframe: pd.DataFrame, precision = 3, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self._dataframe = dataframe
+        self.precision = precision
 
     def rowCount(self, parent=QModelIndex()) -> int:
         """ Override method from QAbstractTableModel
@@ -42,7 +43,9 @@ class QPandasModel(QAbstractTableModel):
             if isinstance(data, float):
                 if data == 0:
                     return '0'
-                return f'{data:.3f}'
+                return f'{data:.{self.precision}f}'
+            if isinstance(data, datetime.datetime):
+                return data.strftime('%Y/%d/%m %H:%M:%S')
             return str(data)
 
         return None
@@ -59,6 +62,25 @@ class QPandasModel(QAbstractTableModel):
                 return str(self._dataframe.index[section])
         return None
 
+class QPandasModelEdit(QPandasModel):
+
+    def setData(self, index: QModelIndex, value, role=Qt.ItemDataRole):
+        """Override method from QAbstractTableModel
+
+        Set data cell from the pandas DataFrame
+        """
+        if role == Qt.EditRole:
+            self._dataframe.iloc[index.row(), index.column()] = value
+            self.dataChanged.emit(index, index)
+            return True
+        return False
+
+    def flags(self, index):
+        """Override method from QAbstractTableModel"""
+        return Qt.ItemIsSelectable | Qt.ItemIsEnabled | Qt.ItemIsEditable
+
+def test(*args):
+    print(args)
 
 if __name__ == "__main__":
 
@@ -75,7 +97,8 @@ if __name__ == "__main__":
     view.setSelectionBehavior(QTableView.SelectRows)
     view.show()
 
-    model = QPandasModel(df)
+    model = QPandasModelEdit(df)
+    model.dataChanged.connect(test)
     view.setModel(model)
 
     app.exec()

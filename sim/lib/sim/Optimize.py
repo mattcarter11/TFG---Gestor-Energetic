@@ -1,30 +1,20 @@
-from re import T
-from matplotlib.pyplot import axes
 import pandas as pd
-from pyparsing import col
 from .Results import Results
 
 class Optimize:
 
-    def __init__(self, index_name:str, columns:list[str]):
+    def __init__(self, index_name:str, columns:dict[str:dict[str:str, str:str, str:str]]):
+        columns.pop('None')
         self.columns = columns
-        self.df = pd.DataFrame(columns=[index_name]+columns)
+        self.df = pd.DataFrame(columns=[index_name]+list(columns.keys()))
 
     def add_results(self, index:int, results:Results):
         l = [index]
-        for column in self.columns:
-            df = results.df_results
-            if column in df.columns.to_list():
-                row = 'Total'
-            elif 'Load' in column:
-                tmp = column.split(' ')
-                row = ' '.join(tmp[-2:])
-                column = ' '.join(tmp[:-2])
-            else:
-                if column == 'Energy Grid':
+        for _, item in self.columns.items():
+            match item['table']:
+                case 'results':
+                    df = results.df_results
+                case 'total':
                     df = results.df_total
-                    column = 'energyG'
-                    row = 'Daily Total [Wh/day]'
-            value = df.loc[row, column]
-            l.append(value)
+            l.append(df.loc[item['row'], item['column']])
         self.df.loc[len(self.df)] = l

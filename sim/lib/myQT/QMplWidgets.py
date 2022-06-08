@@ -2,18 +2,55 @@ import sys
 from PySide6.QtWidgets import QWidget, QVBoxLayout, QTabWidget
 from PySide6.QtWidgets import QApplication
 from PySide6.QtGui import QAction, QIcon
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, Signal
+import matplotlib as mp
+from matplotlib.lines import Line2D
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdate
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as Canvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavToolbar
 from matplotlib.backend_bases import PickEvent
-import matplotlib
 import numpy as np
 import datetime as dt
+from enum import Enum
 
 # Ensure using PyQt5 backend
-matplotlib.use('QT5Agg')
+mp.use('QT5Agg')
+
+class CossHairAction(QAction):
+    def __init__(self, icon:QIcon, text:str, parent):
+        super().__init__(icon, text)
+        self.setCheckable(True)
+        self.toggled.connect(self.toggle_snap_cursor)
+        self.parent = parent
+        self.snap_cursor = None
+        self.snap_cursor_ps = None
+
+    def toggle_snap_cursor(self, value):
+        if value:
+            lines = []
+            for ax in self.parent.axes:
+                lines += ax.get_lines()
+            if lines != []:
+                self.snap_cursor = SnappingCursor(self.parent.fig, self.parent.ax, lines[0])
+                self.snap_cursor_ps = PickStack(lines, self._snap_cursor_on_pick)
+            else:
+                self.setChecked(False)
+        else:
+            if self.snap_cursor != None:
+                self.snap_cursor.remove()
+                self.snap_cursor_ps = None
+                self.snap_cursor = None
+
+    def _snap_cursor_on_pick(self, event):
+        line = event.artist
+        self.snap_cursor.remove()
+        for ax in self.parent.axes:
+            if line in ax.get_lines():
+                self.snap_cursor = SnappingCursor(self.parent.fig, ax, line)
+                return
+
+    def coords(self):
+        return self.snap_cursor.snap_data
 
 class SnappingCursor:
     """
@@ -27,13 +64,13 @@ class SnappingCursor:
         self.ax = ax
         self.x, self.y = line.get_data()
         if isinstance(self.x[0], (dt.datetime, np.datetime64)):
-            f = lambda x: mdate.date2num(x)
+            f = lambda x: mp.dates.date2num(x)
             self.x = f(self.x)
         self.hline = ax.axhline(y=self.y[0], color='k', lw=0.8, ls='--')
         self.vline = ax.axvline(x=self.x[0], color='k', lw=0.8, ls='--')
         self.snap_data = (0, 0)
         self._last_index = None
-        self.cid = self.fig.canvas.mpl_connect('motion_notify_event', self.on_mouse_move)
+        self.cid = self.fig.canvas.mpl_connect('motion_notify_event', self._on_mouse_move)
 
     def set_cross_hair_visible(self, visible):
         need_redraw = self.hline.get_visible() != visible
@@ -41,7 +78,7 @@ class SnappingCursor:
         self.vline.set_visible(visible)
         return need_redraw
 
-    def on_mouse_move(self, event):
+    def _on_mouse_move(self, event):
         if not event.inaxes:
             self._last_index = None
             need_redraw = self.set_cross_hair_visible(False)
@@ -81,9 +118,9 @@ class PickStack:
         self.stack = stack
         self.ax = [artist.axes for artist in self.stack][0]
         self.on_pick = on_pick
-        self.cid = self.ax.figure.canvas.mpl_connect('button_press_event', self.fire_pick_event)
+        self.cid = self.ax.figure.canvas.mpl_connect('button_press_event', self._fire_pick_event)
 
-    def fire_pick_event(self, event):
+    def _fire_pick_event(self, event):
         if not event.inaxes:
             return
         cont = [a for a in self.stack if a.contains(event)[0]]
@@ -172,7 +209,7 @@ class Zoom:
         return zoom
 
 # Matplotlib widget
-class MplWidget(QWidget):
+class QMplPlot(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         self.fig, self.ax = plt.subplots()
@@ -181,15 +218,7 @@ class MplWidget(QWidget):
         self.canvas.setFocusPolicy(Qt.ClickFocus)
         self.canvas.setFocus()
         self.toolbar = NavToolbar(self.canvas, self)
-
-        # Navbar add custom actions
-        self.snap_cursor = None
-        self.snap_cursor_ps = None
-        self.snap_cursor_a = QAction(QIcon('./lib/myQT/cross.png'), 'Enable cross hair cursor /nClick any line to snap to it')
-        self.snap_cursor_a.setCheckable(True)
-        self.snap_cursor_a.toggled.connect(self.toggle_snap_cursor)
-        self.toolbar.insertAction(self.toolbar.actions()[4], self.snap_cursor_a)
-
+        
         # Make layout
         self.vbl = QVBoxLayout()
         self.vbl.addWidget(self.toolbar)
@@ -198,47 +227,54 @@ class MplWidget(QWidget):
         self.fig.tight_layout()
 
         # Resize thight
-        self.fig.canvas.mpl_connect('resize_event', self.on_resize)
+        self.fig.canvas.mpl_connect('resize_event', self.draw_idle)
+
+        # Navbar add custom actions
+        self.snap_cross_hair = CossHairAction(QIcon('./lib/myQT/cross.png'), 'Enable snaping cross hair cursor \nClick any line to snap to it', self)
+        self.toolbar.insertAction(self.toolbar.actions()[4], self.snap_cross_hair)
+        
         # Mouse Zoom
         self.zp = Zoom()
         self.zp.zoom_factory(self.ax, base_scale = 1.1)
-
+        
+        # Custom Home (fit plot)
+        self.ax_xlimit = None
         self.toolbar.home = self.home_view
 
         # Custom coords format
-        if not isinstance(self, MplTwinxWidget):
-            self.ax.format_coord = self.make_format()
+        if not isinstance(self, QMplTwinxPlot):
+            self.ax.format_coord = self._make_format()
 
-    def draw_idle(self):
+    #regions -> Generic
+    def draw_idle(self, *_):
+        self.fig.tight_layout()
         self.fig.canvas.draw_idle()
     
     def home_view(self):
-        # for ax in self.axes:
-        #     ax.relim()      # make sure all the data fits
-        #     ax.autoscale()  # auto-scale
-        if isinstance(self, MplTwinxWidget):
+        for ax in self.axes:
+            ax.relim()      # make sure all the data fits
+            ax.autoscale()  # auto-scale
+        if self.ax_xlimit != None:
+            self.ax.set_xlim(*self.ax_xlimit)
+        if isinstance(self, QMplTwinxPlot) and self.align:
             self.align_yaxis()
-        self.fig.tight_layout()
-        self.fig.canvas.draw_idle()
-    
-    def on_resize(self, _):
-        self.fig.tight_layout()
-        self.fig.canvas.draw_idle()
+        self.draw_idle()
     
     def clear(self):
         for ax in self.axes:
             ax.clear()
+    #endregion
 
-    # Show/Hide lines if selected in legend
+    #region -> Show/Hide lines if selected in legend
     def toggable_legend_lines(self):
         lines = []
         for ax in self.axes:
             if ax.get_legend() == None:
                 ax.legend()
             lines += ax.get_legend().get_lines()
-        self.legend_PS = PickStack(lines, self.legend_on_pick)
+        self.legend_PS = PickStack(lines, self._legend_on_pick)
         
-    def legend_on_pick(self, event):
+    def _legend_on_pick(self, event):
         legline = event.artist
         label = legline.get_label()
         # Get right axes
@@ -254,68 +290,46 @@ class MplWidget(QWidget):
                 break
         legline.set_alpha(1.0 if visible else 0.2)
         self.fig.canvas.draw_idle()
-    
-    # Display XY coords
-    def make_format(self):
+    #endregion
+
+    #region -> Display XY coords
+    def _make_format(self):
         def format_coord(x, y):
-            if self.snap_cursor_a.isChecked():
-                x, y = self.snap_cursor.snap_data
-            x = self.format_coord_x(x)
-            return self.format_coords_str(x, y)
+            if self.snap_cross_hair.isChecked():
+                x, y = self.snap_cross_hair.coords()
+            x = self._format_coord_x(x)
+            return self._format_coords_str(x, y)
         return format_coord
 
-    def format_coord_x(self, x):
+    def _format_coord_x(self, x):
         for ax in self.axes:
             line = ax.get_lines()
             if line != []:
                 xdata, _ = line[0].get_data()
                 if isinstance(xdata[0], (dt.datetime, np.datetime64)):
-                    return mdate.num2date(x).strftime("%m/%d/%Y %H:%M:%S")
+                    return mp.dates.num2date(x).strftime("%m/%d/%Y %H:%M:%S")
         return x
 
-    def format_coords_str(self, x, y):
+    def _format_coords_str(self, x, y):
         if isinstance(x, str):
             return f'({x}, {y:.3f})'
         return f'({x:.3f}, {y:.3f})'
-
-    # Mouse Cross hair cursor
-    def toggle_snap_cursor(self, value):
-        if value:
-            lines = []
-            for ax in self.axes:
-                lines += ax.get_lines()
-            if lines != []:
-                self.snap_cursor = SnappingCursor(self.fig, self.ax, lines[0])
-                self.snap_cursor_ps = PickStack(lines, self.snap_cursor_on_pick)
-            else:
-                self.snap_cursor_a.setChecked(False)
-        else:
-            if self.snap_cursor != None:
-                self.snap_cursor.remove()
-                self.snap_cursor_ps = None
-                self.snap_cursor = None
-
-    def snap_cursor_on_pick(self, event):
-        line = event.artist
-        self.snap_cursor.remove()
-        for ax in self.axes:
-            if line in ax.get_lines():
-                self.snap_cursor = SnappingCursor(self.fig, ax, line)
-                return
+    #endregion
 
 # Two axes matplotlib widget
-class MplTwinxWidget(MplWidget):
+class QMplTwinxPlot(QMplPlot):
     def __init__(self, parent=None):
-        MplWidget.__init__(self, parent)
+        QMplPlot.__init__(self, parent)
         self.ax1 = self.ax
         self.ax2 = self.ax.twinx()
         self.axes = [self.ax1, self.ax2]
+        self.align = True
 
         # Mouse Zoom
         self.zp = Zoom()
         self.zp.zoom_factory(self.ax, self.ax2, base_scale = 1.1)
 
-        self.ax2.format_coord = self.make_format(self.ax2, self.ax1)
+        self.ax2.format_coord = self._make_format(self.ax2, self.ax1)
 
     def align_yaxis(self):
         """Align zeros of the two axes, zooming them out by same ratio"""
@@ -334,24 +348,154 @@ class MplTwinxWidget(MplWidget):
         for i in range(2):
             axes[i].set_ylim(*extrema[i]) 
 
-    def make_format(self, current, other):
+    def _make_format(self, current, other):
         # current and other are axes
         def format_coord(x, y):
-            if self.snap_cursor_a.isChecked():
-                x, y = self.snap_cursor.snap_data
-                x = self.format_coord_x(x)
-                return self.format_coords_str(x, y)
+            if self.snap_cross_hair.isChecked():
+                x, y = self.snap_cross_hair.coords()
+                x = self._format_coord_x(x)
+                return self._format_coords_str(x, y)
             else:
                 display_coord = current.transData.transform((x,y))
                 inv = other.transData.inverted()
                 # convert back to data coords with respect to ax
                 X, Y = inv.transform(display_coord)
-                x = self.format_coord_x(x)
-                X = self.format_coord_x(X)
+                x = self._format_coord_x(x)
+                X = self._format_coord_x(X)
                 coords = [(X, Y), (x, y)]
-                return ('Left: {:<}  |  Right: {:<}'.format(*[self.format_coords_str(x, y) for x, y in coords]))
+                return ('Left: {:<}  |  Right: {:<}'.format(*[self._format_coords_str(x, y) for x, y in coords]))
         return format_coord
 
+# Editable Plot by moving poits in y axis
+class QMplPlotterWidget(QMplPlot):
+    dataChanged = Signal([object, object])
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.selected = False
+
+    def set_line(self, x, y, linestyle='-o', *arg, **kwargs):
+        self.clear()
+        self.draw_idle()
+        self.line = self.ax.plot(x, y, linestyle, *arg, **kwargs)[0]
+        self.data_lines_PS = PickStack([self.line], self._on_click)
+
+    def set_value(self, i, val):
+        y = self.line.get_ydata()
+        y[i] = val
+        self.line.set_ydata(y)
+        self.draw_idle()
+
+    def get_value(self, i):
+        return self.line.get_ydata()[i]
+
+    def _on_click(self, event):
+        if not self.selected:
+            self.selected = True
+            self.i = event.ind[0]
+            self.y0 = self.get_value(self.i)
+            self.vline = self.ax.axvline(self.line.get_xdata()[self.i], color='#a5a5a5',linestyle=':')
+            self.on_move_cid = self.fig.canvas.mpl_connect('motion_notify_event', self._on_move)
+            self.on_keypress_cid = self.fig.canvas.mpl_connect('key_press_event', self._on_keypress)
+            self.on_button_press_cid = self.fig.canvas.mpl_connect('button_press_event', self._on_button_press)
+        else:
+            self._exit_selection()
+    
+    def _on_move(self, event):
+        if event.inaxes:
+            self.set_value(self.i, event.ydata)
+
+    def _on_keypress(self, event):
+        if event.key == "escape":
+            self.set_value(self.i, self.y0,)
+            self._exit_selection()   
+
+    def _on_button_press(self, event):
+        if not self.line.contains(event)[0]:
+            self._exit_selection()
+
+    def _exit_selection(self, *_):
+        self.dataChanged.emit(self.get_value(self.i), self.i)
+        self.selected = False
+        if self.vline in self.ax.lines:
+            i = self.ax.lines.index(self.vline)
+            self.ax.lines.pop(i)
+        self.draw_idle()
+        self.fig.canvas.mpl_disconnect(self.on_move_cid)
+        self.fig.canvas.mpl_disconnect(self.on_keypress_cid)
+        self.fig.canvas.mpl_disconnect(self.on_button_press_cid)
+
+# Selectable and movable hline or vline
+class QMplHVLineType(Enum):
+    hline = 'vline'
+    vline = 'hline'
+
+class QMplMovableHVLine(QWidget):
+    dataChanged = Signal([object, object])
+
+    def __init__(self, line:Line2D, type:QMplHVLineType, fig, parent=None):
+        QWidget.__init__(self, parent)
+        self.line = line
+        self.type = type
+        self.fig = fig
+        self.selected = False
+        self.ps = PickStack([line], self._on_pick)
+
+    def _on_pick(self, _):
+        x, y = self.line.get_data()
+        self.x0 = x[0] if isinstance(x, list) else x
+        self.y0 = y[0] if isinstance(y, list) else y
+        self.x0, self.y0 = self._process_val(x, y)
+        
+        if not self.selected:
+            self.selected = True
+            self.on_move_cid = self.fig.canvas.mpl_connect('motion_notify_event', self._on_move)
+            self.on_keypress_cid = self.fig.canvas.mpl_connect('key_press_event', self._on_keypress)
+        else:
+            self._exit()
+
+    def _on_move(self, event):
+        if event.inaxes:
+            self.set_xydata( event.xdata, event.ydata )
+            self.fig.canvas.draw_idle()
+    
+    def _on_keypress(self, event):
+        if event.key == "escape":
+            self._reset()
+    
+    def _exit(self):
+        x, y = self.line.get_data()
+        x = x[0] if isinstance(x, list) else x
+        y = y[0] if isinstance(y, list) else y
+        if self.type == QMplHVLineType.hline:
+            self.dataChanged.emit(y, self.type)
+        elif self.type == QMplHVLineType.vline:
+            self.dataChanged.emit(x, self.type)
+
+        self.selected = False
+        self.fig.canvas.mpl_disconnect(self.on_move_cid)
+        self.fig.canvas.mpl_disconnect(self.on_keypress_cid)
+
+    def _reset(self):
+        self.set_xydata(self.x0, self.y0)
+        self.fig.canvas.draw_idle()
+        self._exit()
+
+    def _process_val(self, x, y):
+        x = mp.dates.date2num(x) if isinstance(x, (dt.datetime, np.datetime64)) else x
+        y = mp.dates.date2num(y) if isinstance(y, (dt.datetime, np.datetime64)) else y
+        return (x, y)
+
+    def set_xydata(self, x, y):
+        x, y = self._process_val(x, y)
+        if self.type == QMplHVLineType.hline:
+            self.line.set_ydata(y)
+        elif self.type == QMplHVLineType.vline:
+            self.line.set_xdata(x)
+        
+
+def vhline_print(val, type):
+    print(val, type)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -360,22 +504,32 @@ if __name__ == '__main__':
     for i in range(10):
         random_dates_1.append( np.datetime64(dt.datetime.now() + dt.timedelta(days=i)) )
 
-    a = MplWidget()
+    p = QMplPlotterWidget()
+    p.set_line(range(0,24), np.zeros(24))
+    tmp = QMplMovableHVLine( p.ax.axvline(1), QMplHVLineType.vline, p.fig)
+    tmp2 = QMplMovableHVLine( p.ax.axhline(1), QMplHVLineType.hline, p.fig)
+    tmp.dataChanged.connect(vhline_print)
+    tmp2.dataChanged.connect(vhline_print)
+
+    a = QMplPlot()
     a.ax.plot(random_dates_1, range(0,10), '-o', label='A')
+    tmp3 = QMplMovableHVLine( a.ax.axvline(1), QMplHVLineType.vline, a.fig)
+    tmp3.dataChanged.connect(vhline_print)
     a.toggable_legend_lines()
 
-    b = MplTwinxWidget()
+    b = QMplTwinxPlot()
     b.ax1.plot(range(10,20), range(0,10), '-o', label='B1', color='orange')
     b.ax2.plot(range(0,10), range(0,-10,-1), '-o', color='red')
     b.ax2.plot(range(0,10), range(0,10), '-o', label='B2', color='green')
     b.toggable_legend_lines()
 
-    c = MplTwinxWidget()
+    c = QMplTwinxPlot()
     c.ax1.plot(random_dates_1, range(0,10), '-o', label='C1', color='orange')
     c.ax2.plot(random_dates_1, range(0,-10,-1), '-o', label='C2')
     c.toggable_legend_lines()
 
     window = QTabWidget()
+    window.addTab(p, 'p')
     window.addTab(a, 'a')
     window.addTab(b, 'b')
     window.addTab(c, 'c')
