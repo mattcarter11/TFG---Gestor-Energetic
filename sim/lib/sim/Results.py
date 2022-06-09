@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 from .DataFrames import DataFrameOut 
+from .constants import OCT
 
 class Results:
 
@@ -8,11 +9,11 @@ class Results:
         df.fill_missing_power()
         self.Ts = df.Ts
         self.nsec = df.nsec
-        self.df_in = df.df.copy()
         self.sim_hours = self.nsec/3600
         self.sim_days = 24/self.sim_hours
-        self.df_price = df_price
         self.sell_price = sell_price
+        self.df_price = df_price
+        self.df_in = df.df.copy()
         self.df_hour = pd.DataFrame()
         self.df_total = pd.DataFrame()
         self.df_results = pd.DataFrame()
@@ -61,6 +62,11 @@ class Results:
         energy_l[energy_l < 0] = 0
         self.df_hour['energyL'] = energy_l
 
+        # Price
+        if self.df_price is not None:
+            buy_price = [self.df_price.values[hour-1] for hour in self.df_hour['timestamp'].dt.hour]
+            self.df_hour['balance'] = (self.df_hour['energyS'].values*self.sell_price - self.df_hour['energyL'].values*buy_price)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cént.
+
         # Efficiency
         with np.errstate(divide='ignore', invalid='ignore'):
             self.df_hour['efficiency'] = 100 - self.df_hour['energyL'].values/self.df_hour['energyCM'].values
@@ -69,10 +75,6 @@ class Results:
 
         # Commutations
         self.df_hour[on_off] = data_h_sum[on_off]
-
-        # Price
-        if self.df_price is not None:
-            self.df_hour['balance'] = (self.df_hour['energyS'].values*self.sell_price - self.df_hour['energyL'].values*self.df_price.values)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cént.
 
     def _total(self):
         # Energy Balance - Add hourly columns to get one row series of the total        

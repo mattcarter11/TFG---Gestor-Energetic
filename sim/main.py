@@ -8,12 +8,13 @@ import matplotlib as mp
 from lib.sim.Load import Load
 from lib.sim.Results import Results
 from lib.sim.Optimize import Optimize
+from lib.sim.PlotController import EBPlotController, SinglePlotController
 import lib.sim.Simulator as sim
 import lib.sim.AlgorithmsConfig as ac
 import lib.sim.DataFrames as df
 import lib.myQT.QMplWidgets as mw
 import lib.myQT.QPandasWidgets as pw
-from constants import *
+from lib.sim.constants import *
 
 class AlignDelegate(QItemDelegate):
     def paint(self, painter, option, index):
@@ -34,11 +35,8 @@ class QPandasModelTranslate(pw.QPandasModel):
             if orientation == Qt.Vertical:
                 title = str(self._dataframe.index[section])
             if title in OCT.keys():
-                name = OCT[title]['translate'][self.i]
-                if self.use_unit == True or (isinstance(self.use_unit, list) and title in self.use_unit):
-                    if (unit:=OCT[title]["unit"]) != '':
-                        return f'{name} [{unit}]'
-                return name
+                use_unit = self.use_unit == True or (isinstance(self.use_unit, list) and title in self.use_unit)
+                return oct_translate(title, self.i, use_unit)
         
         return super().headerData(section, orientation, role)
 
@@ -61,7 +59,11 @@ class App(QMainWindow):
         self.first_table_show = True
         self.sim_prev_ls = self.data_prev_ls = ''
         self.th_lines = self.sim_areas = self.sim_lines = self.data_lines = self.date_range_lines = []
-        self.results = self.optimize = None
+        self.results = self.optimize = self.df_out = None
+        self.eb_plotC = EBPlotController()
+        self.ebt_plotC = EBPlotController()
+        self.eff_plotC = SinglePlotController()
+        self.bl_plotC = SinglePlotController()
 
         t0 = time()
         super().__init__()
@@ -139,13 +141,16 @@ class App(QMainWindow):
         self.ui.energyP_s.stateChanged.connect( self.toggle_energyP)
         self.ui.show_th.stateChanged.connect( self.toggle_th)
         # Energy balance plot
-        self.ui.show_values_eb.stateChanged.connect( self.plot_eb)
-        self.ui.show_ecm_eb.stateChanged.connect( self.plot_eb)
-        self.ui.subdivide_eb.stateChanged.connect( self.plot_eb)
+        self.ui.show_values_eb.stateChanged.connect( self.eb_plotC.set_show_values)
+        self.ui.show_ecm_eb.stateChanged.connect( self.eb_plotC.set_show_cm)
+        self.ui.subdivide_eb.stateChanged.connect( self.eb_plotC.set_subdivide)
+        # Other plot
+        self.ui.show_values_eff.stateChanged.connect( self.eff_plotC.set_show_values)
+        self.ui.show_values_balance.stateChanged.connect( self.bl_plotC.set_show_values)
         # Summary balance plot
-        self.ui.show_values_t.stateChanged.connect( self.plot_t)
-        self.ui.show_ecm_t.stateChanged.connect( self.plot_t)
-        self.ui.subdivide_t.stateChanged.connect( self.plot_t)
+        self.ui.show_values_t.stateChanged.connect( self.ebt_plotC.set_show_values)
+        self.ui.show_ecm_t.stateChanged.connect( self.ebt_plotC.set_show_cm)
+        self.ui.subdivide_t.stateChanged.connect( self.ebt_plotC.set_subdivide)
         # Optimize
         self.ui.op_calculate.clicked.connect(self.optimize_press)
         self.ui.op_ax_left.currentIndexChanged.connect(self.plot_op)
@@ -435,9 +440,8 @@ class App(QMainWindow):
 
     #region -> Show results
     def show_results(self, df:pd.DataFrame): 
-        columns = list(OCT.keys())
         header = ['energyT', 'energyDT']
-        columns = [col for col in columns if 'energy' in col and col not in header]
+        columns = [col for col in list(OCT.keys()) if 'energy' in col and col not in header]
         self.ui.table_eb_t.setModel( QPandasModelTranslate(self.results.df_total[columns].T, i=1, use_unit=header) )
         self.ui.table_t.setModel( QPandasModelTranslate(self.results.df_results, use_unit=True) )
         self.ui.table_s.setModel( QPandasModelTranslate(df) )
@@ -453,11 +457,13 @@ class App(QMainWindow):
         for name in ['table_eb', 'table_s', 'table_in']:
             table = self.ui.findChild(QTableView, name)
             table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
-            
+        
         t0 = time()
         self.plot_general(df)
         self.plot_eb()
+        self.plot_other()
         self.plot_t()
+
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
 
         # Checkboxes enable
@@ -573,7 +579,14 @@ class App(QMainWindow):
             showV = self.ui.show_values_eb.isChecked()
             showD = self.ui.subdivide_eb.isChecked()
             showCM = self.ui.show_ecm_eb.isChecked()
-            self.plot_bars(self.results.df_hour, self.ui.plot_eb, showV, showD, showCM)
+            self.eb_plotC.new_plot(self.results.df_hour, self.ui.plot_eb, showV, showD, showCM)
+
+    def plot_other(self):
+        if self.results is not None:
+            showV = self.ui.show_values_eff.isChecked()
+            self.eff_plotC.new_plot(self.results.df_hour[['timestamp','efficiency']], self.ui.plot_eff, showV, xtime=True)
+            showV = self.ui.show_values_balance.isChecked()
+            self.bl_plotC.new_plot(self.results.df_hour[['timestamp','balance']], self.ui.plot_balance, showV, xtime=True)
 
     def plot_t(self):
         if self.results is not None:
@@ -582,95 +595,8 @@ class App(QMainWindow):
             showV = self.ui.show_values_t.isChecked()
             showD = self.ui.subdivide_t.isChecked()
             showCM = self.ui.show_ecm_t.isChecked()
-            self.plot_bars(data, self.ui.plot_eb_t, showV, showD, showCM, None, 'horizontal', False)
+            self.ebt_plotC.new_plot(data, self.ui.plot_eb_t, showV, showD, showCM, None, 'horizontal', False)
 
-    def plot_bars(self, data, plot, showV, showD, showCM, gaxis='both', lrot='vertical', xtimestamp = True):
-        if data is None:
-            return
-
-        t0 = time()
-        ax = plot.ax
-        plot.clear()
-
-        # Sum of each stacked type
-        bars = ['energyC', 'energySY', 'energyA']
-        labels = [OCT[col]['translate'][1] for col in bars]
-        colors = [OCT[col]['color'] for col in bars]
-        # Energy loads subtypes
-        barsL = ['energyLB', 'energyL1', 'energyL2']
-        labelsL = [OCT[col]['translate'][1] for col in barsL]
-        colorsL = [OCT[col]['color'] for col in barsL]
-        # Energy system subtypes
-        barsSY = ['energyG', 'energyP']
-        labelsSY = [OCT[col]['translate'][1] for col in barsSY]
-        colorsSY = [OCT[col]['color'] for col in barsSY]
-        # Energy left subtypes
-        barsGSL = ['energyL', 'energyS']
-        labelsGSL = [OCT[col]['translate'][1] for col in barsGSL]
-        colorsGSL = [OCT[col]['color'] for col in barsGSL]
-        # Energy consume max
-        barsCM = ['energyCM']
-        labelsCM = [OCT[col]['translate'][1] for col in barsCM]
-        colorsCM = [OCT[col]['color'] for col in barsCM]
-        # All
-        bars_ = barsL + barsSY + barsGSL
-
-        # Plot types
-        data.plot.bar(y=bars, ax=ax, color=colors, label=labels, width=0.60)
-        pre_xlim = ax.get_xlim()
-        width = ax.patches[0].get_width()
-
-        # Plot Divisions
-        if showD:
-            # Plot Load Subtypes
-            pos = 1.5
-            data.plot.bar(y=barsL, ax=ax, color=colorsL, label=labelsL, stacked=True, position=pos, width=width)
-            # Plot System Subtypes
-            pos = 0.5
-            data.plot.bar(y=barsSY, ax=ax, color=colorsSY, label=labelsSY, stacked=True, position=pos, width=width)
-            # Plot Load Subtypes
-            pos = -0.5
-            data.plot.bar(y=barsGSL, ax=ax, color=colorsGSL, label=labelsGSL, stacked=True, position=pos, width=width)
-            # Reset ax limits
-            ax.set_xlim(pre_xlim) 
-
-        if showCM:
-            data.plot.bar(y=barsCM, ax=ax, color="none", edgecolor=colorsCM, label=labelsCM, stacked=True, position=1.5, width=width)
-
-        # Add value labels
-        if showV:
-            containers = ax.containers
-            for i, name in enumerate(bars):
-                label = [f'{p:.0f}' for p in data[name]]
-                ax.bar_label(containers[i], labels=label, rotation=lrot, color=colors[i], fontsize=8, padding=4)
-            off = i+1
-            if showD:
-                for i, names in enumerate(bars_):
-                    label = [f'{p:.0f}' if p>0 else '' for p in data[names]]
-                    ax.bar_label(containers[i+off], labels=label, rotation=lrot, fontsize=8, color='#1e1e1e', label_type='center')
-                off +=i+1
-            if showCM:
-                label = [f'{p:.0f}' for p in data[barsCM[0]]]
-                ax.bar_label(containers[off], labels=label, rotation=lrot, color=colorsCM[0], fontsize=8, padding=4)
-        
-        # Visuals
-        ax.margins(y=0.1)
-        ax.legend(loc="upper right")
-        ax.set_ylabel('Energy [Wh]')
-        ax.set_title('Energy Balance')
-        if gaxis != None:
-            ax.set_axisbelow(True)
-            ax.grid(True, linestyle=':', axis=gaxis)
-        if xtimestamp:
-            ax.set_xlabel('Date & Time')
-            ax.set_xticklabels([x.strftime("%m-%d %H") for x in data['timestamp']], rotation=45)
-            plot.fig.autofmt_xdate()
-        else:
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
-            plot.ax_xlimit= (-0.38, 1.75)
-        plot.home_view()
-        self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
-    
     def plot_op(self):
         if self.optimize is None:
             return
