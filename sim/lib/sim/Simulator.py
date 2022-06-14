@@ -1,7 +1,4 @@
-import pandas as pd
 import datetime as dt
-
-from sqlalchemy import column
 from .Load import Load
 from .DataFrames import DataFrameIn, DataFrameOut
 from .AlgorithmsConfig import AlgorithmConfig, AlgorithmsEnum, PredictFinalEnergy
@@ -68,15 +65,13 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
                     case PredictFinalEnergy.project_current_power:
                         energy1h = energy_a + time_remaining*(power_a)/3600
 
-                time_to_use = energy1h / load1.power * 3600 # [s] <- Wh/W = h
-                
-                if not load1.on and energy1h >= algorithm.on_min_energy:
-                    if time_to_use >= (time_remaining*algorithm.time_factor):
-                        on_offL1 = load1.turn_on()
-                elif load1.on:
-                    energy1h = energy_a + (power_a + load1.get_power()) * time_remaining
-                    if energy1h <= algorithm.end_at_energy:
-                        on_offL1 = load1.turn_off()
+                on_offL1 = _TTC_load_control(load1, energy_a, power_a, energy1h, time_remaining, algorithm)
+
+                energy1h = energy1h - load1.get_power() * time_remaining / 3600
+                power_a = power_a + load1.get_power()
+                on_offL2 = _TTC_load_control(load2, energy_a, power_a, energy1h, time_remaining, algorithm)
+
+
         #endregion
 
         #region -> [Simulation] Calc/Save other energys for data avaluation [Wh]
@@ -102,3 +97,15 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
     df_out.rearange_cols()
     return df_out
     
+def _TTC_load_control(load:Load, energy_a:float, power_a:float, energy1h:float, time_remaining:float, algorithm:AlgorithmConfig):
+    if load.power > 0:
+        if not load.on:
+            if energy1h >= algorithm.on_min_energy:
+                time_to_use = energy1h / load.power * 3600 # [s] <- Wh/W = h
+                if time_to_use >= (time_remaining*algorithm.time_factor):
+                    return load.turn_on()
+        else:
+            energy1h_if_off = energy_a + (power_a + load.get_power()) * time_remaining / 3600
+            if energy1h_if_off <= algorithm.end_at_energy:
+                return load.turn_off()
+    return 0

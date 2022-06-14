@@ -57,3 +57,8 @@
 
 # InfluxDB cli export csv
 - influx -host 10.10.10.100 -port 18086 -database 'gestor-energetic-SVC' -execute 'SELECT * FROM hysteresis' -format csv > test.csv
+
+
+
+# Canvis a d'algorithme
+- 14/06/2022 a les 19:00

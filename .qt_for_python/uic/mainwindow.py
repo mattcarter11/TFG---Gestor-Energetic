@@ -991,13 +991,9 @@ class Ui_MainWindow(object):
 
         self.op_settings.addWidget(self.label_12)
 
-        self.op_start = QSpinBox(self.optimise_t)
+        self.op_start = QDoubleSpinBox(self.optimise_t)
         self.op_start.setObjectName(u"op_start")
         self.op_start.setEnabled(True)
-        self.op_start.setMinimum(-99999)
-        self.op_start.setMaximum(99999)
-        self.op_start.setSingleStep(10)
-        self.op_start.setProperty("dataValidEnable", True)
 
         self.op_settings.addWidget(self.op_start)
 
@@ -1008,13 +1004,9 @@ class Ui_MainWindow(object):
 
         self.op_settings.addWidget(self.label_13)
 
-        self.op_end = QSpinBox(self.optimise_t)
+        self.op_end = QDoubleSpinBox(self.optimise_t)
         self.op_end.setObjectName(u"op_end")
         self.op_end.setEnabled(True)
-        self.op_end.setMinimum(-99999)
-        self.op_end.setMaximum(99999)
-        self.op_end.setSingleStep(10)
-        self.op_end.setProperty("dataValidEnable", True)
 
         self.op_settings.addWidget(self.op_end)
 
@@ -1025,13 +1017,9 @@ class Ui_MainWindow(object):
 
         self.op_settings.addWidget(self.label_15)
 
-        self.op_step = QSpinBox(self.optimise_t)
+        self.op_step = QDoubleSpinBox(self.optimise_t)
         self.op_step.setObjectName(u"op_step")
         self.op_step.setEnabled(True)
-        self.op_step.setMinimum(-99999)
-        self.op_step.setMaximum(99999)
-        self.op_step.setSingleStep(10)
-        self.op_step.setProperty("dataValidEnable", True)
 
         self.op_settings.addWidget(self.op_step)
 
@@ -1297,9 +1285,6 @@ class Ui_MainWindow(object):
         self.use_data_bl.toggled.connect(self.recalc_warn.show)
         self.load_file.clicked.connect(self.recalc_warn.show)
         self.op_setting.currentIndexChanged.connect(self.op_recalc_warn.show)
-        self.op_start.valueChanged.connect(self.op_recalc_warn.show)
-        self.op_end.valueChanged.connect(self.op_recalc_warn.show)
-        self.op_step.valueChanged.connect(self.op_recalc_warn.show)
         self.op_calculate.pressed.connect(self.op_recalc_warn.hide)
         self.predict_final_energy.currentIndexChanged.connect(self.recalc_warn.show)
         self.ttc_end_at.valueChanged.connect(self.recalc_warn.show)
@@ -1371,7 +1356,7 @@ class Ui_MainWindow(object):
         self.label_20.setText(QCoreApplication.translate("MainWindow", u"On min", None))
         self.ttc_on_min.setSuffix(QCoreApplication.translate("MainWindow", u" Wh", None))
         self.ttc_time_factor.setPrefix("")
-        self.ttc_time_factor.setSuffix(QCoreApplication.translate("MainWindow", u" s", None))
+        self.ttc_time_factor.setSuffix("")
         self.bload_l.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\">Loads</p></body></html>", None))
 #if QT_CONFIG(tooltip)
         self.label.setToolTip(QCoreApplication.translate("MainWindow", u"External / Not controled", None))
@@ -1420,11 +1405,8 @@ class Ui_MainWindow(object):
         self.tabs.setTabText(self.tabs.indexOf(self.resultsH_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcca Hourly Results", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Setting:", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Start", None))
-        self.op_start.setSuffix("")
         self.label_13.setText(QCoreApplication.translate("MainWindow", u"End", None))
-        self.op_end.setSuffix("")
         self.label_15.setText(QCoreApplication.translate("MainWindow", u"Step", None))
-        self.op_step.setSuffix("")
         self.op_calculate.setText(QCoreApplication.translate("MainWindow", u"Calculate", None))
         self.op_recalc_warn.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700; color:#f4b300;\">\u26a0</span><span style=\" color:#f4b300;\"> Recalculate \u26a0</span></p></body></html>", None))
         self.label_16.setText(QCoreApplication.translate("MainWindow", u"Left Axis", None))

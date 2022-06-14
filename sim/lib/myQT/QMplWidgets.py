@@ -16,6 +16,23 @@ from enum import Enum
 # Ensure using PyQt5 backend
 mp.use('QT5Agg')
 
+def align_yaxis(ax1, ax2):
+    """Align zeros of the two axes, zooming them out by same ratio"""
+    axes = np.array([ax1, ax2])
+    extrema = np.array([ax.get_ylim() for ax in axes])
+    tops = extrema[:,1] / (extrema[:,1] - extrema[:,0])
+    # Ensure that plots (intervals) are ordered bottom to top:
+    if tops[0] > tops[1]:
+        axes, extrema, tops = [a[::-1] for a in (axes, extrema, tops)]
+
+    # How much would the plot overflow if we kept current zoom levels?
+    tot_span = tops[1] + 1 - tops[0]
+
+    extrema[0,1] = extrema[0,0] + tot_span * (extrema[0,1] - extrema[0,0])
+    extrema[1,0] = extrema[1,1] + tot_span * (extrema[1,0] - extrema[1,1])
+    for i in range(2):
+        axes[i].set_ylim(*extrema[i]) 
+
 class CossHairAction(QAction):
     def __init__(self, icon:QIcon, text:str, parent):
         super().__init__(icon, text)
@@ -153,7 +170,7 @@ class Zoom:
         self.cidKeyR = None
         self.cidScroll = None
 
-    def zoom_factory(self, ax, ax2=None, base_scale=2.0):
+    def zoom_factory(self, ax, ax2=None, base_scale=2.0, align=False):
         def zoom(event):
             xdata = event.xdata # get event x location
             ydata = event.ydata # get event y location
@@ -189,7 +206,9 @@ class Zoom:
                 new_height = (cur_ylim[1] - cur_ylim[0]) * scale_factor
                 rely = (cur_ylim[1] - ydata)/(cur_ylim[1] - cur_ylim[0])
                 if(self.yzoom): ax2.set_ylim([ydata - new_height * (1-rely), ydata + new_height * (rely)])
-
+                if align:
+                    align_yaxis(ax, ax2)
+                
             ax.figure.canvas.draw_idle()
             ax.figure.canvas.flush_events()
 
@@ -323,30 +342,17 @@ class QMplTwinxPlot(QMplPlot):
         self.ax1 = self.ax
         self.ax2 = self.ax.twinx()
         self.axes = [self.ax1, self.ax2]
-        self.align = True
+        self.align = False
 
         # Mouse Zoom
         self.zp = Zoom()
-        self.zp.zoom_factory(self.ax, self.ax2, base_scale = 1.1)
+        self.zp.zoom_factory(self.ax, self.ax2, 1.1, self.align)
 
         self.ax2.format_coord = self._make_format(self.ax2, self.ax1)
 
     def align_yaxis(self):
-        """Align zeros of the two axes, zooming them out by same ratio"""
-        axes = np.array([self.ax1, self.ax2])
-        extrema = np.array([ax.get_ylim() for ax in axes])
-        tops = extrema[:,1] / (extrema[:,1] - extrema[:,0])
-        # Ensure that plots (intervals) are ordered bottom to top:
-        if tops[0] > tops[1]:
-            axes, extrema, tops = [a[::-1] for a in (axes, extrema, tops)]
-
-        # How much would the plot overflow if we kept current zoom levels?
-        tot_span = tops[1] + 1 - tops[0]
-
-        extrema[0,1] = extrema[0,0] + tot_span * (extrema[0,1] - extrema[0,0])
-        extrema[1,0] = extrema[1,1] + tot_span * (extrema[1,0] - extrema[1,1])
-        for i in range(2):
-            axes[i].set_ylim(*extrema[i]) 
+        self.align = True
+        align_yaxis(self.ax1, self.ax2)
 
     def _make_format(self, current, other):
         # current and other are axes
@@ -522,6 +528,7 @@ if __name__ == '__main__':
     b.ax2.plot(range(0,10), range(0,-10,-1), '-o', color='red')
     b.ax2.plot(range(0,10), range(0,10), '-o', label='B2', color='green')
     b.toggable_legend_lines()
+    b.align_yaxis()
 
     c = QMplTwinxPlot()
     c.ax1.plot(random_dates_1, range(0,10), '-o', label='C1', color='orange')

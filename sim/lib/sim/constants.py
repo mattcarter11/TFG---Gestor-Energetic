@@ -67,8 +67,8 @@ def oct_translate(key:str, i:int=0, use_unit:bool=False):
 
 SettingsQDateTimeEdits = ('start_date', 'end_date')
 SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'op_setting', 'op_ax_right', 'op_ax_left')
-SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'op_start', 'op_end', 'op_step', 'ttc_end_at', 'ttc_on_min')
-SettingsQDoubleSpinBox = ['ttc_time_factor', 'sell_price']
+SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'ttc_end_at', 'ttc_on_min')
+SettingsQDoubleSpinBox = [ 'op_start', 'op_end', 'op_step', 'ttc_time_factor', 'sell_price']
 SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'subdivide_eb', 'show_values_eff', 'show_values_balance', 'show_values_t', 'show_ecm_t', 'subdivide_t')
 SettingsQLineEdits = ('data_line_style', 'sim_line_style')
 

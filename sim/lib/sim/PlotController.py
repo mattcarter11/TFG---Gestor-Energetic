@@ -202,10 +202,7 @@ class SinglePlotController(BarPlotController):
         # Add Labels + Separate containers
         containers = ax.containers[0]
         self.glabels= [[], [], []]
-        if column == 'balance':
-            labels = [f'{p:.3f}' for p in self.data[column]]
-        else:
-            labels = [f'{p:.0f}' for p in self.data[column]]
+        labels = [f'{p:.3f}' for p in self.data[column]]
         self.glabels[0].extend( ax.bar_label(containers, labels=labels, rotation=self.lrot, color=oct_color(column), fontsize=8, padding=4) )
 
         # Visuals

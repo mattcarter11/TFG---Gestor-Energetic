@@ -328,7 +328,7 @@ class App(QMainWindow):
         self.ui.wh_eq.setText(f'Top threshold {self.tl_eq:.2f} Wh')
 
     def algorithm_changed(self, i):
-        self.ui.load2.setEnabled(i == 0)
+        self.ui.load2.setEnabled(i != 1)
         self.load_op_settings(i)
 
     def load_op_settings(self, i):
@@ -552,6 +552,9 @@ class App(QMainWindow):
                     self.th_lines.append( ax2.axhline(self.ui.th_bottom2.value(), color=COLOR_GR) )
             case 1:
                 self.th_lines.append( ax2.axhline(self.tl_eq, color=COLOR_GR) )
+            case 2:
+                self.th_lines.append( ax2.axhline(self.ui.ttc_end_at.value(), color=COLOR_GR) )
+                self.th_lines.append( ax2.axhline(self.ui.ttc_on_min.value(), color=COLOR_GR) )
         self.toggle_th(self.ui.show_th.isChecked())
 
         # Energy

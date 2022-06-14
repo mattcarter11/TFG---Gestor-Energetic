@@ -38,10 +38,14 @@ def proces_jordi(fileOpen, fileSave, start, end):
 if __name__ == "__main__":
     # G_merge_LB('2022-02-1..8 (G).csv', 'consumed.csv', '2022-02-1..8 (G+LB).csv')
     # process_paco('2022-03-11..13.csv', '2022-03-11..13 Pluja (G).csv')
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-04-27")
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-27", "2022-05-02")
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-08", "2022-05-13")
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-17", "2022-05-22")
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-22", "2022-05-27")
-    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-05-27") # All
+    # proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-04-27")
+    # proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-27", "2022-05-02")
+    # proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-08", "2022-05-13")
+    # proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-17", "2022-05-22")
+    # proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-22", "2022-05-27")
+    # proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-05-27", "2022-06-01")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-06-01", "2022-06-06")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-06-06", "2022-06-11")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-06-11", "2022-06-14")
+    proces_jordi('hysteresis.csv', 'Jordi.csv', "2022-04-22", "2022-06-14") # All
 
