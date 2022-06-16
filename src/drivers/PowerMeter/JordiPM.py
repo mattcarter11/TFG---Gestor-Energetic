@@ -1,7 +1,7 @@
-from .PowerMeter import PowerMeter
+from .PowerMeterBase import PowerMeterBase
 import json, requests
 
-class JordiPM(PowerMeter):
+class JordiPM(PowerMeterBase):
 
     def __init__(self, url:str, user:str, pswd:str, timeout:int=5, zero_ref:int=20):
         self.url        = url

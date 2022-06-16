@@ -1,7 +1,8 @@
 import time
 import datetime as dt
 from enum import Enum
-from drivers.Load.Load import Load
+from drivers.DataBase.InfluxDB import InfluxDB
+from drivers.Load.LoadBase import LoadBase
 from drivers.Load.Shelly import ShellyLoad
 from drivers.PowerMeter.JordiPM import JordiPM
 
@@ -18,10 +19,11 @@ class PredictFinalEnergy(Enum):
 # ======== INIT ========
 # Global parameters
 Ts              = 10 # [s]
-load1           = ShellyLoad('192.168.100.131', value=700) # None = no load
-load2           = ShellyLoad('192.168.100.132', value=700) # None = no load
+database        = InfluxDB('10.10.10.100', 18086, 'gestor-energetic-SVC')
+load1           = ShellyLoad('192.168.100.131', value=700, on_time=3630) # None = no load
+load2           = ShellyLoad('192.168.100.132', value=1000, on_time=3630) # None = no load
 powermeter      = JordiPM('http://envoy.local/stream/meter', 'installer', 'aeceha39', 5, 20)
-algorithm       = AlgorithmsEnum.hysteresis
+algorithm       = AlgorithmsEnum.time_to_consume
 # Managing load interval
 start_managing  = '06:00:00'
 end_managing    = '23:59:59'
@@ -42,18 +44,15 @@ time_factor     = 0.75      # [0..1]
 end_at_energy   = 100       # [Wh]
 
 # ======== MAIN ========
-current_hour = None
-start_managing = dt.datetime.strptime(start_managing, format_date).time()
-end_managing = dt.datetime.strptime(end_managing, format_date).time()
-
 def is_load(load):
-    return isinstance(load, Load)
+    return isinstance(load, LoadBase)
 
-def _TTC_load_control(load:Load, energy_a:float, power_a:float, energy1h:float, time_remaining:float, algorithm):
-    if load.power > 0:
-        if not load.on:
+def _TTC_load_control(load:LoadBase, status, energy_a:float, power_a:float, energy1h:float, time_remaining:float):
+    print(f'{load}  {status}  eA: {energy_a:<6.2f}  pA: {power_a:<6.2f}  e1h: {energy1h:<6.2f}  tr: {time_remaining:<6.0f}')
+    if load.value > 0:
+        if not status['ison']:
             if energy1h >= on_min_energy:
-                time_to_use = energy1h / load.power * 3600 # [s] <- Wh/W = h
+                time_to_use = energy1h / load.value * 3600 # [s] <- Wh/W = h
                 if time_to_use >= (time_remaining*time_factor):
                     load.set_status(True)
         else:
@@ -61,7 +60,19 @@ def _TTC_load_control(load:Load, energy_a:float, power_a:float, energy1h:float, 
             if energy1h_if_off <= end_at_energy:
                 load.set_status(False)
 
+def next_hour_datetime(datetime:dt.datetime) -> dt.datetime:
+    return datetime.replace(second=0, microsecond=0, minute=0) + dt.timedelta(hours=1)
+
 if __name__ == '__main__':
+    # Get power_a from monitoring so they can start synced, plus it makes all that hour slot more efficient
+    last60s = database.query('select last(*) from hysteresis where time > now() - 60s')
+    energy_a = last60s[0]['last_energyA'] if last60s else 0
+    current_hour = dt.datetime.now().hour
+    next_hour = next_hour_datetime(dt.datetime.now())
+    start_managing = dt.datetime.strptime(start_managing, format_date).time()
+    end_managing = dt.datetime.strptime(end_managing, format_date).time()
+
+
     load1.set_status(False)
     load2.set_status(False)
 
@@ -82,13 +93,14 @@ if __name__ == '__main__':
         if current_hour != timestamp.hour:
             energy_a = 0
             current_hour = timestamp.hour
-            next_hour = timestamp.replace(second=0, microsecond=0, minute=0) + dt.timedelta(hours=1)
+            next_hour = next_hour_datetime(timestamp)
             if working_hours: # Refresh loads when hour change in working hours
                 load1.set_status(l1['ison'])
                 load2.set_status(l2['ison'])
         
         power_g, power_c = powermeter.power_gc()
-        energy_a = (power_g-power_c) * Ts / 3600 + energy_a
+        power_a = power_g - power_c
+        energy_a = (power_a) * Ts / 3600 + energy_a
         #endregion
 
         # region -> Algorithms
@@ -96,12 +108,12 @@ if __name__ == '__main__':
             if algorithm == AlgorithmsEnum.hysteresis:
                 if is_load(load1):
                     if energy_a >= th_top1 and not l1['ison']:
-                        load1.set_status(True, 3630)
+                        load1.set_status(True)
                     elif energy_a <= th_bottom1 and l1['ison']:
                         load1.set_status(False)
                 if is_load(load2):
                     if energy_a >= th_top2 and not l2['ison']:
-                        load2.set_status(True, 3630)
+                        load2.set_status(True)
                     elif energy_a <= th_bottom2 and l2['ison']:
                         load2.set_status(False)
 
@@ -125,11 +137,11 @@ if __name__ == '__main__':
                 elif predict == PredictFinalEnergy.project_current_power:
                     energy1h = energy_a + time_remaining*(power_a)/3600
 
-                on_offL1 = _TTC_load_control(load1, energy_a, power_a, energy1h, time_remaining, algorithm)
+                on_offL1 = _TTC_load_control(load1, l1, energy_a, power_a, energy1h, time_remaining)
 
                 energy1h = energy1h - load1.get_power() * time_remaining / 3600
                 power_a = power_a + load1.get_power()
-                on_offL2 = _TTC_load_control(load2, energy_a, power_a, energy1h, time_remaining, algorithm)
+                on_offL2 = _TTC_load_control(load2, l2, energy_a, power_a, energy1h, time_remaining)
         #endregion
 
         # Wait

@@ -1,16 +1,18 @@
-from .Load import Load
+from .LoadBase import LoadBase
 from ShellyPy import Shelly
 
-class ShellyLoad(Load):
+class ShellyLoad(LoadBase):
 
-    def __init__(self, ip:str, port:str="80", value:int=0):
+    def __init__(self, ip:str, port:str="80", value:int=0, on_time=None):
+        super().__init__(value, on_time)
         self.__load = Shelly(ip, port)
-        self.value = value
 
     def set_status(self, status:bool, timer:int=None):
         try:
             if timer is not None:
                 self.__load.relay(0, turn=status, timer=timer)
+            elif self.on_time is not None:
+                self.__load.relay(0, turn=status, time=self.on_time)
             else:
                 self.__load.relay(0, turn=status)
         except:

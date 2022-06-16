@@ -1,7 +1,7 @@
 import time
 import datetime as dt
 from drivers.DataBase.InfluxDB import InfluxDB
-from drivers.Load.Load import Load
+from drivers.Load.LoadBase import LoadBase
 from drivers.Load.Shelly import ShellyLoad
 from drivers.PowerMeter.JordiPM import JordiPM
 
@@ -15,7 +15,7 @@ powermeter  = JordiPM('http://envoy.local/stream/meter', 'installer', 'aeceha39'
 
 # ========== MAIN ==========
 def is_load(load):
-    return isinstance(load, Load)
+    return isinstance(load, LoadBase)
     
 if __name__ == '__main__':
     current_hour = prel1 = prel2 = None

@@ -62,3 +62,6 @@
 
 # Canvis a d'algorithme
 - 14/06/2022 a les 19:00
+- 15/06/2022 a les 16:00
+- 16/06/2022 a les 15:00 -> canvi a predictiu = fail
+- 16/06/2022 a les 18:00 -> fixing

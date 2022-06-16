@@ -1,8 +1,8 @@
-from .DataBase import DataBase
+from .DataBaseBase import DBBase
 from influxdb import InfluxDBClient
 from datetime import datetime
 
-class InfluxDB(DataBase):
+class InfluxDB(DBBase):
 
     def __init__(self, host:str, port:int, database:str):
         self.__client = InfluxDBClient(host, port, database=database)
@@ -28,3 +28,13 @@ class InfluxDB(DataBase):
             self.__client.write_points(json)
         except:
             pass
+        
+    def query(self, query:str) -> list:
+        results = []
+        try:
+            for table in self.__client.query(query):
+              for record in table:
+                results.append(record)
+        except:
+            pass
+        return results

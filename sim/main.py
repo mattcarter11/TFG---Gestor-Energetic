@@ -417,12 +417,11 @@ class App(QMainWindow):
 
         load1 = value if value is not None and element == 'load1' else self.ui.load1.value()
         load2 = value if value is not None and element == 'load2' else self.ui.load2.value()
+        dfRG = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString() )
+        dfRG.df['powerG'] = dfRG.df['powerG'].values * self.ui.generation_factor.value()
         try:
             self.df_out = sim.simulate(
-                self.df_in.select_daterange(
-                    self.ui.start_date.dateTime().toString(),
-                    self.ui.end_date.dateTime().toString()
-                ),
+                dfRG,
                 get_algorithm_config(),
                 Load(load1),
                 Load(load2),
