@@ -32,10 +32,10 @@ OCT = {
     'energyLB'  :{"color":'#e7d6a9',    "unit":'Wh',    "translate": ('Energy Base Load', 'Base Load')}, 
     'energyL1'  :{"color":'#fdc26c',    "unit":'Wh',    "translate": ('Energy Load 1', 'Load 1')}, 
     'energyL2'  :{"color":'#ffd463',    "unit":'Wh',    "translate": ('Energy Load 2', 'Load 2')},
-    'energyCM'  :{"color":GRAY2,        "unit":'Wh',    "translate": ('Energy Max Consuption', 'Max Cons')}, 
+    'energyCM'  :{"color":GRAY2,        "unit":'Wh',    "translate": ('Energy Max. Consuption', 'Max. Cons.')}, 
     'energyB'   :{"color":GRAY2,        "unit":'Wh',    "translate": ('Energy Balance', 'Balance')}, 
     'energyGD'  :{"color":'#ef8271',    "unit":'Wh',    "translate": ('Energy Grid Debt', 'Grid Debt')},
-    'energyAB'  :{"color":'#60b0ff',    "unit":'Wh',    "translate": ('Energy Available Balance', 'Available Bal')}, 
+    'energyAB'  :{"color":'#60b0ff',    "unit":'Wh',    "translate": ('Energy Available Balance', 'Available Bal.')}, 
     'energyS'   :{"color":'#7ad92b',    "unit":'Wh',    "translate": ('Energy Surplus', 'Surplus')},
     'energyL'   :{"color":'#f98e7e',    "unit":'Wh',    "translate": ('Energy Lost', 'Lost')},
     'energyGR'  :{"color":'#9865c6',    "unit":'Wh',    "translate": ('Energy Returned Grid', 'Returned Grid')},
@@ -83,15 +83,18 @@ SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s',
 SettingsQLineEdits = ('data_line_style', 'sim_line_style')
 
 OpAxDict = {
-    'None'                      :{'row':'none',     'column':'none',      'table':None}, 
+    'None'                      :{'row':'none',     'column':'none',        'table':None}, 
     'Efficiency [%]'            :{'row':'total',    'column':'efficiency',  'table':'results'}, 
     'Balance [cént.]'           :{'row':'total',    'column':'balance',     'table':'results'}, 
     'Daily Commutations'        :{'row':'total',    'column':'commutD',     'table':'results'}, 
-    'Daily Commutations Load 1' :{'row':'load1',    'column':'commutD',     'table':'results'}, 
-    'Daily Commutations Load 2' :{'row':'load2',    'column':'commutD',     'table':'results'}, 
+    'Daily Commut. Load 1'      :{'row':'load1',    'column':'commutD',     'table':'results'}, 
+    'Daily Commut. Load 2'      :{'row':'load2',    'column':'commutD',     'table':'results'}, 
     'Daily Hours On Load 1'     :{'row':'load1',    'column':'hoursOnD',    'table':'results'}, 
     'Daily Hours On Load 2'     :{'row':'load2',    'column':'hoursOnD',    'table':'results'}, 
-    'Energy Grid [Wh]'          :{'row':'energyDT', 'column':'energyGB',    'table':'total'}
+    'Energy Grid [Wh]'          :{'row':'energyDT', 'column':'energyG',     'table':'total'},
+    'Energy Grid Debt [Wh]'     :{'row':'energyDT', 'column':'energyGD',    'table':'total'},
+    'Energy Avail. Bal. [Wh]'   :{'row':'energyDT', 'column':'energyAB',    'table':'total'},
+    'Energy Lost [Wh]'          :{'row':'energyDT', 'column':'energyL',     'table':'total'},
 }
 
 OpAlgorithm = {

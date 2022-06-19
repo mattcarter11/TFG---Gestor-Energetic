@@ -2113,6 +2113,9 @@ p, li { white-space: pre-wrap; }
               <property name="locale">
                <locale language="English" country="UnitedStates"/>
               </property>
+              <property name="maximum">
+               <double>9999.989999999999782</double>
+              </property>
              </widget>
             </item>
             <item>
@@ -2136,6 +2139,9 @@ p, li { white-space: pre-wrap; }
               <property name="locale">
                <locale language="English" country="UnitedStates"/>
               </property>
+              <property name="maximum">
+               <double>9999.989999999999782</double>
+              </property>
              </widget>
             </item>
             <item>
@@ -2158,6 +2164,9 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="locale">
                <locale language="English" country="UnitedStates"/>
+              </property>
+              <property name="maximum">
+               <double>999.990000000000009</double>
               </property>
              </widget>
             </item>

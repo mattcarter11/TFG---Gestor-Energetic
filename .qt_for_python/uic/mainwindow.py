@@ -1075,6 +1075,7 @@ class Ui_MainWindow(object):
         self.op_start.setObjectName(u"op_start")
         self.op_start.setEnabled(True)
         self.op_start.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
+        self.op_start.setMaximum(9999.989999999999782)
 
         self.op_settings.addWidget(self.op_start)
 
@@ -1089,6 +1090,7 @@ class Ui_MainWindow(object):
         self.op_end.setObjectName(u"op_end")
         self.op_end.setEnabled(True)
         self.op_end.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
+        self.op_end.setMaximum(9999.989999999999782)
 
         self.op_settings.addWidget(self.op_end)
 
@@ -1103,6 +1105,7 @@ class Ui_MainWindow(object):
         self.op_step.setObjectName(u"op_step")
         self.op_step.setEnabled(True)
         self.op_step.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
+        self.op_step.setMaximum(999.990000000000009)
 
         self.op_settings.addWidget(self.op_step)
 
