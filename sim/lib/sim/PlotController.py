@@ -8,7 +8,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 if True:
     # Sum of each stacked type
-    barsT = ['energyC', 'energySY', 'energyA']
+    barsT = ['energyC', 'energySY', 'energyGR', 'energyAB']
     labelsT = [oct_translate(col, 1) for col in barsT]
     colorsT = [oct_color(col) for col in barsT]
     # Energy loads subtypes
@@ -20,7 +20,7 @@ if True:
     labelsSY = [oct_translate(col, 1) for col in barsSY]
     colorsSY = [oct_color(col) for col in barsSY]
     # Energy left subtypes
-    barsGSL = ['energyL', 'energyS']
+    barsGSL = ['energyGR', 'energyL', 'energyS']
     labelsGSL = [oct_translate(col, 1) for col in barsGSL]
     colorsGSL = [oct_color(col) for col in barsGSL]
     # All
@@ -40,8 +40,7 @@ class BarPlotController:
         self.showCM = False
         self.glabels = [[], [], []]
         self.gbars = [[], [], []]
-        self.ghandlab = [[], []]
-
+        self.ghandlab = [[], [], []]
 
     def new_plot(self, data:DataFrame, plot:QMplPlot, showV:bool=True, showD:bool=True, showCM:bool=True, gaxis:str='both', lrot:str='vertical', xtime:bool=True):
         self.data = data
@@ -88,7 +87,7 @@ class BarPlotController:
 
     def _set_show_values(self, val:bool):
         for label in self.glabels[0]:
-            label.set_visible(val)
+            label.set_visible(val and not self.showD)
         for label in self.glabels[1]:
             label.set_visible(val and self.showD)
         for label in self.glabels[2]:
@@ -98,18 +97,20 @@ class BarPlotController:
     def _set_subdivide(self, val:bool):
         for bar in self.gbars[1]:
             bar.set_visible(val)
+        for bar in self.gbars[0]:
+            bar.set_visible(not val)
 
     def _set_show_cm(self, val:bool):
         for bar in self.gbars[2]:
             bar.set_visible(val)
 
     def _set_legend(self):
-        val = [self.showD, self.showCM]
+        val = [not self.showD, self.showD, self.showCM]
         handles, labels = self.plot.ax.get_legend_handles_labels()
         for j, ghandlab in enumerate(self.ghandlab):
             for handler, label in ghandlab:
-                    i = handles.index(handler)
-                    labels[i] = label if val[j] else f'_{label}'
+                i = handles.index(handler)
+                labels[i] = label if val[j] else f'_{label}'
         self.plot.ax.legend(handles, labels, loc="upper right")
 
 class EBPlotController(BarPlotController):
@@ -125,9 +126,10 @@ class EBPlotController(BarPlotController):
         self.plot.clear()
         
         # Plot types
-        self.data.plot.bar(y=barsT, ax=ax, color=colorsT, label=labelsT, width=0.60)
+        width = 0.2
+        self.data.plot.bar(y=barsT[:2], ax=ax, color=colorsT[:2], label=labelsT[:2], position=0.75, width=width*2)
+        self.data.plot.bar(y=barsT[2:], ax=ax, color=colorsT[2:], label=labelsT[2:], stacked=True, position=-0.5, width=width)
         pre_xlim = ax.get_xlim()
-        width = ax.patches[0].get_width()
     
         # Plot Load Subtypes
         pos = 1.5
@@ -167,24 +169,26 @@ class EBPlotController(BarPlotController):
         ax.margins(y=0.1)
         ax.legend()
         ax.set_ylabel('Energy [Wh]')
-        ax.set_title('Energy Balance')
         if self.gaxis != None:
             ax.set_axisbelow(True)
             ax.grid(True, linestyle=':', axis=self.gaxis)
         if self.xtime:
-            ax.set_xlabel('Date & Time')
+            ax.set_xlabel('Hour Zone [h]')
             ax.set_xticklabels([x.strftime("%m-%d %H") for x in self.data['timestamp']], rotation=45)
             self.plot.fig.autofmt_xdate()
         else:
             ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
             self.plot.ax_xlimit= (-0.38, 1.75)
         self.plot.home_view()
-        self.ghandlab = [[],[]]
+        self.ghandlab = [[], [],[]]
         h, l = self.plot.ax.get_legend_handles_labels()
-        for i in range(len(barsT), len(barsD)+len(barsT)+1):
+        for i in range(len(barsT)):
             self.ghandlab[0].append((h[i], l[i]))
-        off = i
-        self.ghandlab[1].append((h[i], l[i]))
+        off = i+1
+        for i in range(len(barsD)):
+            self.ghandlab[1].append((h[i+off], l[i+off]))
+        off += i+1
+        self.ghandlab[2].append((h[off], l[off]))
 
 
         self.plotted = True
@@ -213,7 +217,7 @@ class SinglePlotController(BarPlotController):
             ax.set_axisbelow(True)
             ax.grid(True, linestyle=':', axis=self.gaxis)
         if self.xtime:
-            ax.set_xlabel('Date & Time')
+            ax.set_xlabel('Hour Zone [h]')
             ax.set_xticklabels([x.strftime("%m-%d %H") for x in self.data['timestamp']], rotation=45)
             self.plot.fig.autofmt_xdate()
         else:

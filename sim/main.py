@@ -2,9 +2,10 @@ import sys, json, traceback
 from time import time
 from PySide6.QtUiTools import QUiLoader
 from PySide6.QtCore import QFile, QIODevice, QDateTime, QCoreApplication, Qt, QModelIndex
-from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView, QItemDelegate, QCheckBox, QTableView, QDateTimeEdit, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView, QCheckBox, QTableView, QDateTimeEdit, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit
 import pandas as pd
 import matplotlib as mp
+import numpy as np
 from lib.sim.Load import Load
 from lib.sim.Results import Results
 from lib.sim.Optimize import Optimize
@@ -15,11 +16,6 @@ import lib.sim.DataFrames as df
 import lib.myQT.QMplWidgets as mw
 import lib.myQT.QPandasWidgets as pw
 from lib.sim.constants import *
-
-class AlignDelegate(QItemDelegate):
-    def paint(self, painter, option, index):
-        option.displayAlignment = Qt.AlignCenter
-        QItemDelegate.paint(self, painter, option, index)
 
 class QPandasModelTranslate(pw.QPandasModel):
 
@@ -34,7 +30,7 @@ class QPandasModelTranslate(pw.QPandasModel):
                 title = str(self._dataframe.columns[section])
             if orientation == Qt.Vertical:
                 title = str(self._dataframe.index[section])
-            if title in OCT.keys():
+            if title in COL_ORDER:
                 use_unit = self.use_unit == True or (isinstance(self.use_unit, list) and title in self.use_unit)
                 return oct_translate(title, self.i, use_unit)
         
@@ -91,21 +87,17 @@ class App(QMainWindow):
         ui_file.close()
     
     def load_ui_manual_part(self): 
-        # Other ui stuff
-        self.ui.plot_op.align = False
         # Tables view style
         for table in self.ui.findChildren(QTableView):
+            table.setHorizontalHeader(pw.WrapHeader(Qt.Horizontal, table))
             table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-            table.setItemDelegate(AlignDelegate())
-        for name in ['table_eb_t', 'table_t', 'table_price_energy']:
-            table = self.ui.findChild(QTableView, name)
-            table.verticalHeader().setDefaultAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
+            # table.horizontalHeader().sectionResized.connect(table.resizeRowsToContents)
         # Warning Optimize not resize on hiden
         pol = self.ui.op_recalc_warn.sizePolicy()
         pol.setRetainSizeWhenHidden(True)
         self.ui.op_recalc_warn.setSizePolicy(pol) 
         # List Optimze Axes values
-        for key, value in OpAxDict.items():
+        for key, _ in OpAxDict.items():
             self.ui.op_ax_left.addItem(key)
             self.ui.op_ax_right.addItem(key)
             
@@ -227,7 +219,7 @@ class App(QMainWindow):
 
     #region -> Load data
     def load_file(self):
-        path = QFileDialog.getOpenFileName(self, "Select Generated Power", './db', '*.csv')[0]
+        path = QFileDialog.getOpenFileName(self, "Select Data", './db', '*.csv')[0]
         if path != '':
             self.load_csv(path)
 
@@ -289,7 +281,7 @@ class App(QMainWindow):
         plot.set_line(df.index, df['Price [€/kWh]'], label='Buy Price')
 
         self.sell_price_line = mw.QMplMovableHVLine(
-            ax.axhline(self.ui.sell_price.value(), color=COLOR_G1, linestyle='-', label='Sell Price'), 
+            ax.axhline(self.ui.sell_price.value(), color=GREEN1, linestyle='-', label='Sell Price'), 
             mw.QMplHVLineType.hline,
             plot.fig
         )
@@ -297,7 +289,7 @@ class App(QMainWindow):
 
         ax.grid(True, linestyle=':')
         ax.legend(loc="upper left")
-        ax.set_xlabel('Hour [h]')
+        ax.set_xlabel('Hour Zone [h]')
         ax.set_ylabel('Price [€/kWh]')
     
     def talbe_price(self, df:pd.DataFrame):
@@ -355,7 +347,8 @@ class App(QMainWindow):
             self.ui.start_date.dateTime().toString(), 
             self.ui.end_date.dateTime().toString()
         )
-        df.fill_missing_power()
+        df.fill_powerAG()
+        df.fill_missing_energy()
         df.rearange_cols()
         self.results = Results(df, self.df_price.iloc[:, 0], self.ui.sell_price.value())
         self.ui.calc_time.setText(f'Results calculated in {time()-t0:.3f} s')
@@ -374,7 +367,7 @@ class App(QMainWindow):
     def optimize_press(self):
         t0 = time()
         self.optimize = Optimize(self.ui.op_setting.currentText(), OpAxDict)
-        values = range(self.ui.op_start.value(), self.ui.op_end.value()+self.ui.op_step.value(), self.ui.op_step.value()) 
+        values = np.arange(self.ui.op_start.value(), self.ui.op_end.value()+self.ui.op_step.value(), self.ui.op_step.value()) 
         for value in values:
             err = self.simulate(value)
             if err: 
@@ -418,7 +411,7 @@ class App(QMainWindow):
         load1 = value if value is not None and element == 'load1' else self.ui.load1.value()
         load2 = value if value is not None and element == 'load2' else self.ui.load2.value()
         dfRG = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString() )
-        dfRG.df['powerG'] = dfRG.df['powerG'].values * self.ui.generation_factor.value()
+        dfRG.df['powerP'] = dfRG.df['powerP'].values * self.ui.generation_factor.value()
         try:
             self.df_out = sim.simulate(
                 dfRG,
@@ -440,7 +433,7 @@ class App(QMainWindow):
     #region -> Show results
     def show_results(self, df:pd.DataFrame): 
         header = ['energyT', 'energyDT']
-        columns = [col for col in list(OCT.keys()) if 'energy' in col and col not in header]
+        columns = [col for col in list(COL_ORDER) if 'energy' in col and col not in header+['energyB']]
         self.ui.table_eb_t.setModel( QPandasModelTranslate(self.results.df_total[columns].T, i=1, use_unit=header) )
         self.ui.table_t.setModel( QPandasModelTranslate(self.results.df_results, use_unit=True) )
         self.ui.table_s.setModel( QPandasModelTranslate(df) )
@@ -458,7 +451,7 @@ class App(QMainWindow):
             table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         
         t0 = time()
-        self.plot_general(df)
+        self.plot_sim(df)
         self.plot_eb()
         self.plot_other()
         self.plot_t()
@@ -478,7 +471,7 @@ class App(QMainWindow):
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
     #endregion
 
-    #region -> Plots
+    #region -> Plots <- TO DO
     def plot_in_data(self):
         plot = self.ui.plot_dr
         ax1, ax2 = plot.ax1, plot.ax2
@@ -486,7 +479,7 @@ class App(QMainWindow):
         df = self.df_in.df
 
         # Plot Data
-        self.data_lines = df_plot_col(df, 'timestamp', 'powerG', ax1)
+        self.data_lines = df_plot_col(df, 'timestamp', 'powerP', ax1)
         if 'powerLB' in self.df_in.df.columns:
             self.data_lines += df_plot_col(df, 'timestamp', 'powerLB', ax2)
 
@@ -513,13 +506,12 @@ class App(QMainWindow):
         ax1.set_xlabel('Date & Time')
         ax1.set_ylabel('Power [W]')
         ax2.set_ylabel('Power [W]')
-        ax1.set_title('Data Range/In')
         plot.fig.autofmt_xdate()
         plot.home_view()
         plot.toggable_legend_lines()
         self.data_line_style(self.ui.data_line_style.text())
 
-    def plot_general(self, df:pd.DataFrame):
+    def plot_sim(self, df:pd.DataFrame):
         if df is None:
             return
 
@@ -529,8 +521,9 @@ class App(QMainWindow):
         plot.clear()
 
         # Plot Power Lines
-        self.sim_lines = df_plot_col(df, 'timestamp', 'powerC', ax1)
-        self.sim_lines += df_plot_col(df, 'timestamp', 'powerG', ax1)
+        self.sim_lines = []
+        for col in ['powerC', 'powerP', 'powerA', 'powerG']:
+            self.sim_lines += df_plot_col(df, 'timestamp', col, ax1)
         
         # Power Load Areas
         cols = ['powerLB', 'powerL1', 'powerL2']
@@ -544,34 +537,37 @@ class App(QMainWindow):
         match self.ui.algorithm.currentIndex():
             case 0:
                 if self.ui.load1.value() > 0:
-                    self.th_lines.append( ax2.axhline(self.ui.th_top1.value(), color=COLOR_GR) )
-                    self.th_lines.append( ax2.axhline(self.ui.th_bottom1.value(), color=COLOR_GR) )
+                    self.th_lines.append( ax2.axhline(self.ui.th_top1.value(), color=GRAY1) )
+                    self.th_lines.append( ax2.axhline(self.ui.th_bottom1.value(), color=GRAY1) )
                 if self.ui.load2.value() > 0:
-                    self.th_lines.append( ax2.axhline(self.ui.th_top2.value(), color=COLOR_GR) )
-                    self.th_lines.append( ax2.axhline(self.ui.th_bottom2.value(), color=COLOR_GR) )
+                    self.th_lines.append( ax2.axhline(self.ui.th_top2.value(), color=GRAY1) )
+                    self.th_lines.append( ax2.axhline(self.ui.th_bottom2.value(), color=GRAY1) )
             case 1:
-                self.th_lines.append( ax2.axhline(self.tl_eq, color=COLOR_GR) )
+                self.th_lines.append( ax2.axhline(self.tl_eq, color=GRAY1) )
             case 2:
-                self.th_lines.append( ax2.axhline(self.ui.ttc_end_at.value(), color=COLOR_GR) )
-                self.th_lines.append( ax2.axhline(self.ui.ttc_on_min.value(), color=COLOR_GR) )
+                self.th_lines.append( ax2.axhline(self.ui.ttc_end_at.value(), color=GRAY1) )
+                self.th_lines.append( ax2.axhline(self.ui.ttc_on_min.value(), color=GRAY1) )
         self.toggle_th(self.ui.show_th.isChecked())
 
         # Energy
         if self.ui.energyP_s.isChecked():
             self.sim_lines += df_plot_col(df, 'timestamp', 'energyP', ax2)
-        self.sim_lines += df_plot_col(df, 'timestamp', 'energyA', ax2)
-        self.sim_lines += df_plot_col(df, 'timestamp', 'energyG', ax2)
+        self.sim_lines += df_plot_col(df, 'timestamp', 'energyAB', ax2)
+        self.sim_lines += df_plot_col(df, 'timestamp', 'energyGD', ax2)
 
         # Visuals
         ax1.grid(True, linestyle=':')
-        ax1.legend(loc="upper left")
+        leglines = ax1.legend(loc="upper left").get_lines()[2:4]
         ax2.legend(loc="upper right")
+        for legline in leglines:
+            plot._hide_legline(legline)
+
         ax1.set_xlabel('Date & Time')
         ax1.set_ylabel('Power [W]')
-        ax2.set_ylabel('Energy [Wh]')
-        ax1.set_title('Simulation')
+        ax2.set_ylabel('Energy Balance [Wh]')
         plot.fig.autofmt_xdate()
         plot.toggable_legend_lines()
+        plot.align = True
         plot.home_view()
         self.sim_line_style(self.ui.sim_line_style.text())
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
@@ -586,9 +582,9 @@ class App(QMainWindow):
     def plot_other(self):
         if self.results is not None:
             showV = self.ui.show_values_eff.isChecked()
-            self.eff_plotC.new_plot(self.results.df_hour[['timestamp','efficiency']], self.ui.plot_eff, showV, xtime=True)
+            self.eff_plotC.new_plot(self.results.df_hour[['timestamp','efficiency']], self.ui.plot_eff, showV, lrot=None)
             showV = self.ui.show_values_balance.isChecked()
-            self.bl_plotC.new_plot(self.results.df_hour[['timestamp','balance']], self.ui.plot_balance, showV, xtime=True)
+            self.bl_plotC.new_plot(self.results.df_hour[['timestamp','balance']], self.ui.plot_balance, showV, lrot=None)
 
     def plot_t(self):
         if self.results is not None:
@@ -623,6 +619,8 @@ class App(QMainWindow):
             ax2.legend(loc="upper right")
         ax1.set_xlabel(x)
         ax1.grid(True, linestyle=':')
+        ax1.ticklabel_format(useOffset=False)
+        ax2.ticklabel_format(useOffset=False)
         plot.home_view()
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
     #endregion
@@ -644,7 +642,7 @@ class App(QMainWindow):
     
     def toggle_energyP(self):
         if self.df_out is not None:
-            self.plot_general(self.df_out.df)
+            self.plot_sim(self.df_out.df)
 
     def toggle_th(self, val):
         if self.th_lines: # List Not empty

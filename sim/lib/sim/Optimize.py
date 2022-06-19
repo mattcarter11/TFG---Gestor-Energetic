@@ -4,6 +4,7 @@ from .Results import Results
 class Optimize:
 
     def __init__(self, index_name:str, columns:dict[str:dict[str:str, str:str, str:str]]):
+        columns = columns.copy()
         columns.pop('None')
         self.columns = columns
         self.df = pd.DataFrame(columns=[index_name]+list(columns.keys()))

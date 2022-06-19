@@ -1,9 +1,22 @@
+# InfluxDB cli export csv
+- influx -host 10.10.10.100 -port 18086 -database 'gestor-energetic-SVC' -execute 'SELECT * FROM hysteresis' -format csv > test.csv
+
+# Canvis a d'algorithme
+- 14/06/2022 a les 19:00
+- 15/06/2022 a les 16:00
+- 16/06/2022 a les 15:00 -> canvi a predictiu = fail
+- 16/06/2022 a les 18:00 -> fixing
+- 18/06/2022 -> fixing time to use (not done, data results)
+
+
+# === OLD ===
+
 # Simulació
 
 ## Dades d'entrada
 
- - Potència produïda                (format .csv -> timestamp, powerG)
- - Potència produïda i Consumida    (format .csv -> timestamp, powerG, powerC)
+ - Potència produïda                (format .csv -> timestamp, powerP)
+ - Potència produïda i Consumida    (format .csv -> timestamp, powerP, powerC)
 
 ## Dades de sortida
 
@@ -11,10 +24,11 @@
  
 | Variable | Descripció                    |
 | :------: | :-----------------------------|
-| powerG   | Generada                      |
+| powerP   | Produïda                      |
 | powerC   | Consumida Total               |
 | powerLB  | Consumida per la càrrega base |
 | powerL1  | Consumida per la càrrega 1    |
+| powerL2  | Consumida per la càrrega 2    |
 
 ### Energia per mostra
 
@@ -23,7 +37,7 @@
 | energyP  | Produïda                      |
 | energyA  | Disponible                    |
 
-### Energia per hora / total / diaria
+### Balanç d'Energia per hora / total / diaria
 
 | Variable | Descripció                    |
 | :------: | :-----------------------------|
@@ -34,6 +48,7 @@
 | energyC  | Consumida Total               |
 | energyLB | Consumida per la càrrega base |
 | energyL1 | Consumida per la càrrega 1    |
+| energyL2 | Consumida per la càrrega 2    |
 | energyS  | Sobreixida / Excedent         |
 | energyL  | Perduda / Podria consumir-se  |
 
@@ -54,14 +69,3 @@
 - Base de dades al arnau
 - Codi per fer el driver i parlar amb les plaques
 - Com fer el control de les càrregues
-
-# InfluxDB cli export csv
-- influx -host 10.10.10.100 -port 18086 -database 'gestor-energetic-SVC' -execute 'SELECT * FROM hysteresis' -format csv > test.csv
-
-
-
-# Canvis a d'algorithme
-- 14/06/2022 a les 19:00
-- 15/06/2022 a les 16:00
-- 16/06/2022 a les 15:00 -> canvi a predictiu = fail
-- 16/06/2022 a les 18:00 -> fixing

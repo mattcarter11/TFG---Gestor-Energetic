@@ -1,57 +1,67 @@
 UI_FILE = "mainwindow.ui"
 DT_FORMAT = 'yyyy-MM-dd HH:mm'
-COLOR_GR = '#a5a5a5'
-COLOR_SD = '#0cb7e8'
-COLOR_ED = '#8e09d5'
-COLOR_G1 = '#6dbf31'
+GRAY1    = '#a5a5a5'
+GRAY2    = '#7e7e7e'
+GREEN1   = '#6dbf31'
 
-COLOR_LB = '#e7d6a9'
-COLOR_L1 = '#fdc26c'
-COLOR_L2 = '#ffd463'
+COLOR_SD = '#60b0ff'
+COLOR_ED = '#9865c6'
 
 # ordered key: (color, unit, translate)
 OCT = {
     'timestamp' :{"color":None,         "unit":'',     "translate": ('Timestamp', 'Timestamp')},
 
-    'powerG'    :{"color":'#33ab1d',    "unit":'W',     "translate": ('Power Generated', 'Generated')}, 
-    'powerC'    :{"color":'#f8a62a',    "unit":'W',     "translate": ('Power Consumed', 'Consumed')}, 
-    'powerLB'   :{"color":COLOR_LB,     "unit":'W',     "translate": ('Power Base Load', 'Base Load')},
-    'powerL1'   :{"color":COLOR_L1,     "unit":'W',     "translate": ('Power Load 1', 'Load 1')},
-    'powerL2'   :{"color":COLOR_L2,     "unit":'W',     "translate": ('Power Load 2', 'Load 2')},
+    'powerP'    :{"color":'#33ab1d',    "unit":'W',     "translate": ('Power Produced', 'Produced')}, 
+    'powerC'    :{"color":'#f8a62a',    "unit":'W',     "translate": ('Power Consumed', 'Consumed')},
+    'powerG'    :{"color":'#dc604d',    "unit":'W',     "translate": ('Power Grid', 'Grid')},
+    'powerA'    :{"color":'#4b90f3',    "unit":'W',     "translate": ('Power Available', 'Available')},
+    'powerLB'   :{"color":'#e7d6a9',    "unit":'W',     "translate": ('Power Base Load', 'Base Load')},
+    'powerL1'   :{"color":'#fdc26c',    "unit":'W',     "translate": ('Power Load 1', 'Load 1')},
+    'powerL2'   :{"color":'#ffd463',    "unit":'W',     "translate": ('Power Load 2', 'Load 2')},
+    'powerGP'   :{"color":None,         "unit":'W',     "translate": ('Power Grid while Prod.', 'Grid while Prod.')},
 
-    'on_offL1'  :{"color":COLOR_L1,     "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
-    'on_offL2'  :{"color":COLOR_L2,     "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
+    'on_offL1'  :{"color":None,         "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
+    'on_offL2'  :{"color":None,         "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
 
     'energySY'  :{"color":'#195aa7',    "unit":'Wh',    "translate": ('Energy System', 'System')}, 
     'energyP'   :{"color":'#2176db',    "unit":'Wh',    "translate": ('Energy Produced', 'Produced')}, 
-    'energyG'   :{"color":'#ef8271',    "unit":'Wh',    "translate": ('Energy Grid', 'Grid')}, 
-    'energyA'   :{"color":'#60b0ff',    "unit":'Wh',    "translate": ('Energy Available', 'Available')}, 
+    'energyG'   :{"color":'#dc604d',    "unit":'Wh',    "translate": ('Energy Grid', 'Grid')}, 
+    'energyGP'  :{"color":'#d03429',    "unit":'Wh',    "translate": ('Energy Grid while Prod.', 'Grid w Prod.')},
+    'energyGnP' :{"color":GRAY1,        "unit":'Wh',    "translate": ('Energy Grid while not Prod.', 'Grid w not Prod.')},
     'energyC'   :{"color":'#f8a62a',    "unit":'Wh',    "translate": ('Energy Consumed', 'Consumed')}, 
     'energyLB'  :{"color":'#e7d6a9',    "unit":'Wh',    "translate": ('Energy Base Load', 'Base Load')}, 
-    'energyL1'  :{"color":COLOR_L1,     "unit":'Wh',    "translate": ('Energy Load 1', 'Load 1')}, 
-    'energyL2'  :{"color":COLOR_L2,     "unit":'Wh',    "translate": ('Energy Load 2', 'Load 2')},
-    'energyCM'  :{"color":'#7e7e7e',    "unit":'Wh',    "translate": ('Energy Consumed Max', 'Cons. Max')}, 
-    'energyS'   :{"color":'#6dbf31',    "unit":'Wh',    "translate": ('Energy Surplus', 'Surplus')},
-    'energyL'   :{"color":'#e15f4b',    "unit":'Wh',    "translate": ('Energy Lost', 'Lost')}, 
+    'energyL1'  :{"color":'#fdc26c',    "unit":'Wh',    "translate": ('Energy Load 1', 'Load 1')}, 
+    'energyL2'  :{"color":'#ffd463',    "unit":'Wh',    "translate": ('Energy Load 2', 'Load 2')},
+    'energyCM'  :{"color":GRAY2,        "unit":'Wh',    "translate": ('Energy Max Consuption', 'Max Cons')}, 
+    'energyB'   :{"color":GRAY2,        "unit":'Wh',    "translate": ('Energy Balance', 'Balance')}, 
+    'energyGD'  :{"color":'#ef8271',    "unit":'Wh',    "translate": ('Energy Grid Debt', 'Grid Debt')},
+    'energyAB'  :{"color":'#60b0ff',    "unit":'Wh',    "translate": ('Energy Available Balance', 'Available Bal')}, 
+    'energyS'   :{"color":'#7ad92b',    "unit":'Wh',    "translate": ('Energy Surplus', 'Surplus')},
+    'energyL'   :{"color":'#f98e7e',    "unit":'Wh',    "translate": ('Energy Lost', 'Lost')},
+    'energyGR'  :{"color":'#9865c6',    "unit":'Wh',    "translate": ('Energy Returned Grid', 'Returned Grid')},
+    'energyPC'  :{"color":None,         "unit":'Wh',    "translate": ('Energy Produced Consumed', 'Prod Cons')},
+
 
     'energyT'   :{"color":None,         "unit":'Wh',    "translate": ('Total Energy', 'Total')},
     'energyDT'  :{"color":None,         "unit":'Wh/day',"translate": ('Daily Total', 'Daily Total')},
 
-    'loadApprox':{"color":None,         "unit":'W',     "translate": ('Aprox. Load', 'Aprox. Load')},
-    'efficiency':{"color":'#6dbf31',    "unit":'%',     "translate": ('Efficiency', 'Efficiency')},
-    'balance'   :{"color":'#60b0ff',    "unit":'cént.', "translate": ('Balance', 'Balance')},
+    'loadAprox' :{"color":None,         "unit":'W',     "translate": ('Aprox. Load', 'Aprox. Load')},
+    'efficiency':{"color":GREEN1,       "unit":'%',     "translate": ('Efficiency', 'Efficiency')},
+    'balance'   :{"color":'#60b0ff',     "unit":'cént.', "translate": ('Balance', 'Balance')},
     'commut'    :{"color":None,         "unit":'',      "translate": ('Commutations', 'Commut.')},
     'commutD'   :{"color":None,         "unit":'',      "translate": ('Daily Commutations', 'Daily Commut.')},
     'samplesOn' :{"color":None,         "unit":'',      "translate": ('Samples On', 'Samples On')},
     'hoursOn'   :{"color":None,         "unit":'h',     "translate": ('Hours On', 'Hours On')},
     'hoursOnD'  :{"color":None,         "unit":'h/day', "translate": ('Daily Hours On', 'Daily Hours On')},
 
-    'loadB'     :{"color":COLOR_LB,     "unit":'',      "translate": ('Base Load', 'Base Load')},
-    'load1'     :{"color":COLOR_L1,     "unit":'',      "translate": ('Load 1', 'Load 1')},
-    'load2'     :{"color":COLOR_L2,     "unit":'',      "translate": ('Load 2', 'Load 2')},
+    'loadB'     :{"color":None,         "unit":'',      "translate": ('Base Load', 'Base Load')},
+    'load1'     :{"color":None,         "unit":'',      "translate": ('Load 1', 'Load 1')},
+    'load2'     :{"color":None,         "unit":'',      "translate": ('Load 2', 'Load 2')},
     'total'     :{"color":None,         "unit":'',      "translate": ('Total', 'Total')},
     'none'      :{"color":None,         "unit":'',      "translate": ('None', 'None')},
 }
+
+COL_ORDER = list(OCT.keys())
 
 def oct_color(key):
     return OCT[key]['color']
@@ -81,7 +91,7 @@ OpAxDict = {
     'Daily Commutations Load 2' :{'row':'load2',    'column':'commutD',     'table':'results'}, 
     'Daily Hours On Load 1'     :{'row':'load1',    'column':'hoursOnD',    'table':'results'}, 
     'Daily Hours On Load 2'     :{'row':'load2',    'column':'hoursOnD',    'table':'results'}, 
-    'Energy Grid [Wh]'          :{'row':'energyDT', 'column':'energyG',    'table':'total'}
+    'Energy Grid [Wh]'          :{'row':'energyDT', 'column':'energyGB',    'table':'total'}
 }
 
 OpAlgorithm = {

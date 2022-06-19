@@ -294,7 +294,9 @@ class QMplPlot(QWidget):
         self.legend_PS = PickStack(lines, self._legend_on_pick)
         
     def _legend_on_pick(self, event):
-        legline = event.artist
+        self._hide_legline(event.artist)
+
+    def _hide_legline(self, legline):
         label = legline.get_label()
         # Get right axes
         for ax in self.axes:
@@ -305,9 +307,9 @@ class QMplPlot(QWidget):
                     if label == line.get_label():
                         visible = not line.get_visible()
                         line.set_visible(visible)
+                        legline.set_alpha(1.0 if visible else 0.2)
                         break
                 break
-        legline.set_alpha(1.0 if visible else 0.2)
         self.fig.canvas.draw_idle()
     #endregion
 

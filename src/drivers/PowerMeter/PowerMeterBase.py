@@ -11,5 +11,9 @@ class PowerMeterBase(ABC):
         raise NotImplementedError("Base Class")
 
     @abstractmethod
-    def power_gc(self) -> float:
+    def power_gc(self) -> tuple:
+        raise NotImplementedError("Base Class")
+
+    @abstractmethod
+    def power_available(self) -> float:
         raise NotImplementedError("Base Class")

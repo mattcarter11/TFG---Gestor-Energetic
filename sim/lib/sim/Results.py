@@ -1,12 +1,12 @@
 import pandas as pd
 import numpy as np
 from .DataFrames import DataFrameOut 
-from .constants import OCT
+from .constants import COL_ORDER
 
 class Results:
 
     def __init__(self, df:DataFrameOut, df_price=None, sell_price:float|int=0.1):
-        df.fill_missing_power()
+        df.fill_missing_energy()
         self.Ts = df.Ts
         self.nsec = df.nsec
         self.sim_hours = self.nsec/3600
@@ -23,22 +23,27 @@ class Results:
 
     def _hourly(self):
         # Grup data by hour, select only energies, copy data in new place, add hour grups to get total
-        select = ['timestamp', 'energyP', 'energyG', 'energyA']
+        select = ['timestamp', 'energyP', 'energyB', 'energyGD', 'energyAB']
         on_off = ['on_offL1', 'on_offL2']
         self.df_in[on_off] = self.df_in[on_off].astype(bool)
         data = self.df_in.groupby(pd.Grouper(key='timestamp', freq='H'), as_index=False)
         self.df_hour = data[select].last().copy()
         data_h_sum = data.sum()
 
-        # Energy in system
-        self.df_hour.insert(1, 'energySY', self.df_hour['energyP'].values + self.df_hour['energyG'].values)
-
         # General energyes
+        self.df_hour['energyG'] = data_h_sum['powerG'].values*self.Ts/3600
+        self.df_hour['energyGP'] = data_h_sum['powerGP'].values*self.Ts/3600
         self.df_hour['energyC'] = data_h_sum['powerC'].values*self.Ts/3600
         self.df_hour['energyLB'] = data_h_sum['powerLB'].values*self.Ts/3600
         self.df_hour['energyL1'] = data_h_sum['powerL1'].values*self.Ts/3600
         self.df_hour['energyL2'] = data_h_sum['powerL2'].values*self.Ts/3600
+        self.df_hour['energySY'] = self.df_hour['energyP'].values + self.df_hour['energyG'].values
+        self.df_hour['energyGR'] = self.df_hour['energyG'].values - self.df_hour['energyGD'].values
+        self.df_hour.loc[np.abs(self.df_hour['energyGR']) < 0.00001, 'energyGR'] = 0
+        self.df_hour['energyGnP'] = self.df_hour['energyG'].values - self.df_hour['energyGP'].values
+        self.df_hour['energyPC'] = self.df_hour['energyC'].values - self.df_hour['energyG'].values
 
+       
         # Find aprox loads of each one
         self.aprox_loads = {'powerLB':0, 'powerL1':0, 'powerL2':0}
         for k in self.aprox_loads:
@@ -58,14 +63,14 @@ class Results:
         self.df_hour['energyS'] = energy_s
 
         # Energy Lost
-        energy_l = self.df_hour['energyA'].values - energy_s
+        energy_l = self.df_hour['energyAB'].values - energy_s
         energy_l[energy_l < 0] = 0
         self.df_hour['energyL'] = energy_l
 
         # Price
         if self.df_price is not None:
             buy_price = [self.df_price.values[hour-1] for hour in self.df_hour['timestamp'].dt.hour]
-            self.df_hour['balance'] = (self.df_hour['energyS'].values*self.sell_price - self.df_hour['energyL'].values*buy_price)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cént.
+            self.df_hour['balance'] = (self.df_hour['energyAB'].values*self.sell_price - self.df_hour['energyGD'].values*buy_price)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cént.
 
         # Efficiency
         with np.errstate(divide='ignore', invalid='ignore'):
@@ -75,6 +80,9 @@ class Results:
 
         # Commutations
         self.df_hour[on_off] = data_h_sum[on_off]
+
+        columns = [col for col in COL_ORDER if col in self.df_hour.columns]
+        self.df_hour = self.df_hour[columns]
 
     def _total(self):
         # Energy Balance - Add hourly columns to get one row series of the total        

@@ -47,7 +47,7 @@ if __name__ == '__main__':
 
         #region -> Store data
         dic = {
-            "powerG": power_g,
+            "powerP": power_g,
             "powerC": power_c,
             "energyA": energy_a,
             "energyP": energy_p,

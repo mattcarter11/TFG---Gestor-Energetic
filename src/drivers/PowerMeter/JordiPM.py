@@ -23,7 +23,7 @@ class JordiPM(PowerMeterBase):
                 return prod
         return 0.0
 
-    def power_gc(self) -> float:
+    def power_gc(self) -> tuple:
         data = self.__get_data()
         if data:
             prod = self.__exract_generated(data)
@@ -33,6 +33,16 @@ class JordiPM(PowerMeterBase):
             else:
                 return (0.0, cons)
         return (0.0, 0.0)
+
+    def power_available(self) -> float:
+        data = self.__get_data()
+        if data:
+            prod = self.__exract_generated(data)
+            cons = self.__exract_consumed(data)
+            if prod > self.zero_ref:
+                prod = 0
+            return prod-cons
+        return 0
 
     def __get_data(self) -> dict:
         try:
