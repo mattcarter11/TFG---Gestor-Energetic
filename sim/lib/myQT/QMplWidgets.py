@@ -258,6 +258,7 @@ class QMplPlot(QWidget):
         
         # Custom Home (fit plot)
         self.ax_xlimit = None
+        self.ax_ylimit = None
         self.toolbar.home = self.home_view
 
         # Custom coords format
@@ -275,7 +276,13 @@ class QMplPlot(QWidget):
             ax.autoscale()  # auto-scale
         if self.ax_xlimit != None:
             self.ax.set_xlim(*self.ax_xlimit)
+        if self.ax_ylimit != None:
+            self.ax.set_ylim(*self.ax_ylimit)
         if isinstance(self, QMplTwinxPlot) and self.align:
+            if self.ax2_xlimit != None:
+                self.ax2.set_xlim(*self.ax2_xlimit)
+            if self.ax2_ylimit != None:
+                self.ax2.set_ylim(*self.ax2_ylimit)
             self.align_yaxis()
         self.draw_idle()
     
@@ -345,6 +352,10 @@ class QMplTwinxPlot(QMplPlot):
         self.ax2 = self.ax.twinx()
         self.axes = [self.ax1, self.ax2]
         self.align = False
+
+        # Custom Home (fit plot)
+        self.ax2_xlimit = None
+        self.ax2_ylimit = None
 
         # Mouse Zoom
         self.zp = Zoom()

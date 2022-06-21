@@ -9,7 +9,7 @@ import numpy as np
 from lib.sim.Load import Load
 from lib.sim.Results import Results
 from lib.sim.Optimize import Optimize   
-from lib.sim.PlotController import EBPlotController, BarPlotController
+import lib.sim.PlotController as pc 
 import lib.sim.Simulator as sim
 import lib.sim.AlgorithmsConfig as ac
 import lib.sim.DataFrames as df
@@ -56,10 +56,10 @@ class App(QMainWindow):
         self.sim_prev_ls = self.data_prev_ls = ''
         self.th_lines = self.sim_areas = self.sim_lines = self.data_lines = self.date_range_lines = []
         self.results = self.optimize = self.df_out = None
-        self.eb_plotC = EBPlotController()
-        self.ebt_plotC = EBPlotController()
-        self.eff_plotC = BarPlotController()
-        self.bl_plotC = BarPlotController()
+        self.eb_plotC = pc.EBPlotController()
+        self.ebt_plotC = pc.EBPlotController()
+        self.eff_plotC = pc.BarPlotController()
+        self.bl_plotC = pc.BarPlotController()
 
         t0 = time()
         super().__init__()
@@ -476,7 +476,7 @@ class App(QMainWindow):
 
     #region -> Plots
     def plot_in_data(self):
-        plot = self.ui.plot_dr
+        plot: mw.QMplTwinxPlot = self.ui.plot_dr
         ax1, ax2 = plot.ax1, plot.ax2
         plot.clear()
         df = self.df_in.df
@@ -519,7 +519,7 @@ class App(QMainWindow):
             return
 
         t0 = time()
-        plot = self.ui.plot_s
+        plot: mw.QMplTwinxPlot = self.ui.plot_s
         ax1, ax2 = plot.ax1, plot.ax2
         plot.clear()
 
@@ -561,9 +561,9 @@ class App(QMainWindow):
 
         # Visuals
         ax1.grid(True, linestyle=':')
-        leglines = ax1.legend(loc="upper left").get_lines()[2:4]
+        ax1.legend(loc="upper left")
         ax2.legend(loc="upper right")
-        for legline in leglines:
+        for legline in ax1.get_legend().get_lines()[2:4]:
             plot._hide_legline(legline)
 
         ax1.set_xlabel('Date & Time')
@@ -572,6 +572,7 @@ class App(QMainWindow):
         plot.fig.autofmt_xdate()
         plot.toggable_legend_lines()
         plot.align = True
+        plot.ax_ylimit = (0, df['powerP'].max()*1.05)
         plot.home_view()
         self.sim_line_style(self.ui.sim_line_style.text())
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
@@ -604,7 +605,7 @@ class App(QMainWindow):
             return
 
         t0 = time()
-        plot = self.ui.plot_op
+        plot: mw.QMplTwinxPlot = self.ui.plot_op
         ax1, ax2 = plot.ax1, plot.ax2
         plot.clear()
 

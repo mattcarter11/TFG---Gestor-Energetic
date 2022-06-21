@@ -52,6 +52,9 @@ class DataFrameIn:
             return DataFrameOut(df, False)
         return DataFrameIn(df, False)
 
+    def max_powerG(self):
+        return self.df['powerG'].max()
+
 class DataFrameOut (DataFrameIn):
 
     def __init__(self, df:pd.DataFrame, _correct=True):
