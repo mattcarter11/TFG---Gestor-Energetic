@@ -31,8 +31,7 @@ class WrapHeader(QHeaderView):
         size = super().sectionSizeFromContents(logicalIndex)
         if self.model():
             if size.width() > self.sectionSize(logicalIndex):
-                text = self.model().headerData(logicalIndex, 
-                    self.orientation(), Qt.DisplayRole)
+                text = self.model().headerData(logicalIndex, self.orientation(), Qt.DisplayRole)
                 if not text:
                     return size
                 # in case the display role is numeric (for example, when header 
@@ -41,21 +40,16 @@ class WrapHeader(QHeaderView):
 
                 option = QStyleOptionHeader()
                 self.initStyleOption(option)
-                alignment = self.model().headerData(logicalIndex, 
-                    self.orientation(), Qt.TextAlignmentRole)
+                alignment = self.model().headerData(logicalIndex, self.orientation(), Qt.TextAlignmentRole)
                 if alignment is None:
                     alignment = option.textAlignment
 
                 # get the default style margin for header text and create a 
                 # possible rectangle using the current section size, then use
                 # QFontMetrics to get the required rectangle for the wrapped text
-                margin = self.style().pixelMetric(
-                    QStyle.PM_HeaderMargin, option, self)
+                margin = self.style().pixelMetric(QStyle.PM_HeaderMargin, option, self)
                 maxWidth = self.sectionSize(logicalIndex) - margin * 2
-                rect = option.fontMetrics.boundingRect(
-                    QRect(0, 0, maxWidth, 10000), 
-                    alignment | Qt.TextWordWrap, 
-                    text)
+                rect = option.fontMetrics.boundingRect( QRect(0, 0, maxWidth, 10000),  alignment | Qt.TextWordWrap, text)
 
                 # add vertical margins to the resulting height
                 height = rect.height() + margin * 2
@@ -167,7 +161,7 @@ if __name__ == "__main__":
 
     view = QTableView()
     view.resize(400, 500)
-    view.setHorizontalHeader(WrapHeader(Qt.Horizontal, view))
+    view.setHorizontalHeader(WrapHeader(Qt.Horizontal))
     view.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
     view.setAlternatingRowColors(True)
     view.setSelectionBehavior(QTableView.SelectRows)

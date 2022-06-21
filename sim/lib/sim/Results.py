@@ -39,9 +39,10 @@ class Results:
         self.df_hour['energyL2'] = data_h_sum['powerL2'].values*self.Ts/3600
         self.df_hour['energySY'] = self.df_hour['energyP'].values + self.df_hour['energyG'].values
         self.df_hour['energyGR'] = self.df_hour['energyG'].values - self.df_hour['energyGD'].values
-        self.df_hour.loc[np.abs(self.df_hour['energyGR']) < 0.00001, 'energyGR'] = 0
         self.df_hour['energyGnP'] = self.df_hour['energyG'].values - self.df_hour['energyGP'].values
         self.df_hour['energyPC'] = self.df_hour['energyC'].values - self.df_hour['energyG'].values
+        self.df_hour['energyPL'] = self.df_hour['energyP'].values - self.df_hour['energyPC'].values
+        self.df_hour.loc[np.abs(self.df_hour['energyGR']) < 0.00001, 'energyGR'] = 0
 
        
         # Find aprox loads of each one
@@ -72,11 +73,10 @@ class Results:
             buy_price = [self.df_price.values[hour-1] for hour in self.df_hour['timestamp'].dt.hour]
             self.df_hour['balance'] = (self.df_hour['energyAB'].values*self.sell_price - self.df_hour['energyGD'].values*buy_price)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cént.
 
-        # Efficiency
+        # Efficiency Con. Max
         with np.errstate(divide='ignore', invalid='ignore'):
-            self.df_hour['efficiency'] = 100 - self.df_hour['energyL'].values/self.df_hour['energyCM'].values
-        self.df_hour.loc[self.df_hour['efficiency'].values < 0, 'efficiency'] = 100
-        self.df_hour['efficiency'] = self.df_hour['efficiency'].fillna(100)
+            self.df_hour['efficCM'] = 100 - (self.df_hour['energyL'].values/self.df_hour['energyCM'].values)*100
+            self.df_hour['efficGR'] = (self.df_hour['energyGR'].values/self.df_hour['energyGP'].values)*100
 
         # Commutations
         self.df_hour[on_off] = data_h_sum[on_off]
@@ -88,7 +88,9 @@ class Results:
         # Energy Balance - Add hourly columns to get one row series of the total        
         self.df_total = self.df_hour.sum(numeric_only=True).rename('energyT')
         self.df_total = self.df_total.to_frame()
-        self.df_total.loc['efficiency',:] = self.df_total.loc['efficiency',:] / self.df_hour.iloc[:,0].count()
+        with np.errstate(divide='ignore', invalid='ignore'):
+            self.df_total.loc['efficCM',:] = 100 - (self.df_total.loc['energyL',:]/self.df_total.loc['energyCM',:])*100
+            self.df_total.loc['efficGR',:] = (self.df_total.loc['energyGR',:]/self.df_total.loc['energyGP',:])*100
         self.df_total['energyDT'] = self.df_total['energyT'].mul(self.sim_days)
         self.df_total = self.df_total.T
             
@@ -119,7 +121,8 @@ class Results:
         # Convert to dataframe
         dic = {
             'loadAprox': self.aprox_loads,
-            'efficiency': {'total': self.df_total['efficiency'].values[0]}, 
+            'efficCM': {'total': self.df_total['efficCM'].values[0]}, 
+            'efficGR': {'total': self.df_total['efficGR'].values[0]}, 
             'balance': {'total': self.df_total['balance'].values[0]}, 
             'commut':commutations,  'commutD':daily_com, 
             'samplesOn':samples_on,  'hoursOn':hours_on, 'hoursOnD': hours_on_daily

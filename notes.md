@@ -6,7 +6,8 @@
 - 15/06/2022 a les 16:00
 - 16/06/2022 a les 15:00 -> canvi a predictiu = fail
 - 16/06/2022 a les 18:00 -> fixing
-- 18/06/2022 -> fixing time to use (not done, data results)
+- 18/06/2022 all day     -> fixing time to consume (not done, data results)
+- 21/06/2022 a les 16:23 -> testing ttc
 
 
 # === OLD ===

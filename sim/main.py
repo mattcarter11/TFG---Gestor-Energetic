@@ -8,8 +8,8 @@ import matplotlib as mp
 import numpy as np
 from lib.sim.Load import Load
 from lib.sim.Results import Results
-from lib.sim.Optimize import Optimize
-from lib.sim.PlotController import EBPlotController, SinglePlotController
+from lib.sim.Optimize import Optimize   
+from lib.sim.PlotController import EBPlotController, BarPlotController
 import lib.sim.Simulator as sim
 import lib.sim.AlgorithmsConfig as ac
 import lib.sim.DataFrames as df
@@ -58,8 +58,8 @@ class App(QMainWindow):
         self.results = self.optimize = self.df_out = None
         self.eb_plotC = EBPlotController()
         self.ebt_plotC = EBPlotController()
-        self.eff_plotC = SinglePlotController()
-        self.bl_plotC = SinglePlotController()
+        self.eff_plotC = BarPlotController()
+        self.bl_plotC = BarPlotController()
 
         t0 = time()
         super().__init__()
@@ -89,9 +89,9 @@ class App(QMainWindow):
     def load_ui_manual_part(self): 
         # Tables view style
         for table in self.ui.findChildren(QTableView):
-            table.setHorizontalHeader(pw.WrapHeader(Qt.Horizontal, table))
+            table.setHorizontalHeader(pw.WrapHeader(Qt.Horizontal))
             table.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
-            # table.horizontalHeader().sectionResized.connect(table.resizeRowsToContents)
+            table.horizontalHeader().setVisible(True)
         # Warning Optimize not resize on hiden
         pol = self.ui.op_recalc_warn.sizePolicy()
         pol.setRetainSizeWhenHidden(True)
@@ -135,14 +135,14 @@ class App(QMainWindow):
         # Energy balance plot
         self.ui.show_values_eb.stateChanged.connect( self.eb_plotC.set_show_values)
         self.ui.show_ecm_eb.stateChanged.connect( self.eb_plotC.set_show_cm)
-        self.ui.subdivide_eb.stateChanged.connect( self.eb_plotC.set_subdivide)
+        self.ui.subdivide_eb.currentIndexChanged.connect( self.eb_plotC.set_subdivide)
         # Other plot
         self.ui.show_values_eff.stateChanged.connect( self.eff_plotC.set_show_values)
         self.ui.show_values_balance.stateChanged.connect( self.bl_plotC.set_show_values)
         # Summary balance plot
         self.ui.show_values_t.stateChanged.connect( self.ebt_plotC.set_show_values)
         self.ui.show_ecm_t.stateChanged.connect( self.ebt_plotC.set_show_cm)
-        self.ui.subdivide_t.stateChanged.connect( self.ebt_plotC.set_subdivide)
+        self.ui.subdivide_t.currentIndexChanged.connect( self.ebt_plotC.set_subdivide)
         # Optimize
         self.ui.op_calculate.clicked.connect(self.optimize_press)
         self.ui.op_ax_left.currentIndexChanged.connect(self.plot_op)
@@ -320,7 +320,8 @@ class App(QMainWindow):
         self.ui.wh_eq.setText(f'Top threshold {self.tl_eq:.2f} Wh')
 
     def algorithm_changed(self, i):
-        self.ui.load2.setEnabled(i != 1)
+        self.ui.load1.setEnabled(i != 0)
+        self.ui.load2.setEnabled(i != 0)
         self.load_op_settings(i)
 
     def load_op_settings(self, i):
@@ -387,18 +388,20 @@ class App(QMainWindow):
         element = OpAlgorithm[alKey][opKey]
             
         def get_algorithm_config():
-            match self.ui.algorithm.currentIndex():
-                case 0: 
+            match alI:
+                case 0:
+                    return ac.AlgorithmConfig()
+                case 1: 
                     th_top1     = value if value is not None and element == 'th_top1' else self.ui.th_top1.value()
                     th_bottom1  = value if value is not None and element == 'th_bottom1' else self.ui.th_bottom1.value()
                     th_top2     = value if value is not None and element == 'th_top2' else self.ui.th_top2.value()
                     th_bottom2  = value if value is not None and element == 'th_bottom2' else self.ui.th_bottom2.value()
                     th_bottom2  = value if value is not None and element == 'th_bottom2' else self.ui.th_bottom2.value()
                     return ac.HysteresisConfig(th_top1, th_bottom1, th_top2, th_bottom2)
-                case 1: 
+                case 2: 
                     time_limit  = value if value is not None and element == 'time_limit' else self.ui.time_limit.value()
                     return ac.MinOnTimeConfig(time_limit)
-                case 2:
+                case 3:
                     end_at       = value if value is not None and element == 'ttc_end_at' else self.ui.ttc_end_at.value()
                     on_min       = value if value is not None and element == 'ttc_on_min' else self.ui.ttc_on_min.value()
                     time_factor  = value if value is not None and element == 'ttc_time_factor' else self.ui.ttc_time_factor.value()
@@ -433,7 +436,7 @@ class App(QMainWindow):
     #region -> Show results
     def show_results(self, df:pd.DataFrame): 
         header = ['energyT', 'energyDT']
-        columns = [col for col in list(COL_ORDER) if 'energy' in col and col not in header+['energyB']]
+        columns = [col for col in COL_ORDER if 'energy' in col and col not in header+['energyB']]
         self.ui.table_eb_t.setModel( QPandasModelTranslate(self.results.df_total[columns].T, i=1, use_unit=header) )
         self.ui.table_t.setModel( QPandasModelTranslate(self.results.df_results, use_unit=True) )
         self.ui.table_s.setModel( QPandasModelTranslate(df) )
@@ -471,7 +474,7 @@ class App(QMainWindow):
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
     #endregion
 
-    #region -> Plots <- TO DO
+    #region -> Plots
     def plot_in_data(self):
         plot = self.ui.plot_dr
         ax1, ax2 = plot.ax1, plot.ax2
@@ -535,16 +538,17 @@ class App(QMainWindow):
         # Add energy thresholds
         self.th_lines = []
         match self.ui.algorithm.currentIndex():
-            case 0:
+            case 1:
                 if self.ui.load1.value() > 0:
                     self.th_lines.append( ax2.axhline(self.ui.th_top1.value(), color=GRAY1) )
                     self.th_lines.append( ax2.axhline(self.ui.th_bottom1.value(), color=GRAY1) )
                 if self.ui.load2.value() > 0:
                     self.th_lines.append( ax2.axhline(self.ui.th_top2.value(), color=GRAY1) )
                     self.th_lines.append( ax2.axhline(self.ui.th_bottom2.value(), color=GRAY1) )
-            case 1:
-                self.th_lines.append( ax2.axhline(self.tl_eq, color=GRAY1) )
             case 2:
+                self.th_lines.append( ax2.axhline(self.tl_eq, color=GRAY1) )
+                self.th_lines.append( ax2.axhline(self.tl_eq*2, color=GRAY1) )
+            case 3:
                 self.th_lines.append( ax2.axhline(self.ui.ttc_end_at.value(), color=GRAY1) )
                 self.th_lines.append( ax2.axhline(self.ui.ttc_on_min.value(), color=GRAY1) )
         self.toggle_th(self.ui.show_th.isChecked())
@@ -575,14 +579,14 @@ class App(QMainWindow):
     def plot_eb(self):
         if self.results is not None:
             showV = self.ui.show_values_eb.isChecked()
-            showD = self.ui.subdivide_eb.isChecked()
+            showD = self.ui.subdivide_eb.currentIndex()
             showCM = self.ui.show_ecm_eb.isChecked()
             self.eb_plotC.new_plot(self.results.df_hour, self.ui.plot_eb, showV, showD, showCM)
 
     def plot_other(self):
         if self.results is not None:
             showV = self.ui.show_values_eff.isChecked()
-            self.eff_plotC.new_plot(self.results.df_hour[['timestamp','efficiency']], self.ui.plot_eff, showV, lrot=None)
+            self.eff_plotC.new_plot(self.results.df_hour[['timestamp','efficCM']], self.ui.plot_eff, showV, lrot=None)
             showV = self.ui.show_values_balance.isChecked()
             self.bl_plotC.new_plot(self.results.df_hour[['timestamp','balance']], self.ui.plot_balance, showV, lrot=None)
 
@@ -591,7 +595,7 @@ class App(QMainWindow):
             data = self.results.df_total
             data['timestamp'] = self.results.df_hour.iloc[-1]['timestamp']
             showV = self.ui.show_values_t.isChecked()
-            showD = self.ui.subdivide_t.isChecked()
+            showD = self.ui.subdivide_t.currentIndex()
             showCM = self.ui.show_ecm_t.isChecked()
             self.ebt_plotC.new_plot(data, self.ui.plot_eb_t, showV, showD, showCM, None, 'horizontal', False)
 

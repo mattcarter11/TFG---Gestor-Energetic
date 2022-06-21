@@ -108,6 +108,8 @@ class DataFrameOut (DataFrameIn):
 
             if calcB: 
                 self.df['energyB'] = energyB
-                self.split_energyB() 
             if calcP: 
                 self.df['energyP'] = energyP
+        if any([x not in self.df.columns for x in ['energyAB', 'energyGD']]):
+            self.split_energyB() 
+        

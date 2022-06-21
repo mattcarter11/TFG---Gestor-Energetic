@@ -14,17 +14,19 @@ OCT = {
     'powerP'    :{"color":'#33ab1d',    "unit":'W',     "translate": ('Power Produced', 'Produced')}, 
     'powerC'    :{"color":'#f8a62a',    "unit":'W',     "translate": ('Power Consumed', 'Consumed')},
     'powerG'    :{"color":'#dc604d',    "unit":'W',     "translate": ('Power Grid', 'Grid')},
+    'powerGP'   :{"color":GRAY1,        "unit":'W',     "translate": ('Power Grid while Prod.', 'Grid while Prod.')},
     'powerA'    :{"color":'#4b90f3',    "unit":'W',     "translate": ('Power Available', 'Available')},
     'powerLB'   :{"color":'#e7d6a9',    "unit":'W',     "translate": ('Power Base Load', 'Base Load')},
     'powerL1'   :{"color":'#fdc26c',    "unit":'W',     "translate": ('Power Load 1', 'Load 1')},
     'powerL2'   :{"color":'#ffd463',    "unit":'W',     "translate": ('Power Load 2', 'Load 2')},
-    'powerGP'   :{"color":None,         "unit":'W',     "translate": ('Power Grid while Prod.', 'Grid while Prod.')},
 
-    'on_offL1'  :{"color":None,         "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
-    'on_offL2'  :{"color":None,         "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
+    'on_offL1'  :{"color":GRAY1,        "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
+    'on_offL2'  :{"color":GRAY1,        "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
 
     'energySY'  :{"color":'#195aa7',    "unit":'Wh',    "translate": ('Energy System', 'System')}, 
     'energyP'   :{"color":'#2176db',    "unit":'Wh',    "translate": ('Energy Produced', 'Produced')}, 
+    'energyPC'  :{"color":'#2176db',    "unit":'Wh',    "translate": ('Energy Produced Consumed', 'Prod Cons')},
+    'energyPL'  :{"color":'#60b0ff',    "unit":'Wh',    "translate": ('Energy Produced Left', 'Prod. Left')}, 
     'energyG'   :{"color":'#dc604d',    "unit":'Wh',    "translate": ('Energy Grid', 'Grid')}, 
     'energyGP'  :{"color":'#d03429',    "unit":'Wh',    "translate": ('Energy Grid while Prod.', 'Grid w Prod.')},
     'energyGnP' :{"color":GRAY1,        "unit":'Wh',    "translate": ('Energy Grid while not Prod.', 'Grid w not Prod.')},
@@ -39,15 +41,15 @@ OCT = {
     'energyS'   :{"color":'#7ad92b',    "unit":'Wh',    "translate": ('Energy Surplus', 'Surplus')},
     'energyL'   :{"color":'#f98e7e',    "unit":'Wh',    "translate": ('Energy Lost', 'Lost')},
     'energyGR'  :{"color":'#9865c6',    "unit":'Wh',    "translate": ('Energy Returned Grid', 'Returned Grid')},
-    'energyPC'  :{"color":None,         "unit":'Wh',    "translate": ('Energy Produced Consumed', 'Prod Cons')},
 
 
     'energyT'   :{"color":None,         "unit":'Wh',    "translate": ('Total Energy', 'Total')},
     'energyDT'  :{"color":None,         "unit":'Wh/day',"translate": ('Daily Total', 'Daily Total')},
 
     'loadAprox' :{"color":None,         "unit":'W',     "translate": ('Aprox. Load', 'Aprox. Load')},
-    'efficiency':{"color":GREEN1,       "unit":'%',     "translate": ('Efficiency', 'Efficiency')},
-    'balance'   :{"color":'#60b0ff',     "unit":'cént.', "translate": ('Balance', 'Balance')},
+    'efficCM'   :{"color":GREEN1,       "unit":'%',     "translate": ('Cons. Max. Efficiency', 'Cons. Max. Effic.')},
+    'efficGR'   :{"color":'#ef8271',    "unit":'%',     "translate": ('Grid Ret. Efficiency', 'Grid Ret. Effic.')},
+    'balance'   :{"color":'#60b0ff',    "unit":'cént.', "translate": ('Balance', 'Balance')},
     'commut'    :{"color":None,         "unit":'',      "translate": ('Commutations', 'Commut.')},
     'commutD'   :{"color":None,         "unit":'',      "translate": ('Daily Commutations', 'Daily Commut.')},
     'samplesOn' :{"color":None,         "unit":'',      "translate": ('Samples On', 'Samples On')},
@@ -76,15 +78,16 @@ def oct_translate(key:str, i:int=0, use_unit:bool=False):
 
 
 SettingsQDateTimeEdits = ('start_date', 'end_date')
-SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'op_setting', 'op_ax_right', 'op_ax_left')
+SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'subdivide_eb', 'subdivide_t', 'op_setting', 'op_ax_right', 'op_ax_left')
 SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'ttc_end_at', 'ttc_on_min')
 SettingsQDoubleSpinBox = [ 'op_start', 'op_end', 'op_step', 'ttc_time_factor', 'sell_price', 'generation_factor']
-SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'subdivide_eb', 'show_values_eff', 'show_values_balance', 'show_values_t', 'show_ecm_t', 'subdivide_t')
+SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'show_values_eff', 'show_values_balance', 'show_values_t', 'show_ecm_t')
 SettingsQLineEdits = ('data_line_style', 'sim_line_style')
 
 OpAxDict = {
     'None'                      :{'row':'none',     'column':'none',        'table':None}, 
-    'Efficiency [%]'            :{'row':'total',    'column':'efficiency',  'table':'results'}, 
+    'Cons. Max. Efficiency [%]' :{'row':'total',    'column':'efficCM',  'table':'results'}, 
+    'Grid Ret. Efficiency [%]'  :{'row':'total',    'column':'efficGR',  'table':'results'}, 
     'Balance [cént.]'           :{'row':'total',    'column':'balance',     'table':'results'}, 
     'Daily Commutations'        :{'row':'total',    'column':'commutD',     'table':'results'}, 
     'Daily Commut. Load 1'      :{'row':'load1',    'column':'commutD',     'table':'results'}, 

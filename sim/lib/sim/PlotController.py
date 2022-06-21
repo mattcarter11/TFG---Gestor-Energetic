@@ -1,5 +1,6 @@
 from abc import abstractclassmethod
 import warnings
+from matplotlib import colors
 from pandas import DataFrame
 from ..myQT.QMplWidgets import QMplPlot
 from .constants import oct_color, oct_translate
@@ -7,29 +8,32 @@ from .constants import oct_color, oct_translate
 warnings.filterwarnings("ignore", category=UserWarning)
 
 if True:
-    # Sum of each stacked type
-    barsT = ['energyC', 'energySY', 'energyGR', 'energyAB']
-    labelsT = [oct_translate(col, 1) for col in barsT]
-    colorsT = [oct_color(col) for col in barsT]
-    # Energy loads subtypes
-    barsL = ['energyLB', 'energyL1', 'energyL2']
-    labelsL = [oct_translate(col, 1) for col in barsL]
-    colorsL = [oct_color(col) for col in barsL]
-    # Energy system subtypes
-    barsSY = ['energyG', 'energyP']
-    labelsSY = [oct_translate(col, 1) for col in barsSY]
-    colorsSY = [oct_color(col) for col in barsSY]
-    # Energy left subtypes
-    barsGSL = ['energyGR', 'energyL', 'energyS']
-    labelsGSL = [oct_translate(col, 1) for col in barsGSL]
-    colorsGSL = [oct_color(col) for col in barsGSL]
-    # All
-    barsD = barsL + barsSY + barsGSL
-    labelsD = labelsL + labelsSY + labelsGSL
+    # System view
+    barsS0  = [['energyC'], ['energySY'], ['energyPL']]
+    barsS0_ = [col for grup in barsS0 for col in grup]
+    labelsS0 = [oct_translate(col, 1) for col in barsS0_]
+    colorsS0 = [oct_color(col) for col in barsS0_]
+    # Subdivide 1
+    barsS1   = [['energyLB', 'energyL1', 'energyL2'], ['energyG', 'energyP'], ['energyGR', 'energyAB']]
+    labelsS1 = [[oct_translate(col, 1) for col in grup] for grup in barsS1 ]
+    colorsS1 = [[oct_color(col) for col in grup] for grup in barsS1]
+    # Subdivide 2
+    barsS2   = [[], ['energyGP', 'energyGnP', 'energyPC','energyPL'], ['energyGR', 'energyL', 'energyS']]
+    labelsS2 = [[oct_translate(col, 1) for col in grup] for grup in barsS2]
+    colorsS2 = [[oct_color(col) for col in grup] for grup in barsS2]
     # Energy consume max
-    barsCM = ['energyCM']
+    barsCM   = ['energyCM']
     labelsCM = [oct_translate(col, 1) for col in barsCM]
     colorsCM = [oct_color(col) for col in barsCM]
+
+def flatten(x):
+    result = []
+    for el in x:
+        if isinstance(el, list):
+            result.extend(flatten(el))
+        else:
+            result.append(el)
+    return result
 
 class BarPlotController:
 
@@ -38,11 +42,11 @@ class BarPlotController:
         self.showV = False
         self.showD = False
         self.showCM = False
-        self.glabels = [[], [], []]
-        self.gbars = [[], [], []]
-        self.ghandlab = [[], [], []]
+        self.glabels = None # Base, Divide 1, Divide 2, CM
+        self.gbars = None
+        self.ghandlab = None
 
-    def new_plot(self, data:DataFrame, plot:QMplPlot, showV:bool=True, showD:bool=True, showCM:bool=True, gaxis:str='both', lrot:str='vertical', xtime:bool=True):
+    def new_plot(self, data:DataFrame, plot:QMplPlot, showV:bool=True, showD:int=0, showCM:bool=True, gaxis:str='both', lrot:str='vertical', xtime:bool=True):
         self.data = data
         self.plot = plot
         self.showV = showV
@@ -59,9 +63,35 @@ class BarPlotController:
         self._set_legend()
         self.plot.draw_idle()
 
-    @abstractclassmethod
     def _plot_bars(self):
-        pass
+        columns = self.data.columns[1:].values
+        colors = [oct_color(col) for col in columns]
+        labels = [oct_translate(col) for col in columns]
+        ax = self.plot.ax
+        self.plot.clear()
+        
+        # Plot types
+        self.data.plot.bar(y=columns, ax=ax, color=colors, label=labels, width=0.60)
+
+        # Add Labels + Separate containers
+        containers = ax.containers
+        self.glabels= [[[]], [[]], [[]], []]
+        for i, col in enumerate(columns):
+            labels = [f'{p:.3f}' for p in self.data[col]]
+            self.glabels[0][0].extend( ax.bar_label(containers[i], labels=labels, rotation=self.lrot, color=colors[i], fontsize=8, padding=4) )
+
+        # Visuals
+        ax.margins(y=0.1)
+        ax.legend(loc="upper right")
+        if len(columns) == 1:
+            ylabel = oct_translate(columns[0], 0, True)
+        else:
+            ylabel = 'Efficiency [%]'
+        ax.set_ylabel(ylabel)
+        self._xformat()
+        self._plot_grid()
+        self.plot.home_view()
+        self.plotted = True
 
     def set_show_values(self, val:bool):
         if self.plotted and val != self.showV:
@@ -86,32 +116,55 @@ class BarPlotController:
             self.plot.draw_idle()
 
     def _set_show_values(self, val:bool):
-        for label in self.glabels[0]:
-            label.set_visible(val and not self.showD)
-        for label in self.glabels[1]:
-            label.set_visible(val and self.showD)
-        for label in self.glabels[2]:
-            label.set_visible(val and self.showCM)
-        self.showV = val
+        if self.glabels is not None:
+            for label in list(flatten(self.glabels)):
+                label.set_visible(False)
+            if val:
+                for glabels in self.glabels[self.showD]:
+                    for label in glabels:
+                        label.set_visible(True)
+                for label in self.glabels[3]:
+                    label.set_visible(self.showCM)
+            self.showV = val
 
     def _set_subdivide(self, val:bool):
-        for bar in self.gbars[1]:
-            bar.set_visible(val)
-        for bar in self.gbars[0]:
-            bar.set_visible(not val)
+        if self.gbars is not None:
+            for label in list(flatten(self.gbars[:-1])):
+                label.set_visible(False)
+            for gbars in self.gbars[val]:
+                for bar in gbars:
+                    bar.set_visible(True)
 
     def _set_show_cm(self, val:bool):
-        for bar in self.gbars[2]:
-            bar.set_visible(val)
+        if self.gbars is not None:
+            for bar in self.gbars[3]:
+                bar.set_visible(val)
 
     def _set_legend(self):
-        val = [not self.showD, self.showD, self.showCM]
-        handles, labels = self.plot.ax.get_legend_handles_labels()
-        for j, ghandlab in enumerate(self.ghandlab):
-            for handler, label in ghandlab:
-                i = handles.index(handler)
-                labels[i] = label if val[j] else f'_{label}'
-        self.plot.ax.legend(handles, labels, loc="upper right")
+        if self.ghandlab is not None:
+            val = [self.showD == 0, self.showD == 1, self.showD == 2, self.showCM]
+            handles, labels = self.plot.ax.get_legend_handles_labels()
+            for j, sublevel in enumerate(self.ghandlab):
+                for ghandlab in sublevel:
+                    for handler, label in ghandlab:
+                        i = handles.index(handler)
+                        labels[i] = label if val[j] else f'_{label}'
+            self.plot.ax.legend(handles, labels, loc="upper right")
+
+    def _plot_grid(self):
+        if self.gaxis != None:
+            self.plot.ax.set_axisbelow(True)
+            self.plot.ax.grid(True, linestyle=':', axis=self.gaxis)
+
+    def _xformat(self):
+        ax = self.plot.ax
+        if self.xtime:
+            ax.set_xlabel('Hour Zone [h]')
+            ax.set_xticklabels([x.strftime("%m-%d %H") for x in self.data['timestamp']], rotation=45)
+            self.plot.fig.autofmt_xdate()
+        else:
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
+            self.plot.ax_xlimit= (-0.38, 1.75)
 
 class EBPlotController(BarPlotController):
 
@@ -125,103 +178,68 @@ class EBPlotController(BarPlotController):
         ax = self.plot.ax
         self.plot.clear()
         
-        # Plot types
+        # Plot System view
         width = 0.2
-        self.data.plot.bar(y=barsT[:2], ax=ax, color=colorsT[:2], label=labelsT[:2], position=0.75, width=width*2)
-        self.data.plot.bar(y=barsT[2:], ax=ax, color=colorsT[2:], label=labelsT[2:], stacked=True, position=-0.5, width=width)
+        self.data.plot.bar(y=barsS0_, ax=ax, color=colorsS0, label=labelsS0, width=width*3)
         pre_xlim = ax.get_xlim()
     
         # Plot Load Subtypes
-        pos = 1.5
-        self.data.plot.bar(y=barsL, ax=ax, color=colorsL, label=labelsL, stacked=True, position=pos, width=width)
-        # Plot System Subtypes
-        pos = 0.5
-        self.data.plot.bar(y=barsSY, ax=ax, color=colorsSY, label=labelsSY, stacked=True, position=pos, width=width)
-        # Plot Load Subtypes
-        pos = -0.5
-        self.data.plot.bar(y=barsGSL, ax=ax, color=colorsGSL, label=labelsGSL, stacked=True, position=pos, width=width)
-        # Reset ax limits
+        for i in range(len(barsS0_)):
+            if barsS1[i] != []:
+                self.data.plot.bar(y=barsS1[i], ax=ax, color=colorsS1[i], label=labelsS1[i], stacked=True, position=1.5-1*i, width=width)
+        for i in range(len(barsS0_)):
+            if barsS2[i] != []:
+                self.data.plot.bar(y=barsS2[i], ax=ax, color=colorsS2[i], label=labelsS2[i], stacked=True, position=1.5-1*i, width=width)
         ax.set_xlim(pre_xlim)
+
         # Plot energy Consum
         self.data.plot.bar(y=barsCM, ax=ax, color="none", edgecolor=colorsCM, label=labelsCM, stacked=True, position=1.5, width=width)
 
         # Add Labels + Separate containers
         containers = ax.containers
-        self.glabels = [[], [], []]
-        self.gbars = [[], [], []]
-        # Types
-        for i, name in enumerate(barsT):
-            labels = [f'{p:.0f}' for p in self.data[name]]
-            self.glabels[0].extend( ax.bar_label(containers[i], labels=labels, rotation=self.lrot, color=colorsT[i], fontsize=8, padding=4) )
-        off = i+1
-        # Subtypes
-        for i, name in enumerate(barsD):
-            labels = [f'{p:.0f}' for p in self.data[name]]
-            self.glabels[1].extend(ax.bar_label(containers[i+off], labels=labels, rotation=self.lrot, fontsize=8, color='#1e1e1e', label_type='center') )
-            self.gbars[1].extend(containers[i+off])
-        off +=i+1
-        # Energy ConsumeMax
+        self.glabels = [[], [], [], []]
+        self.gbars = [[], [], [], []]
+        off = 0
+        # Labels System, Subdivide 1 & 2
+        for j, barsX in enumerate([ barsS0, barsS1, barsS2 ]):
+            for p, bars in enumerate(barsX):
+                if bars == []: # No divisions, use previous labels
+                    self.glabels[j].append(self.glabels[j-1][p])
+                    self.gbars[j].append(self.gbars[j-1][p])
+                    off += len(bars)
+                else:
+                    self.glabels[j].append([])
+                    self.gbars[j].append([])
+                    for i, name in enumerate(bars):
+                        labels = [f'{p:.0f}' for p in self.data[name]]
+                        self.glabels[j][p].extend(ax.bar_label(containers[i+off], labels=labels, rotation=self.lrot, fontsize=8, color='#1e1e1e', label_type='center') )
+                        self.gbars[j][p].extend(containers[i+off])
+                    off += i+1
+        # Labels Energy ConsumeMax
         labels = [f'{p:.0f}' for p in self.data[barsCM[0]]]
-        self.glabels[2].extend( ax.bar_label(containers[off], labels=labels, rotation=self.lrot, color=colorsCM[0], fontsize=8, padding=4) )
-        self.gbars[2].extend(containers[off])
+        self.glabels[j+1].extend( ax.bar_label(containers[off], labels=labels, rotation=self.lrot, color=colorsCM[0], fontsize=8, padding=4) )
+        self.gbars[j+1].extend(containers[off])
 
         # Visuals
         ax.margins(y=0.1)
         ax.legend()
         ax.set_ylabel('Energy [Wh]')
-        if self.gaxis != None:
-            ax.set_axisbelow(True)
-            ax.grid(True, linestyle=':', axis=self.gaxis)
-        if self.xtime:
-            ax.set_xlabel('Hour Zone [h]')
-            ax.set_xticklabels([x.strftime("%m-%d %H") for x in self.data['timestamp']], rotation=45)
-            self.plot.fig.autofmt_xdate()
-        else:
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
-            self.plot.ax_xlimit= (-0.38, 1.75)
+        self._xformat()
+        self._plot_grid()
         self.plot.home_view()
-        self.ghandlab = [[], [],[]]
+        self.plotted = True
+
+        # Legend handles
         h, l = self.plot.ax.get_legend_handles_labels()
-        for i in range(len(barsT)):
-            self.ghandlab[0].append((h[i], l[i]))
-        off = i+1
-        for i in range(len(barsD)):
-            self.ghandlab[1].append((h[i+off], l[i+off]))
-        off += i+1
-        self.ghandlab[2].append((h[off], l[off]))
-
-
-        self.plotted = True
-
-class SinglePlotController(BarPlotController):
-
-    def _plot_bars(self):
-        column = self.data.columns[1]
-        ax = self.plot.ax
-        self.plot.clear()
-        
-        # Plot types
-        self.data.plot.bar(y=column, ax=ax, color=oct_color(column), label=oct_translate(column), width=0.60)
-
-        # Add Labels + Separate containers
-        containers = ax.containers[0]
-        self.glabels= [[], [], []]
-        labels = [f'{p:.3f}' for p in self.data[column]]
-        self.glabels[0].extend( ax.bar_label(containers, labels=labels, rotation=self.lrot, color=oct_color(column), fontsize=8, padding=4) )
-
-        # Visuals
-        ax.margins(y=0.1)
-        ax.legend(loc="upper right")
-        ax.set_ylabel(oct_translate(column, 0, True))
-        if self.gaxis != None:
-            ax.set_axisbelow(True)
-            ax.grid(True, linestyle=':', axis=self.gaxis)
-        if self.xtime:
-            ax.set_xlabel('Hour Zone [h]')
-            ax.set_xticklabels([x.strftime("%m-%d %H") for x in self.data['timestamp']], rotation=45)
-            self.plot.fig.autofmt_xdate()
-        else:
-            ax.set_xticklabels(ax.get_xticklabels(), rotation=0)
-            self.plot.ax_xlimit= (-0.38, 1.75)
-        self.plot.home_view()
-        self.plotted = True
+        self.ghandlab = [[], [], [], []]
+        off = 0
+        for j, barsX in enumerate([ barsS0, barsS1, barsS2 ]):
+            for p, bars in enumerate(barsX):
+                if bars == []: # No divisions, use previous handles
+                    self.ghandlab[j].append(self.ghandlab[j-1][p])
+                else:
+                    self.ghandlab[j].append([])
+                    for i in range(len(bars)):
+                        self.ghandlab[j][p].append((h[i+off], l[i+off]))
+                    off += i+1
+        self.ghandlab[j+1].append([(h[off], l[off])])

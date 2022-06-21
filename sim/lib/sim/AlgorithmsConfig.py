@@ -1,12 +1,15 @@
 from enum import Enum
 
 class AlgorithmsEnum(Enum):
+    none = 0
     hysteresis = 1
     min_on_time = 2
     time_to_consume = 3
 
 class AlgorithmConfig():
-    pass
+    def __init__(self):
+        self.type = AlgorithmsEnum.none
+
 
 class HysteresisConfig(AlgorithmConfig):
     def __init__(self, th_top1:float, th_bottom1:float, th_top2:float, th_bottom2:float):

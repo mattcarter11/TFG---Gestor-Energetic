@@ -7,7 +7,8 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
     #region -> Init
     use_df_bl = isinstance(df_in, DataFrameOut) and baseload is None
     current_hour = None
-    off_timestamp_limit = dt.datetime.now()
+    two_load_system = load1.power > 0 and load2.power > 0
+    off_timestamps = [dt.datetime.now(), dt.datetime.now()]
     sim_data = {'powerC':[], 'powerLB':[], 'powerL1':[], 'powerL2':[], 'energyP':[], 'energyB':[], 'on_offL1':[], 'on_offL2':[]}
     #endregion
 
@@ -46,25 +47,55 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
                         on_offL2 = load2.turn_off()
             
             case AlgorithmsEnum.min_on_time:
-                time_to_use = energy_b/load1.power * 3600 # [s] <- Wh/W = h
-                if time_to_use >= algorithm.min_on_time:
-                    off_timestamp_limit = timestamp + dt.timedelta(seconds=algorithm.min_on_time)
-                    on_offL1 = load1.turn_on()
-                elif timestamp >= off_timestamp_limit:
+                if two_load_system:
+                    time_to_use = energy_b/(load1.power+load2.power) * 3600 # [s] <- Wh/W = h
+                    if time_to_use >= algorithm.min_on_time:
+                        off_timestamps = [timestamp + dt.timedelta(seconds=algorithm.min_on_time)]*2
+                        on_offL1 = load1.turn_on()
+                        on_offL2 = load2.turn_on()
+                    else:
+                        time_to_use = energy_b/load1.power * 3600 # [s] <- Wh/W = h
+                        if time_to_use >= algorithm.min_on_time:
+                            off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.min_on_time)
+                            on_offL1 = load1.turn_on()
+                else:
+                    time_to_use = energy_b/load1.power * 3600 # [s] <- Wh/W = h
+                    if time_to_use >= algorithm.min_on_time:
+                        off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.min_on_time)
+                        on_offL1 = load1.turn_on()
+                
+                if timestamp >= off_timestamps[0]:
                     on_offL1 = load1.turn_off()
+                if timestamp >= off_timestamps[1]:
+                    on_offL2 = load2.turn_off()
 
             case AlgorithmsEnum.time_to_consume:
                 time_remaining = (next_hour - timestamp).total_seconds()
-
-                on_offL1 = _TTC_load_control_on(load1, energy_b, power_a, time_remaining, algorithm)
-                power_a_ = power_g - (power_lb + load1.get_power() + load2.get_power())
-                on_offL2 = _TTC_load_control_on(load2, energy_b, power_a_, time_remaining, algorithm)
-
-                power_a_ = power_g - (power_lb + load1.get_power() + load2.get_power())
-                on_offL2 = _TTC_load_control_off(load2, energy_b, power_a_, time_remaining, algorithm)
                 
-                power_a_ = power_g - (power_lb + load1.get_power() + load2.get_power())
-                on_offL1 = _TTC_load_control_off(load1, energy_b, power_a_, time_remaining, algorithm)
+                match algorithm.predict_final_energy:
+                    case PredictFinalEnergy.disabled:
+                        energy1h = energy_b
+                    case PredictFinalEnergy.avarage_power:
+                        avg = energy_b / (3600-time_remaining)
+                        energy1h = avg*3600
+                    case PredictFinalEnergy.project_current_power:
+                        energy1h = energy_b + time_remaining*(power_a)/3600
+
+                on1, on2 = load1.on, load2.on
+                if two_load_system:
+                    if not on1:
+                        on_offL1 = _TTC_load_control_on(load1, energy1h, time_remaining, algorithm)
+                    elif on1 and not on2:
+                        on_offL2 = _TTC_load_control_on(load2, energy1h, time_remaining, algorithm)
+                        if not on_offL2:
+                            on_offL1 = _TTC_load_control_off(load1, energy_b, power_a, time_remaining, algorithm)
+                    elif on1 and on2:
+                        on_offL2 = _TTC_load_control_off(load2, energy_b, power_a, time_remaining, algorithm)
+                else:
+                    if not on1:
+                        on_offL1 = _TTC_load_control_on(load1, energy1h, time_remaining, algorithm)
+                    elif on1 and not on2:
+                        on_offL1 = _TTC_load_control_off(load1, energy_b, power_a, time_remaining, algorithm)
         #endregion
 
         #region -> [Simulation] Calc/Save other energys for data avaluation [Wh]
@@ -91,24 +122,15 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
     df_out.rearange_cols()
     return df_out
 
-def _TTC_load_control_on(load:Load, energy_b:float, power_a:float, time_remaining:float, algorithm:AlgorithmConfig):
-    match algorithm.predict_final_energy:
-        case PredictFinalEnergy.disabled:
-            energy1h = energy_b
-        case PredictFinalEnergy.avarage_power:
-            avg = energy_b / (3600-time_remaining)
-            energy1h = avg*3600
-        case PredictFinalEnergy.project_current_power:
-            energy1h = energy_b + time_remaining*(power_a)/3600
-
-    if load.power > 0 and not load.on and energy1h >= algorithm.on_min_energy:
+def _TTC_load_control_on(load:Load, energy1h:float, time_remaining:float, algorithm:AlgorithmConfig):
+    if not load.on and energy1h >= algorithm.on_min_energy:
         time_to_use = energy1h / load.power * 3600 # [s] <- Wh/W = h
         if time_to_use >= (time_remaining*algorithm.time_factor):
             return load.turn_on()
     return 0
 
 def _TTC_load_control_off(load:Load, energy_b:float, power_a:float, time_remaining:float, algorithm:AlgorithmConfig):
-    if load.power > 0 and load.on:
+    if load.on:
         energy1h_if_off = energy_b + (power_a + load.get_power()) * time_remaining / 3600
         if energy1h_if_off <= algorithm.end_at_energy:
             return load.turn_off()

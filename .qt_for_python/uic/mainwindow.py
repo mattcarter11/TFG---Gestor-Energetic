@@ -118,6 +118,7 @@ class Ui_MainWindow(object):
         self.algorithm.addItem("")
         self.algorithm.addItem("")
         self.algorithm.addItem("")
+        self.algorithm.addItem("")
         self.algorithm.setObjectName(u"algorithm")
 
         self.algorithm_option.addWidget(self.algorithm)
@@ -140,6 +141,9 @@ class Ui_MainWindow(object):
         self.algorithm_options.setFrameShadow(QFrame.Plain)
         self.algorithm_options.setLineWidth(1)
         self.algorithm_options.setMidLineWidth(0)
+        self.page_2 = QWidget()
+        self.page_2.setObjectName(u"page_2")
+        self.algorithm_options.addWidget(self.page_2)
         self.th_options = QWidget()
         self.th_options.setObjectName(u"th_options")
         sizePolicy2 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
@@ -454,6 +458,94 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addLayout(self.options, 0, 0, 1, 1)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.load_file = QPushButton(self.centralwidget)
+        self.load_file.setObjectName(u"load_file")
+
+        self.horizontalLayout.addWidget(self.load_file)
+
+        self.unload_file = QPushButton(self.centralwidget)
+        self.unload_file.setObjectName(u"unload_file")
+
+        self.horizontalLayout.addWidget(self.unload_file)
+
+        self.file_path = QLineEdit(self.centralwidget)
+        self.file_path.setObjectName(u"file_path")
+        self.file_path.setEnabled(True)
+        self.file_path.setReadOnly(True)
+
+        self.horizontalLayout.addWidget(self.file_path)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 2)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.sampling_rate = QLabel(self.centralwidget)
+        self.sampling_rate.setObjectName(u"sampling_rate")
+
+        self.horizontalLayout_4.addWidget(self.sampling_rate)
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setLineWidth(0)
+        self.line.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line)
+
+        self.date_range = QLabel(self.centralwidget)
+        self.date_range.setObjectName(u"date_range")
+
+        self.horizontalLayout_4.addWidget(self.date_range)
+
+        self.line_2 = QFrame(self.centralwidget)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShadow(QFrame.Plain)
+        self.line_2.setLineWidth(0)
+        self.line_2.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line_2)
+
+        self.calc_time = QLabel(self.centralwidget)
+        self.calc_time.setObjectName(u"calc_time")
+
+        self.horizontalLayout_4.addWidget(self.calc_time)
+
+        self.line_3 = QFrame(self.centralwidget)
+        self.line_3.setObjectName(u"line_3")
+        self.line_3.setFrameShadow(QFrame.Plain)
+        self.line_3.setLineWidth(0)
+        self.line_3.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line_3)
+
+        self.plotting_time = QLabel(self.centralwidget)
+        self.plotting_time.setObjectName(u"plotting_time")
+
+        self.horizontalLayout_4.addWidget(self.plotting_time)
+
+        self.line_11 = QFrame(self.centralwidget)
+        self.line_11.setObjectName(u"line_11")
+        self.line_11.setFrameShadow(QFrame.Plain)
+        self.line_11.setLineWidth(0)
+        self.line_11.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line_11)
+
+        self.n_samples = QLabel(self.centralwidget)
+        self.n_samples.setObjectName(u"n_samples")
+
+        self.horizontalLayout_4.addWidget(self.n_samples)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout_4, 2, 0, 1, 2)
+
         self.data = QVBoxLayout()
         self.data.setObjectName(u"data")
         self.tabs = QTabWidget(self.centralwidget)
@@ -639,21 +731,25 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.setObjectName(u"horizontalLayout_8")
         self.plot_eb_t = QMplPlot(self.global_results)
         self.plot_eb_t.setObjectName(u"plot_eb_t")
-        sizePolicy3.setHeightForWidth(self.plot_eb_t.sizePolicy().hasHeightForWidth())
-        self.plot_eb_t.setSizePolicy(sizePolicy3)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy7.setHorizontalStretch(0)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.plot_eb_t.sizePolicy().hasHeightForWidth())
+        self.plot_eb_t.setSizePolicy(sizePolicy7)
 
         self.horizontalLayout_8.addWidget(self.plot_eb_t)
 
         self.verticalLayout_5 = QVBoxLayout()
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_5 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_5 = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_5)
 
         self.table_eb_t = QTableView(self.global_results)
         self.table_eb_t.setObjectName(u"table_eb_t")
-        sizePolicy1.setHeightForWidth(self.table_eb_t.sizePolicy().hasHeightForWidth())
-        self.table_eb_t.setSizePolicy(sizePolicy1)
+        sizePolicy3.setHeightForWidth(self.table_eb_t.sizePolicy().hasHeightForWidth())
+        self.table_eb_t.setSizePolicy(sizePolicy3)
+        self.table_eb_t.setMinimumSize(QSize(350, 0))
         self.table_eb_t.setMaximumSize(QSize(350, 10000000))
         self.table_eb_t.setContextMenuPolicy(Qt.PreventContextMenu)
         self.table_eb_t.setFrameShape(QFrame.NoFrame)
@@ -665,14 +761,10 @@ class Ui_MainWindow(object):
         self.table_eb_t.setTextElideMode(Qt.ElideNone)
         self.table_eb_t.setSortingEnabled(False)
         self.table_eb_t.setWordWrap(True)
-        self.table_eb_t.horizontalHeader().setCascadingSectionResizes(False)
-        self.table_eb_t.horizontalHeader().setStretchLastSection(True)
-        self.table_eb_t.verticalHeader().setVisible(True)
-        self.table_eb_t.verticalHeader().setMinimumSectionSize(10)
 
         self.verticalLayout_5.addWidget(self.table_eb_t, 0, Qt.AlignHCenter)
 
-        self.verticalSpacer_6 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_6 = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_6)
 
@@ -684,12 +776,9 @@ class Ui_MainWindow(object):
 
         self.table_t = QTableView(self.global_results)
         self.table_t.setObjectName(u"table_t")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Maximum)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.table_t.sizePolicy().hasHeightForWidth())
-        self.table_t.setSizePolicy(sizePolicy7)
-        self.table_t.setMaximumSize(QSize(16777215, 1000))
+        sizePolicy3.setHeightForWidth(self.table_t.sizePolicy().hasHeightForWidth())
+        self.table_t.setSizePolicy(sizePolicy3)
+        self.table_t.setMaximumSize(QSize(16777215, 16777215))
         self.table_t.setBaseSize(QSize(0, 0))
         self.table_t.setContextMenuPolicy(Qt.PreventContextMenu)
         self.table_t.setFrameShape(QFrame.NoFrame)
@@ -699,9 +788,6 @@ class Ui_MainWindow(object):
         self.table_t.setAlternatingRowColors(True)
         self.table_t.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.table_t.setSortingEnabled(False)
-        self.table_t.horizontalHeader().setCascadingSectionResizes(False)
-        self.table_t.horizontalHeader().setStretchLastSection(False)
-        self.table_t.verticalHeader().setVisible(True)
 
         self.verticalLayout_6.addWidget(self.table_t)
 
@@ -736,10 +822,21 @@ class Ui_MainWindow(object):
 
         self.layout.addWidget(self.line_10)
 
-        self.subdivide_t = QCheckBox(self.global_results)
+        self.label_27 = QLabel(self.global_results)
+        self.label_27.setObjectName(u"label_27")
+        sizePolicy8 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.label_27.sizePolicy().hasHeightForWidth())
+        self.label_27.setSizePolicy(sizePolicy8)
+
+        self.layout.addWidget(self.label_27)
+
+        self.subdivide_t = QComboBox(self.global_results)
+        self.subdivide_t.addItem("")
+        self.subdivide_t.addItem("")
+        self.subdivide_t.addItem("")
         self.subdivide_t.setObjectName(u"subdivide_t")
-        self.subdivide_t.setEnabled(True)
-        self.subdivide_t.setChecked(True)
 
         self.layout.addWidget(self.subdivide_t)
 
@@ -905,10 +1002,16 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_6.addWidget(self.line_5)
 
-        self.subdivide_eb = QCheckBox(self.plot_eb)
+        self.label_26 = QLabel(self.plot_eb)
+        self.label_26.setObjectName(u"label_26")
+
+        self.horizontalLayout_6.addWidget(self.label_26)
+
+        self.subdivide_eb = QComboBox(self.plot_eb)
+        self.subdivide_eb.addItem("")
+        self.subdivide_eb.addItem("")
+        self.subdivide_eb.addItem("")
         self.subdivide_eb.setObjectName(u"subdivide_eb")
-        self.subdivide_eb.setEnabled(True)
-        self.subdivide_eb.setChecked(True)
 
         self.horizontalLayout_6.addWidget(self.subdivide_eb)
 
@@ -947,11 +1050,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
         self.show_values_eff = QCheckBox(self.plot_other)
         self.show_values_eff.setObjectName(u"show_values_eff")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.show_values_eff.sizePolicy().hasHeightForWidth())
-        self.show_values_eff.setSizePolicy(sizePolicy8)
+        sizePolicy9 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        sizePolicy9.setHorizontalStretch(0)
+        sizePolicy9.setVerticalStretch(0)
+        sizePolicy9.setHeightForWidth(self.show_values_eff.sizePolicy().hasHeightForWidth())
+        self.show_values_eff.setSizePolicy(sizePolicy9)
 
         self.horizontalLayout_19.addWidget(self.show_values_eff)
 
@@ -986,8 +1089,8 @@ class Ui_MainWindow(object):
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
         self.show_values_balance = QCheckBox(self.plot_other)
         self.show_values_balance.setObjectName(u"show_values_balance")
-        sizePolicy8.setHeightForWidth(self.show_values_balance.sizePolicy().hasHeightForWidth())
-        self.show_values_balance.setSizePolicy(sizePolicy8)
+        sizePolicy9.setHeightForWidth(self.show_values_balance.sizePolicy().hasHeightForWidth())
+        self.show_values_balance.setSizePolicy(sizePolicy9)
 
         self.horizontalLayout_18.addWidget(self.show_values_balance)
 
@@ -1112,11 +1215,11 @@ class Ui_MainWindow(object):
         self.op_calculate = QPushButton(self.optimise_t)
         self.op_calculate.setObjectName(u"op_calculate")
         self.op_calculate.setEnabled(False)
-        sizePolicy9 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy9.setHorizontalStretch(0)
-        sizePolicy9.setVerticalStretch(0)
-        sizePolicy9.setHeightForWidth(self.op_calculate.sizePolicy().hasHeightForWidth())
-        self.op_calculate.setSizePolicy(sizePolicy9)
+        sizePolicy10 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy10.setHorizontalStretch(0)
+        sizePolicy10.setVerticalStretch(0)
+        sizePolicy10.setHeightForWidth(self.op_calculate.sizePolicy().hasHeightForWidth())
+        self.op_calculate.setSizePolicy(sizePolicy10)
         self.op_calculate.setAutoDefault(False)
         self.op_calculate.setFlat(False)
         self.op_calculate.setProperty("dataValidEnable", True)
@@ -1154,11 +1257,11 @@ class Ui_MainWindow(object):
 
         self.op_ax_left = QComboBox(self.plot_op)
         self.op_ax_left.setObjectName(u"op_ax_left")
-        sizePolicy10 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy10.setHorizontalStretch(0)
-        sizePolicy10.setVerticalStretch(0)
-        sizePolicy10.setHeightForWidth(self.op_ax_left.sizePolicy().hasHeightForWidth())
-        self.op_ax_left.setSizePolicy(sizePolicy10)
+        sizePolicy11 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy11.setHorizontalStretch(0)
+        sizePolicy11.setVerticalStretch(0)
+        sizePolicy11.setHeightForWidth(self.op_ax_left.sizePolicy().hasHeightForWidth())
+        self.op_ax_left.setSizePolicy(sizePolicy11)
 
         self.horizontalLayout_11.addWidget(self.op_ax_left)
 
@@ -1175,8 +1278,8 @@ class Ui_MainWindow(object):
 
         self.op_ax_right = QComboBox(self.plot_op)
         self.op_ax_right.setObjectName(u"op_ax_right")
-        sizePolicy10.setHeightForWidth(self.op_ax_right.sizePolicy().hasHeightForWidth())
-        self.op_ax_right.setSizePolicy(sizePolicy10)
+        sizePolicy11.setHeightForWidth(self.op_ax_right.sizePolicy().hasHeightForWidth())
+        self.op_ax_right.setSizePolicy(sizePolicy11)
 
         self.horizontalLayout_11.addWidget(self.op_ax_right)
 
@@ -1233,94 +1336,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addLayout(self.data, 0, 1, 1, 1)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.load_file = QPushButton(self.centralwidget)
-        self.load_file.setObjectName(u"load_file")
-
-        self.horizontalLayout.addWidget(self.load_file)
-
-        self.unload_file = QPushButton(self.centralwidget)
-        self.unload_file.setObjectName(u"unload_file")
-
-        self.horizontalLayout.addWidget(self.unload_file)
-
-        self.file_path = QLineEdit(self.centralwidget)
-        self.file_path.setObjectName(u"file_path")
-        self.file_path.setEnabled(True)
-        self.file_path.setReadOnly(True)
-
-        self.horizontalLayout.addWidget(self.file_path)
-
-
-        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 2)
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.sampling_rate = QLabel(self.centralwidget)
-        self.sampling_rate.setObjectName(u"sampling_rate")
-
-        self.horizontalLayout_4.addWidget(self.sampling_rate)
-
-        self.line = QFrame(self.centralwidget)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShadow(QFrame.Plain)
-        self.line.setLineWidth(0)
-        self.line.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line)
-
-        self.date_range = QLabel(self.centralwidget)
-        self.date_range.setObjectName(u"date_range")
-
-        self.horizontalLayout_4.addWidget(self.date_range)
-
-        self.line_2 = QFrame(self.centralwidget)
-        self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShadow(QFrame.Plain)
-        self.line_2.setLineWidth(0)
-        self.line_2.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line_2)
-
-        self.calc_time = QLabel(self.centralwidget)
-        self.calc_time.setObjectName(u"calc_time")
-
-        self.horizontalLayout_4.addWidget(self.calc_time)
-
-        self.line_3 = QFrame(self.centralwidget)
-        self.line_3.setObjectName(u"line_3")
-        self.line_3.setFrameShadow(QFrame.Plain)
-        self.line_3.setLineWidth(0)
-        self.line_3.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line_3)
-
-        self.plotting_time = QLabel(self.centralwidget)
-        self.plotting_time.setObjectName(u"plotting_time")
-
-        self.horizontalLayout_4.addWidget(self.plotting_time)
-
-        self.line_11 = QFrame(self.centralwidget)
-        self.line_11.setObjectName(u"line_11")
-        self.line_11.setFrameShadow(QFrame.Plain)
-        self.line_11.setLineWidth(0)
-        self.line_11.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line_11)
-
-        self.n_samples = QLabel(self.centralwidget)
-        self.n_samples.setObjectName(u"n_samples")
-
-        self.horizontalLayout_4.addWidget(self.n_samples)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer)
-
-
-        self.gridLayout.addLayout(self.horizontalLayout_4, 2, 0, 1, 2)
-
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
@@ -1348,8 +1363,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.table_eb_t, self.table_t)
         QWidget.setTabOrder(self.table_t, self.show_values_t)
         QWidget.setTabOrder(self.show_values_t, self.file_path)
-        QWidget.setTabOrder(self.file_path, self.subdivide_t)
-        QWidget.setTabOrder(self.subdivide_t, self.textEdit)
+        QWidget.setTabOrder(self.file_path, self.textEdit)
 
         self.retranslateUi(MainWindow)
         self.algorithm.currentIndexChanged.connect(self.recalc_warn.show)
@@ -1404,9 +1418,10 @@ class Ui_MainWindow(object):
         self.end_date.setDisplayFormat(QCoreApplication.translate("MainWindow", u"yyyy-MM-dd HH:mm", None))
         self.end_date_l.setText(QCoreApplication.translate("MainWindow", u"End", None))
         self.algorithm_l.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-weight:700;\">Algorithm</span></p></body></html>", None))
-        self.algorithm.setItemText(0, QCoreApplication.translate("MainWindow", u"Hysteresis", None))
-        self.algorithm.setItemText(1, QCoreApplication.translate("MainWindow", u"Min On Time", None))
-        self.algorithm.setItemText(2, QCoreApplication.translate("MainWindow", u"Time To Consume", None))
+        self.algorithm.setItemText(0, QCoreApplication.translate("MainWindow", u"None", None))
+        self.algorithm.setItemText(1, QCoreApplication.translate("MainWindow", u"Hysteresis", None))
+        self.algorithm.setItemText(2, QCoreApplication.translate("MainWindow", u"Min On Time", None))
+        self.algorithm.setItemText(3, QCoreApplication.translate("MainWindow", u"Time To Consume", None))
 
         self.th_l.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:11pt; font-weight:700;\">Threshold</span></p></body></html>", None))
         self.th_top1.setSuffix(QCoreApplication.translate("MainWindow", u" Wh", None))
@@ -1457,6 +1472,13 @@ class Ui_MainWindow(object):
         self.simulate.setText(QCoreApplication.translate("MainWindow", u"Simulate", None))
         self.results.setText(QCoreApplication.translate("MainWindow", u"Data In Results", None))
         self.recalc_warn.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700; color:#f4b300;\">\u26a0</span><span style=\" color:#f4b300;\"> Recalculate \u26a0</span></p></body></html>", None))
+        self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
+        self.unload_file.setText(QCoreApplication.translate("MainWindow", u"Unload File", None))
+        self.sampling_rate.setText(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
+        self.date_range.setText(QCoreApplication.translate("MainWindow", u"Date Range", None))
+        self.calc_time.setText(QCoreApplication.translate("MainWindow", u"Calculation Time", None))
+        self.plotting_time.setText(QCoreApplication.translate("MainWindow", u"Plotting Time", None))
+        self.n_samples.setText(QCoreApplication.translate("MainWindow", u"N Samples", None))
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"Line Style", None))
         self.data_line_style.setInputMask("")
         self.data_line_style.setText("")
@@ -1470,7 +1492,11 @@ class Ui_MainWindow(object):
         self.tabs.setTabText(self.tabs.indexOf(self.price_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcb0 Energy Price (In)", None))
         self.show_values_t.setText(QCoreApplication.translate("MainWindow", u"Show values (rounded)", None))
         self.show_ecm_t.setText(QCoreApplication.translate("MainWindow", u"System Max Consuption", None))
-        self.subdivide_t.setText(QCoreApplication.translate("MainWindow", u"Subdivide", None))
+        self.label_27.setText(QCoreApplication.translate("MainWindow", u"Subdivide", None))
+        self.subdivide_t.setItemText(0, QCoreApplication.translate("MainWindow", u"None", None))
+        self.subdivide_t.setItemText(1, QCoreApplication.translate("MainWindow", u"Level 1", None))
+        self.subdivide_t.setItemText(2, QCoreApplication.translate("MainWindow", u"Level 2", None))
+
         self.tabs.setTabText(self.tabs.indexOf(self.global_results), QCoreApplication.translate("MainWindow", u"\ud83d\udcca\ud83d\udcc5 Results", None))
         self.label_9.setText(QCoreApplication.translate("MainWindow", u"Line Style", None))
         self.sim_line_style.setInputMask("")
@@ -1483,7 +1509,11 @@ class Ui_MainWindow(object):
         self.tabs.setTabText(self.tabs.indexOf(self.simulation_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcc9 Simulation", None))
         self.show_values_eb.setText(QCoreApplication.translate("MainWindow", u"Values (rounded)", None))
         self.show_ecm_eb.setText(QCoreApplication.translate("MainWindow", u"System Max Consuption", None))
-        self.subdivide_eb.setText(QCoreApplication.translate("MainWindow", u"Subdivide", None))
+        self.label_26.setText(QCoreApplication.translate("MainWindow", u"Subdivide", None))
+        self.subdivide_eb.setItemText(0, QCoreApplication.translate("MainWindow", u"None", None))
+        self.subdivide_eb.setItemText(1, QCoreApplication.translate("MainWindow", u"Level 1", None))
+        self.subdivide_eb.setItemText(2, QCoreApplication.translate("MainWindow", u"Level 2", None))
+
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.plot_eb), QCoreApplication.translate("MainWindow", u"\ud83d\udcca Energy Balance", None))
         self.show_values_eff.setText(QCoreApplication.translate("MainWindow", u"Values", None))
@@ -1653,12 +1683,5 @@ class Ui_MainWindow(object):
                         "px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Line Style </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">A input that accepts any matplotlib line style and marker to apply to the displayed lines.</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Hide lines </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">Any line in a plot can be hidden by pressing the lines in the legend. Hidden lines still show in the legend but more transparent.</span> </li></ul></body></html>", None))
         self.tabs.setTabText(self.tabs.indexOf(self.help_t), QCoreApplication.translate("MainWindow", u"\u2139 Help", None))
-        self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
-        self.unload_file.setText(QCoreApplication.translate("MainWindow", u"Unload File", None))
-        self.sampling_rate.setText(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
-        self.date_range.setText(QCoreApplication.translate("MainWindow", u"Date Range", None))
-        self.calc_time.setText(QCoreApplication.translate("MainWindow", u"Calculation Time", None))
-        self.plotting_time.setText(QCoreApplication.translate("MainWindow", u"Plotting Time", None))
-        self.n_samples.setText(QCoreApplication.translate("MainWindow", u"N Samples", None))
     # retranslateUi
 
