@@ -293,7 +293,7 @@ class App(QMainWindow):
         ax.set_ylabel('Price [€/kWh]')
     
     def talbe_price(self, df:pd.DataFrame):
-        self.price_model = pw.QPandasModelEdit(df, 5)
+        self.price_model = pw.QPandasModelEdit(df, 3)
         self.ui.table_price_energy.setModel(self.price_model)
         QTable_fit_items_heigh(self.ui.table_price_energy)
 
@@ -533,7 +533,6 @@ class App(QMainWindow):
         labels = [OCT[col]['translate'][0] for col in cols]
         colors = [OCT[col]['color'] for col in cols]
         self.sim_areas = df.plot.area('timestamp', cols, ax=ax1, linewidth=0, color=colors, label=labels).collections
-        self.toggle_loads_area(self.ui.show_loads_area.isChecked())
 
         # Add energy thresholds
         self.th_lines = []
@@ -561,11 +560,11 @@ class App(QMainWindow):
 
         # Visuals
         ax1.grid(True, linestyle=':')
-        ax1.legend(loc="upper left")
         ax2.legend(loc="upper right")
+        ax1.legend(loc="upper left")
         for legline in ax1.get_legend().get_lines()[2:4]:
             plot._hide_legline(legline)
-
+        
         ax1.set_xlabel('Date & Time')
         ax1.set_ylabel('Power [W]')
         ax2.set_ylabel('Energy Balance [Wh]')
@@ -574,6 +573,7 @@ class App(QMainWindow):
         plot.align = True
         plot.ax_ylimit = (0, df['powerP'].max()*1.05)
         plot.home_view()
+        self.toggle_loads_area(self.ui.show_loads_area.isChecked())
         self.sim_line_style(self.ui.sim_line_style.text())
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
 
@@ -639,10 +639,15 @@ class App(QMainWindow):
                 label = '_'+label if not val else label[1:] if label[0] == "_" else label
                 area.set_label(label)
 
-            plot = self.ui.plot_s
+            plot:mw.QMplPlot = self.ui.plot_s
             handles, labels = plot.ax.get_legend_handles_labels()
             legend = plot.ax.get_legend()
+            alphas = [l.get_alpha() for l in legend.get_lines()]
             plot.ax.legend(handles, labels)._set_loc(legend._loc)
+            for i, h in enumerate(plot.ax.get_legend().get_lines()):
+                h.set_visible(True)
+                h.set_alpha(alphas[i])
+            plot.toggable_legend_lines()
             plot.draw_idle()
     
     def toggle_energyP(self):

@@ -8,6 +8,8 @@
 - 16/06/2022 a les 18:00 -> fixing
 - 18/06/2022 all day     -> fixing time to consume (not done, data results)
 - 21/06/2022 a les 16:23 -> testing ttc
+- 22/06/2022 a les 15:49 -> restart per testing ttc
+- 24/06/2022 a les 14:42 -> 150 mon to 70
 
 
 # === OLD ===
