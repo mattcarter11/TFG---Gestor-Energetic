@@ -1741,6 +1741,47 @@ p, li { white-space: pre-wrap; }
                </widget>
               </item>
               <item>
+               <widget class="Line" name="line_9">
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="orientation">
+                 <enum>Qt::Vertical</enum>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="label_28">
+                <property name="text">
+                 <string>Max. Consuption</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="show_max_cons">
+                <item>
+                 <property name="text">
+                  <string>Hide</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Line</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Area</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>Line &amp; Area</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+              <item>
                <widget class="Line" name="line_4">
                 <property name="frameShadow">
                  <enum>QFrame::Plain</enum>
@@ -1782,7 +1823,7 @@ p, li { white-space: pre-wrap; }
                  <bool>true</bool>
                 </property>
                 <property name="text">
-                 <string>Show Thresholds</string>
+                 <string>Thresholds</string>
                 </property>
                </widget>
               </item>

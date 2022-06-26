@@ -897,6 +897,27 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_14.addWidget(self.show_loads_area)
 
+        self.line_9 = QFrame(self.plot_s)
+        self.line_9.setObjectName(u"line_9")
+        self.line_9.setFrameShadow(QFrame.Plain)
+        self.line_9.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_14.addWidget(self.line_9)
+
+        self.label_28 = QLabel(self.plot_s)
+        self.label_28.setObjectName(u"label_28")
+
+        self.horizontalLayout_14.addWidget(self.label_28)
+
+        self.show_max_cons = QComboBox(self.plot_s)
+        self.show_max_cons.addItem("")
+        self.show_max_cons.addItem("")
+        self.show_max_cons.addItem("")
+        self.show_max_cons.addItem("")
+        self.show_max_cons.setObjectName(u"show_max_cons")
+
+        self.horizontalLayout_14.addWidget(self.show_max_cons)
+
         self.line_4 = QFrame(self.plot_s)
         self.line_4.setObjectName(u"line_4")
         self.line_4.setFrameShadow(QFrame.Plain)
@@ -1502,8 +1523,14 @@ class Ui_MainWindow(object):
         self.sim_line_style.setInputMask("")
         self.sim_line_style.setText("")
         self.show_loads_area.setText(QCoreApplication.translate("MainWindow", u"Power Consumed by Load", None))
+        self.label_28.setText(QCoreApplication.translate("MainWindow", u"Max. Consuption", None))
+        self.show_max_cons.setItemText(0, QCoreApplication.translate("MainWindow", u"Hide", None))
+        self.show_max_cons.setItemText(1, QCoreApplication.translate("MainWindow", u"Line", None))
+        self.show_max_cons.setItemText(2, QCoreApplication.translate("MainWindow", u"Area", None))
+        self.show_max_cons.setItemText(3, QCoreApplication.translate("MainWindow", u"Line & Area", None))
+
         self.energyP_s.setText(QCoreApplication.translate("MainWindow", u"Energy Produced", None))
-        self.show_th.setText(QCoreApplication.translate("MainWindow", u"Show Thresholds", None))
+        self.show_th.setText(QCoreApplication.translate("MainWindow", u"Thresholds", None))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.plot_s), QCoreApplication.translate("MainWindow", u"\ud83d\udcc8 Grapth", None))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.table_s_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcc5 Table [W, Wh]", None))
         self.tabs.setTabText(self.tabs.indexOf(self.simulation_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcc9 Simulation", None))

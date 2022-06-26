@@ -17,6 +17,8 @@ class Results:
         self.df_hour = pd.DataFrame()
         self.df_total = pd.DataFrame()
         self.df_results = pd.DataFrame()
+        self.aprox_loads = df.aproximate_loads()
+        self.aprox_max_load = df.aproximate_max_load()
         self._hourly()
         self._total()
         self._results()
@@ -43,24 +45,14 @@ class Results:
         self.df_hour['energyPC'] = self.df_hour['energyC'].values - self.df_hour['energyG'].values
         self.df_hour['energyPL'] = self.df_hour['energyP'].values - self.df_hour['energyPC'].values
         self.df_hour.loc[np.abs(self.df_hour['energyGR']) < 0.00001, 'energyGR'] = 0
-
        
-        # Find aprox loads of each one
-        self.aprox_loads = {'powerLB':0, 'powerL1':0, 'powerL2':0}
-        for k in self.aprox_loads:
-            df = self.df_in[k][self.df_in[k] > 0]
-            if (suma := df.sum()):
-                self.aprox_loads[k] = suma / df.count()
-
         # Energy Consumed Max
-        energy_cm = sum(self.aprox_loads.values())
         tmp = self.df_hour['energyP'].copy()
-        tmp[self.df_hour['energyP'] >= energy_cm] = energy_cm
+        tmp[self.df_hour['energyP'] >= self.aprox_max_load] = self.aprox_max_load
         self.df_hour['energyCM'] = tmp
 
         # Energy Surplus
         energy_s = self.df_hour['energyP'].values - self.df_hour['energyCM'].values
-        energy_s[self.df_hour['energyC'] > energy_cm] = 0
         self.df_hour['energyS'] = energy_s
 
         # Energy Lost

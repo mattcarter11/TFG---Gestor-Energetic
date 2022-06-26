@@ -59,19 +59,20 @@ class DataFrameOut (DataFrameIn):
 
     def __init__(self, df:pd.DataFrame, _correct=True):
         super().__init__(df, _correct)
-        self._fill_missing_LB()
+        self.aprox_loads = self.max_load = None
+        self._calc_missing_LB()
 
     def _set_col_dtype(self):
         self.columns = ['timestamp', 'powerP', 'powerC', 'powerL1', 'powerL2', 'on_offL1', 'on_offL2']
         self.dtypes = [dt.date, numType, numType, numType, numType, numType, numType]
         
-    def _fill_missing_LB(self):
+    def _calc_missing_LB(self):
         if 'powerC' in self.df.columns and 'powerLB' not in self.df.columns:
             # x50..100 Faster vs normal iteration
             self.df['powerLB'] = self.df.loc[:,'powerC'].values - self.df.loc[:,'powerL1'].values - self.df.loc[:,'powerL2'].values
             self.df.loc[self.df['powerLB'].values < 0, 'powerLB'] = 0
     
-    def fill_powerAG(self):
+    def calc_powerAG(self):
         self.df['powerA'] = self.df['powerP'].values - self.df['powerC'].values
         power_g = self.df['powerA'].copy()
         power_g[power_g.values > 0] = 0
@@ -79,6 +80,12 @@ class DataFrameOut (DataFrameIn):
         self.df.loc[self.df['powerA'].values < 0, 'powerA'] = 0 # Fastest
         self.df['powerGP'] = self.df['powerG'].copy()
         self.df.loc[self.df['powerP'].values <= 0, 'powerGP'] = 0 # Fastest
+
+    def calc_powerCM(self):
+        max_load = self.aproximate_max_load()
+        tmp = self.df['powerP'].copy()
+        tmp[tmp > max_load] = max_load
+        self.df['powerCM'] = tmp
 
     def split_energyB(self):
         self.df['energyAB'] = self.df['energyB'].copy()
@@ -115,4 +122,19 @@ class DataFrameOut (DataFrameIn):
                 self.df['energyP'] = energyP
         if any([x not in self.df.columns for x in ['energyAB', 'energyGD']]):
             self.split_energyB() 
-        
+
+    def aproximate_loads(self):
+        if self.aprox_loads is None:
+            loads = {'powerLB':0, 'powerL1':0, 'powerL2':0}
+            for k in loads:
+                df = self.df[k][self.df[k] > 0]
+                if (suma := df.sum()):
+                    loads[k] = suma / df.count()
+            self.aprox_loads = loads
+        return self.aprox_loads
+
+    def aproximate_max_load(self):
+        if self.max_load is None:
+            self.aproximate_loads()
+            self.max_load = sum(self.aprox_loads.values())
+        return self.max_load

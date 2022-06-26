@@ -129,26 +129,38 @@ class BarPlotController:
 
     def _set_subdivide(self, val:bool):
         if self.gbars is not None:
-            for label in list(flatten(self.gbars[:-1])):
-                label.set_visible(False)
+            # Hide all
+            for sublevel in self.gbars[:-1]:
+                for gbars in sublevel:
+                    for bar in gbars:
+                        self.plot.set_visible(bar, False)
+            # Show specific
             for gbars in self.gbars[val]:
-                for bar in gbars:
-                    bar.set_visible(True)
+                    for bar in gbars:
+                        self.plot.set_visible(bar, True)
 
     def _set_show_cm(self, val:bool):
         if self.gbars is not None:
             for bar in self.gbars[3]:
-                bar.set_visible(val)
+                self.plot.set_visible(bar, val)
 
     def _set_legend(self):
         if self.ghandlab is not None:
-            val = [self.showD == 0, self.showD == 1, self.showD == 2, self.showCM]
             handles, labels = self.plot.ax.get_legend_handles_labels()
-            for j, sublevel in enumerate(self.ghandlab):
-                for ghandlab in sublevel:
+            # Hide all labels
+            for i, label in enumerate(labels):
+                labels[i] = f'_{label}'
+            # Show only active
+            for ghandlab in self.ghandlab[self.showD]:
+                for handler, label in ghandlab:
+                    i = handles.index(handler)
+                    labels[i] = label
+            if self.showCM:
+                for ghandlab in self.ghandlab[3]:
                     for handler, label in ghandlab:
                         i = handles.index(handler)
-                        labels[i] = label if val[j] else f'_{label}'
+                        labels[i] = label
+
             self.plot.ax.legend(handles, labels, loc="upper right")
 
     def _plot_grid(self):
@@ -212,12 +224,12 @@ class EBPlotController(BarPlotController):
                     self.gbars[j].append([])
                     for i, name in enumerate(bars):
                         labels = [f'{p:.0f}' for p in self.data[name]]
-                        self.glabels[j][p].extend(ax.bar_label(containers[i+off], labels=labels, rotation=self.lrot, fontsize=8, color='#1e1e1e', label_type='center') )
+                        self.glabels[j][p].extend(ax.bar_label(containers[i+off], labels=labels, rotation=self.lrot, fontsize=8, label_type='center') )
                         self.gbars[j][p].extend(containers[i+off])
                     off += i+1
         # Labels Energy ConsumeMax
         labels = [f'{p:.0f}' for p in self.data[barsCM[0]]]
-        self.glabels[j+1].extend( ax.bar_label(containers[off], labels=labels, rotation=self.lrot, color=colorsCM[0], fontsize=8, padding=4) )
+        self.glabels[j+1].extend( ax.bar_label(containers[off], labels=labels, rotation=self.lrot, fontsize=8, padding=4) )
         self.gbars[j+1].extend(containers[off])
 
         # Visuals

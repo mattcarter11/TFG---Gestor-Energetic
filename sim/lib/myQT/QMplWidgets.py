@@ -237,6 +237,7 @@ class QMplPlot(QWidget):
         self.canvas.setFocusPolicy(Qt.ClickFocus)
         self.canvas.setFocus()
         self.toolbar = NavToolbar(self.canvas, self)
+        self.legend_PS = None
         
         # Make layout
         self.vbl = QVBoxLayout()
@@ -289,6 +290,32 @@ class QMplPlot(QWidget):
     def clear(self):
         for ax in self.axes:
             ax.clear()
+    
+    def set_visible(self, artist, val): # Line or Area
+        artist.set_visible(val)
+        label = artist.get_label()
+        label = '_'+label if not val else label[1:] if label[0] == "_" else label
+        artist.set_label(label)
+
+    def redraw_legend(self, ax_num = 1):
+        ax = self.axes[ax_num-1]
+        legend = ax.get_legend()
+        old_lines = legend.get_lines()
+        ax.legend()._set_loc(legend._loc)
+
+        # Restore hidden lines and alpha level
+        new_lines = ax.get_legend().get_lines()
+        new_lines_labels = [line.get_label() for line in new_lines]
+        for line in old_lines:
+            label = line.get_label()
+            if label in new_lines_labels:
+                i = new_lines_labels.index(label)
+                new_lines[i].set(visible=line.get_visible(), alpha=line.get_alpha())
+        
+        if self.legend_PS is not None:
+            self.toggable_legend_lines()
+        self.draw_idle()
+
     #endregion
 
     #region -> Show/Hide lines if selected in legend

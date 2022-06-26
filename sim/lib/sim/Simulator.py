@@ -117,7 +117,8 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
     #endregion
 
     df_out = DataFrameOut(df_out, False)
-    df_out.fill_powerAG()
+    df_out.calc_powerAG()
+    df_out.calc_powerCM()
     df_out.split_energyB()
     df_out.rearange_cols()
     return df_out

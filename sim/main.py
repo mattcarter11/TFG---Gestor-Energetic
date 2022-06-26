@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBo
 import pandas as pd
 import matplotlib as mp
 import numpy as np
+import datetime as dt
 from lib.sim.Load import Load
 from lib.sim.Results import Results
 from lib.sim.Optimize import Optimize   
@@ -54,8 +55,8 @@ class App(QMainWindow):
     def __init__(self):
         self.first_table_show = True
         self.sim_prev_ls = self.data_prev_ls = ''
-        self.th_lines = self.sim_areas = self.sim_lines = self.data_lines = self.date_range_lines = []
-        self.results = self.optimize = self.df_out = None
+        self.th_lines = self.sim_load_areas = self.sim_lines = self.data_lines = self.date_range_lines = []
+        self.results = self.optimize = self.df_out = self.max_load_line = None
         self.eb_plotC = pc.EBPlotController()
         self.ebt_plotC = pc.EBPlotController()
         self.eff_plotC = pc.BarPlotController()
@@ -130,6 +131,7 @@ class App(QMainWindow):
         self.ui.plot_price.dataChanged.connect(self.plot_price_edited)
         # Simulation plot
         self.ui.show_loads_area.stateChanged.connect( self.toggle_loads_area)
+        self.ui.show_max_cons.currentIndexChanged.connect( self.toggle_max_cons)
         self.ui.energyP_s.stateChanged.connect( self.toggle_energyP)
         self.ui.show_th.stateChanged.connect( self.toggle_th)
         # Energy balance plot
@@ -254,14 +256,14 @@ class App(QMainWindow):
             self.ui.plotting_time.setText(f'Data loaded in {t1-t0:.3f} s. Plotted in {time()-t1:.3f} s')
     
     def limit_datarange_selectors(self):
-        min_date = self.df_in.df['timestamp'].min()
-        max_date = self.df_in.df['timestamp'].max()
+        self.min_date = self.df_in.df['timestamp'].min()
+        self.max_date = self.df_in.df['timestamp'].max()
         format = '%Y-%m-%d %H:%M:%S'
-        self.ui.date_range.setText(f'Date Range: {min_date.strftime(format)} - {max_date.strftime(format)} ({self.df_in.nsamples} Samples)')
-        self.ui.start_date.setMinimumDateTime(min_date)
-        self.ui.end_date.setMinimumDateTime(min_date)
-        self.ui.start_date.setMaximumDateTime(max_date)
-        self.ui.end_date.setMaximumDateTime(max_date)
+        self.ui.date_range.setText(f'Date Range: {self.min_date.strftime(format)} - {self.max_date.strftime(format)} ({self.df_in.nsamples} Samples)')
+        self.ui.start_date.setMinimumDateTime(self.min_date)
+        self.ui.end_date.setMinimumDateTime(self.min_date)
+        self.ui.start_date.setMaximumDateTime(self.max_date)
+        self.ui.end_date.setMaximumDateTime(self.max_date)
     
     def unload_file(self):
         self.ui.file_path.setText('')
@@ -344,16 +346,14 @@ class App(QMainWindow):
     #region -> Simulation/Results/Optimize
     def results_press(self):
         t0 = time()
-        df = self.df_in.select_daterange(
-            self.ui.start_date.dateTime().toString(), 
-            self.ui.end_date.dateTime().toString()
-        )
-        df.fill_powerAG()
+        df = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString(), 3600 )
+        df.calc_powerAG()
+        df.calc_powerCM()
         df.fill_missing_energy()
         df.rearange_cols()
         self.results = Results(df, self.df_price.iloc[:, 0], self.ui.sell_price.value())
         self.ui.calc_time.setText(f'Results calculated in {time()-t0:.3f} s')
-        self.show_results(df.df)
+        self.show_results(df)
 
     def simulate_press(self):
         t0 = time()
@@ -363,7 +363,7 @@ class App(QMainWindow):
             self.results = Results(self.df_out, self.df_price.iloc[:, 0], self.ui.sell_price.value())
             self.ui.calc_time.setText(f'Simulated in {time()-t0:.3f} s. Results calculated in {time()-t1:.3f} s')
             self.print_sim_duration()
-            self.show_results(self.df_out.df)          
+            self.show_results(self.df_out)          
 
     def optimize_press(self):
         t0 = time()
@@ -413,7 +413,7 @@ class App(QMainWindow):
 
         load1 = value if value is not None and element == 'load1' else self.ui.load1.value()
         load2 = value if value is not None and element == 'load2' else self.ui.load2.value()
-        dfRG = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString() )
+        dfRG = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString(), 3600 )
         dfRG.df['powerP'] = dfRG.df['powerP'].values * self.ui.generation_factor.value()
         try:
             self.df_out = sim.simulate(
@@ -424,8 +424,7 @@ class App(QMainWindow):
                 None if isinstance(self.df_in, df.DataFrameOut) and self.ui.use_data_bl.isChecked() else self.ui.base_load.value()
             )
         except Exception as ex:
-            print(f"[{type(ex).__name__}] {ex} \n\n {traceback.format_exc()}")
-            QMessageBox.warning(self, "Error", f"Date & Time interval must be at least 5 min", QMessageBox.Ok)
+            QMessageBox.warning(self, "Error", f"[{type(ex).__name__}] {ex} \n\n {traceback.format_exc()}", QMessageBox.Ok)
             return 1
         return 0
     
@@ -434,12 +433,12 @@ class App(QMainWindow):
     #endregion
 
     #region -> Show results
-    def show_results(self, df:pd.DataFrame): 
+    def show_results(self, df:df.DataFrameOut): 
         header = ['energyT', 'energyDT']
         columns = [col for col in COL_ORDER if 'energy' in col and col not in header+['energyB']]
         self.ui.table_eb_t.setModel( QPandasModelTranslate(self.results.df_total[columns].T, i=1, use_unit=header) )
         self.ui.table_t.setModel( QPandasModelTranslate(self.results.df_results, use_unit=True) )
-        self.ui.table_s.setModel( QPandasModelTranslate(df) )
+        self.ui.table_s.setModel( QPandasModelTranslate(df.df) )
         self.ui.table_eb.setModel( QPandasModelTranslate(self.results.df_hour, i=1) )
 
         # Remove wierd under space
@@ -514,25 +513,29 @@ class App(QMainWindow):
         plot.toggable_legend_lines()
         self.data_line_style(self.ui.data_line_style.text())
 
-    def plot_sim(self, df:pd.DataFrame):
-        if df is None:
-            return
-
+    def plot_sim(self, df:df.DataFrameOut):
         t0 = time()
         plot: mw.QMplTwinxPlot = self.ui.plot_s
         ax1, ax2 = plot.ax1, plot.ax2
         plot.clear()
 
+        max_load = df.aproximate_max_load()
+        df = df.df
+
         # Plot Power Lines
         self.sim_lines = []
-        for col in ['powerC', 'powerP', 'powerA', 'powerG']:
+        for col in ['powerC', 'powerP', 'powerA', 'powerG', 'powerCM']:
             self.sim_lines += df_plot_col(df, 'timestamp', col, ax1)
-        
+
+        # Power CM
+        self.max_load_line = ax1.axhline(max_load, color=oct_color('powerCM'))
+        self.sim_cm_area = df.plot.area('timestamp', ['powerCM'], ax=ax1, linewidth=0, color=[GRAY0], label=[oct_translate('powerCM')]).collections[0]
+
         # Power Load Areas
         cols = ['powerLB', 'powerL1', 'powerL2']
-        labels = [OCT[col]['translate'][0] for col in cols]
-        colors = [OCT[col]['color'] for col in cols]
-        self.sim_areas = df.plot.area('timestamp', cols, ax=ax1, linewidth=0, color=colors, label=labels).collections
+        labels = [oct_translate(col) for col in cols]
+        colors = [oct_color(col) for col in cols]
+        self.sim_load_areas = df.plot.area('timestamp', cols, ax=ax1, linewidth=0, color=colors, label=labels).collections[1:] # Ignore CM area
 
         # Add energy thresholds
         self.th_lines = []
@@ -574,6 +577,7 @@ class App(QMainWindow):
         plot.ax_ylimit = (0, df['powerP'].max()*1.05)
         plot.home_view()
         self.toggle_loads_area(self.ui.show_loads_area.isChecked())
+        self.toggle_max_cons(self.ui.show_max_cons.currentIndex())
         self.sim_line_style(self.ui.sim_line_style.text())
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
 
@@ -632,47 +636,53 @@ class App(QMainWindow):
   
     #region -> Simulation Plot Options
     def toggle_loads_area(self, val):
-        if self.sim_areas: # List Not emptyj
-            for area in self.sim_areas:
-                area.set_visible(val)
-                label = area.get_label()
-                label = '_'+label if not val else label[1:] if label[0] == "_" else label
-                area.set_label(label)
-
+        if self.sim_load_areas: # List Not emptyj
             plot:mw.QMplPlot = self.ui.plot_s
-            handles, labels = plot.ax.get_legend_handles_labels()
-            legend = plot.ax.get_legend()
-            alphas = [l.get_alpha() for l in legend.get_lines()]
-            plot.ax.legend(handles, labels)._set_loc(legend._loc)
-            for i, h in enumerate(plot.ax.get_legend().get_lines()):
-                h.set_visible(True)
-                h.set_alpha(alphas[i])
-            plot.toggable_legend_lines()
-            plot.draw_idle()
+            for area in self.sim_load_areas:
+                plot.set_visible(area, val)
+            plot.redraw_legend()
     
+    def toggle_max_cons(self, i):
+        if self.max_load_line is not None:
+            plot:mw.QMplPlot = self.ui.plot_s
+            self.max_load_line.set_linestyle(':' if i != 0 else 'None')
+            plot.set_visible(self.sim_lines[4], i in (1, 3))
+            plot.set_visible(self.sim_cm_area, i in (2, 3))
+            plot.redraw_legend()
+
     def toggle_energyP(self):
         if self.df_out is not None:
-            self.plot_sim(self.df_out.df)
+            self.plot_sim(self.df_out)
 
     def toggle_th(self, val):
         if self.th_lines: # List Not empty
-            if val:
-                for line in self.th_lines:
-                    line.set_linestyle(':')
-            else:
-                for line in self.th_lines:
-                    line.set_linestyle('None')
+            style = ':' if val else 'None'
+            for line in self.th_lines:
+                line.set_linestyle(style)
             self.ui.plot_s.draw_idle()
     #endregion
 
     #region -> Date Range Plot Selection lines
-    def start_date_changed(self, _):
+    def start_date_changed(self, date):
         if self.date_range_lines:
-            self.date_range_lines[0].set_xydata(self.ui.start_date.dateTime().toPython(), 0)
+            date = date.toPython()
+            date_diff = date + dt.timedelta(hours=1)
+            end_date = self.ui.end_date.dateTime().toPython()
+            if date_diff > end_date:
+                self.ui.end_date.setDateTime(date_diff)
+
+            self.date_range_lines[0].set_xydata(date, 0)
             self.ui.plot_dr.draw_idle()
 
-    def end_date_changed(self, _):
-            self.date_range_lines[1].set_xydata(self.ui.end_date.dateTime().toPython(), 0)
+    def end_date_changed(self, date):
+        if self.date_range_lines:
+            date = date.toPython()
+            date_diff = date - dt.timedelta(hours=1)
+            start_date = self.ui.start_date.dateTime().toPython()
+            if date_diff < start_date:
+                self.ui.start_date.setDateTime(date_diff)
+
+            self.date_range_lines[1].set_xydata(date, 0)
             self.ui.plot_dr.draw_idle()
 
     def start_date_line_changed(self, date, _):

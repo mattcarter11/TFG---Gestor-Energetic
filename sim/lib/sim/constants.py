@@ -1,5 +1,6 @@
 UI_FILE = "mainwindow.ui"
 DT_FORMAT = 'yyyy-MM-dd HH:mm'
+GRAY0    = '#cacaca'
 GRAY1    = '#a5a5a5'
 GRAY2    = '#7e7e7e'
 GREEN1   = '#6dbf31'
@@ -14,11 +15,13 @@ OCT = {
     'powerP'    :{"color":'#33ab1d',    "unit":'W',     "translate": ('Power Produced', 'Produced')}, 
     'powerC'    :{"color":'#f8a62a',    "unit":'W',     "translate": ('Power Consumed', 'Consumed')},
     'powerG'    :{"color":'#dc604d',    "unit":'W',     "translate": ('Power Grid', 'Grid')},
-    'powerGP'   :{"color":GRAY1,        "unit":'W',     "translate": ('Power Grid while Prod.', 'Grid while Prod.')},
+    'powerGP'   :{"color":'#d03429',    "unit":'W',     "translate": ('Power Grid while Prod.', 'Grid while Prod.')},
     'powerA'    :{"color":'#4b90f3',    "unit":'W',     "translate": ('Power Available', 'Available')},
     'powerLB'   :{"color":'#e7d6a9',    "unit":'W',     "translate": ('Power Base Load', 'Base Load')},
     'powerL1'   :{"color":'#fdc26c',    "unit":'W',     "translate": ('Power Load 1', 'Load 1')},
     'powerL2'   :{"color":'#ffd463',    "unit":'W',     "translate": ('Power Load 2', 'Load 2')},
+    'powerCM'   :{"color":GRAY2,        "unit":'W',     "translate": ('Power Max. Consuption', 'Max. Cons.')},
+
 
     'on_offL1'  :{"color":GRAY1,        "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
     'on_offL2'  :{"color":GRAY1,        "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
@@ -40,7 +43,7 @@ OCT = {
     'energyAB'  :{"color":'#60b0ff',    "unit":'Wh',    "translate": ('Energy Available Balance', 'Available Bal.')}, 
     'energyS'   :{"color":'#7ad92b',    "unit":'Wh',    "translate": ('Energy Surplus', 'Surplus')},
     'energyL'   :{"color":'#f98e7e',    "unit":'Wh',    "translate": ('Energy Lost', 'Lost')},
-    'energyGR'  :{"color":'#9865c6',    "unit":'Wh',    "translate": ('Energy Returned Grid', 'Returned Grid')},
+    'energyGR'  :{"color":'#9865c6',    "unit":'Wh',    "translate": ('Energy Returned to Grid', 'Returned to Grid')},
 
 
     'energyT'   :{"color":None,         "unit":'Wh',    "translate": ('Total Energy', 'Total')},
@@ -78,7 +81,7 @@ def oct_translate(key:str, i:int=0, use_unit:bool=False):
 
 
 SettingsQDateTimeEdits = ('start_date', 'end_date')
-SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'subdivide_eb', 'subdivide_t', 'op_setting', 'op_ax_right', 'op_ax_left')
+SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'subdivide_eb', 'subdivide_t', 'op_setting', 'op_ax_right', 'op_ax_left', 'show_max_cons')
 SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'ttc_end_at', 'ttc_on_min')
 SettingsQDoubleSpinBox = [ 'op_start', 'op_end', 'op_step', 'ttc_time_factor', 'sell_price', 'generation_factor']
 SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'show_values_eff', 'show_values_balance', 'show_values_t', 'show_ecm_t')
