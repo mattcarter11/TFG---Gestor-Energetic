@@ -23,8 +23,8 @@ OCT = {
     'powerCM'   :{"color":GRAY2,        "unit":'W',     "translate": ('Power Max. Consuption', 'Max. Cons.')},
 
 
-    'on_offL1'  :{"color":GRAY1,        "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
-    'on_offL2'  :{"color":GRAY1,        "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
+    'on_offL1'  :{"color":'#fdc26c',    "unit":'',      "translate": ('On/Off Load 1', 'On/Off L1')}, 
+    'on_offL2'  :{"color":'#ffd463',    "unit":'',      "translate": ('On/Off Load 2', 'On/Off L2')}, 
 
     'energySY'  :{"color":'#195aa7',    "unit":'Wh',    "translate": ('Energy System', 'System')}, 
     'energyP'   :{"color":'#2176db',    "unit":'Wh',    "translate": ('Energy Produced', 'Produced')}, 
@@ -49,8 +49,8 @@ OCT = {
     'energyT'   :{"color":None,         "unit":'Wh',    "translate": ('Total Energy', 'Total')},
     'energyDT'  :{"color":None,         "unit":'Wh/day',"translate": ('Daily Total', 'Daily Total')},
 
-    'loadAprox' :{"color":None,         "unit":'W',     "translate": ('Aprox. Load', 'Aprox. Load')},
-    'efficCM'   :{"color":GREEN1,       "unit":'%',     "translate": ('Cons. Max. Efficiency', 'Cons. Max. Effic.')},
+    'loadApprox':{"color":None,         "unit":'W',     "translate": ('Approx. Load', 'Aprox. Load')},
+    'efficC'    :{"color":GREEN1,       "unit":'%',     "translate": ('Cons. Efficiency', 'Cons. Effic.')},
     'efficGR'   :{"color":'#ef8271',    "unit":'%',     "translate": ('Grid Ret. Efficiency', 'Grid Ret. Effic.')},
     'balance'   :{"color":'#60b0ff',    "unit":'cént.', "translate": ('Balance', 'Balance')},
     'commut'    :{"color":None,         "unit":'',      "translate": ('Commutations', 'Commut.')},
@@ -81,15 +81,15 @@ def oct_translate(key:str, i:int=0, use_unit:bool=False):
 
 
 SettingsQDateTimeEdits = ('start_date', 'end_date')
-SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'subdivide_eb', 'subdivide_t', 'op_setting', 'op_ax_right', 'op_ax_left', 'show_max_cons')
+SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'subdivide_eb', 'subdivide_t', 'op_setting', 'op_ax_right', 'op_ax_left', 'show_max_cons', 'mot_mode')
 SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'ttc_end_at', 'ttc_on_min')
 SettingsQDoubleSpinBox = [ 'op_start', 'op_end', 'op_step', 'ttc_time_factor', 'sell_price', 'generation_factor']
-SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'show_values_eff', 'show_values_balance', 'show_values_t', 'show_ecm_t')
+SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'show_values_effC', 'show_values_effGR', 'show_values_balance', 'show_values_commut', 'show_values_t', 'show_ecm_t')
 SettingsQLineEdits = ('data_line_style', 'sim_line_style')
 
 OpAxDict = {
     'None'                      :{'row':'none',     'column':'none',        'table':None}, 
-    'Cons. Max. Efficiency [%]' :{'row':'total',    'column':'efficCM',  'table':'results'}, 
+    'Cons. Max. Efficiency [%]' :{'row':'total',    'column':'efficC',  'table':'results'}, 
     'Grid Ret. Efficiency [%]'  :{'row':'total',    'column':'efficGR',  'table':'results'}, 
     'Balance [cént.]'           :{'row':'total',    'column':'balance',     'table':'results'}, 
     'Daily Commutations'        :{'row':'total',    'column':'commutD',     'table':'results'}, 
@@ -104,6 +104,7 @@ OpAxDict = {
 }
 
 OpAlgorithm = {
+    'None': {},
     'Hysteresis':{
         'Threshold Top L1':'th_top1',
         'Threshold Bottom L1':'th_bottom1',

@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1487</width>
+    <width>1508</width>
     <height>843</height>
    </rect>
   </property>
@@ -448,52 +448,70 @@ p, li { white-space: pre-wrap; }
         </widget>
         <widget class="QWidget" name="arnau_options">
          <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item alignment="Qt::AlignTop">
-           <widget class="QLabel" name="label_5">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="font">
-             <font>
-              <pointsize>12</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt;Time Limit&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-           </widget>
-          </item>
           <item>
-           <widget class="QSpinBox" name="time_limit">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="suffix">
-             <string> s</string>
-            </property>
-            <property name="prefix">
-             <string/>
-            </property>
-            <property name="minimum">
-             <number>-99999</number>
-            </property>
-            <property name="maximum">
-             <number>99999</number>
-            </property>
-            <property name="singleStep">
-             <number>25</number>
-            </property>
-            <property name="value">
-             <number>300</number>
-            </property>
-           </widget>
+           <layout class="QFormLayout" name="formLayout">
+            <item row="0" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>Time Limit</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QSpinBox" name="time_limit">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="suffix">
+               <string> s</string>
+              </property>
+              <property name="prefix">
+               <string/>
+              </property>
+              <property name="minimum">
+               <number>-99999</number>
+              </property>
+              <property name="maximum">
+               <number>99999</number>
+              </property>
+              <property name="singleStep">
+               <number>25</number>
+              </property>
+              <property name="value">
+               <number>300</number>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_31">
+              <property name="text">
+               <string>Mode</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QComboBox" name="mot_mode">
+              <item>
+               <property name="text">
+                <string>2n on if 1st on</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>by order</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>fastest</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QLabel" name="wh_eq">
@@ -683,6 +701,9 @@ p, li { white-space: pre-wrap; }
             <property name="suffix">
              <string> W</string>
             </property>
+            <property name="minimum">
+             <number>25</number>
+            </property>
             <property name="maximum">
              <number>99999</number>
             </property>
@@ -690,7 +711,7 @@ p, li { white-space: pre-wrap; }
              <number>25</number>
             </property>
             <property name="value">
-             <number>1000</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
@@ -706,7 +727,7 @@ p, li { white-space: pre-wrap; }
              <number>25</number>
             </property>
             <property name="value">
-             <number>1000</number>
+             <number>500</number>
             </property>
            </widget>
           </item>
@@ -758,7 +779,7 @@ p, li { white-space: pre-wrap; }
            <string/>
           </property>
           <property name="maximum">
-           <double>1.000000000000000</double>
+           <double>10.000000000000000</double>
           </property>
           <property name="singleStep">
            <double>0.100000000000000</double>
@@ -842,138 +863,6 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </item>
-    <item row="1" column="0" colspan="2">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="load_file">
-        <property name="text">
-         <string>Load File</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="unload_file">
-        <property name="text">
-         <string>Unload File</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="file_path">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
-    <item row="2" column="0" colspan="2">
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QLabel" name="sampling_rate">
-        <property name="text">
-         <string>Sampling Rate</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line">
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="date_range">
-        <property name="text">
-         <string>Date Range</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_2">
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="calc_time">
-        <property name="text">
-         <string>Calculation Time</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_3">
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="plotting_time">
-        <property name="text">
-         <string>Plotting Time</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="Line" name="line_11">
-        <property name="frameShadow">
-         <enum>QFrame::Plain</enum>
-        </property>
-        <property name="lineWidth">
-         <number>0</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="n_samples">
-        <property name="text">
-         <string>N Samples</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-     </layout>
-    </item>
     <item row="0" column="1">
      <layout class="QVBoxLayout" name="data">
       <item>
@@ -1004,7 +893,7 @@ p, li { white-space: pre-wrap; }
           <string notr="true"/>
          </property>
          <attribute name="title">
-          <string>⌚ Data Range (In)</string>
+          <string>🕗 Data Range (In)</string>
          </attribute>
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <property name="spacing">
@@ -1418,7 +1307,7 @@ p, li { white-space: pre-wrap; }
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>0</width>
-                  <height>40</height>
+                  <height>0</height>
                  </size>
                 </property>
                </spacer>
@@ -1426,7 +1315,7 @@ p, li { white-space: pre-wrap; }
               <item alignment="Qt::AlignHCenter">
                <widget class="QTableView" name="table_eb_t">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -1483,7 +1372,7 @@ p, li { white-space: pre-wrap; }
                 <property name="sizeHint" stdset="0">
                  <size>
                   <width>0</width>
-                  <height>40</height>
+                  <height>0</height>
                  </size>
                 </property>
                </spacer>
@@ -1937,7 +1826,7 @@ p, li { white-space: pre-wrap; }
             </property>
             <widget class="QMplPlot" name="plot_eb">
              <attribute name="title">
-              <string>📊 Energy Balance</string>
+              <string notr="true">🔋 Energy</string>
              </attribute>
              <layout class="QHBoxLayout" name="horizontalLayout_6">
               <item>
@@ -2053,13 +1942,13 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="plot_other">
+            <widget class="QWidget" name="eff_t">
              <attribute name="title">
-              <string>📊 Other</string>
+              <string>% Efficiencnies</string>
              </attribute>
              <layout class="QVBoxLayout" name="verticalLayout_10">
               <item>
-               <widget class="QMplPlot" name="plot_eff" native="true">
+               <widget class="QMplPlot" name="plot_effC" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -2071,7 +1960,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_19">
                 <item>
-                 <widget class="QCheckBox" name="show_values_eff">
+                 <widget class="QCheckBox" name="show_values_effC">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2119,7 +2008,7 @@ p, li { white-space: pre-wrap; }
                </layout>
               </item>
               <item>
-               <widget class="QMplPlot" name="plot_balance" native="true">
+               <widget class="QMplPlot" name="plot_effGR" native="true">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                   <horstretch>0</horstretch>
@@ -2131,7 +2020,7 @@ p, li { white-space: pre-wrap; }
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_18">
                 <item>
-                 <widget class="QCheckBox" name="show_values_balance">
+                 <widget class="QCheckBox" name="show_values_effGR">
                   <property name="sizePolicy">
                    <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
                     <horstretch>0</horstretch>
@@ -2180,7 +2069,134 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </widget>
-            <widget class="QWidget" name="tab_2">
+            <widget class="QWidget" name="bal_com_t">
+             <attribute name="title">
+              <string>📃 Balance &amp;&amp; Commut</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_12">
+              <item>
+               <widget class="QMplPlot" name="plot_balance" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_21">
+                <item>
+                 <widget class="QCheckBox" name="show_values_balance">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Values</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_18">
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_30">
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;(1:00 hour zone = 1:00 to 1:59)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_11">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>898</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <widget class="QMplPlot" name="plot_commut" native="true">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_20">
+                <item>
+                 <widget class="QCheckBox" name="show_values_commut">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Values</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="Line" name="line_17">
+                  <property name="frameShadow">
+                   <enum>QFrame::Plain</enum>
+                  </property>
+                  <property name="lineWidth">
+                   <number>0</number>
+                  </property>
+                  <property name="orientation">
+                   <enum>Qt::Vertical</enum>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_29">
+                  <property name="text">
+                   <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;(1:00 hour zone = 1:00 to 1:59)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_10">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>898</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="table_t_2">
              <attribute name="title">
               <string>📅 Table [Wh, %, cént.]</string>
              </attribute>
@@ -2642,13 +2658,18 @@ p, li { white-space: pre-wrap; }
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Select a date line to move it &lt;/span&gt;&lt;/li&gt;
 &lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;Pres ESC to cancel the move&lt;/span&gt; &lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;Algorithm&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;You can select what algorithm to simulate and its associated settings.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;You can select what algorithm to simulate and its associated settings.&lt;/span&gt; They can control up two two loads.&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline;&quot;&gt;Hysteresis &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;As the names says, loads are controlled using hysteresis. It allows for up two loads to be managed. Each top and bottom threshold corresponds to the load with the same number. If the load is 0, the thresholds get disabled.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline;&quot;&gt;Min On Use &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;If one load is controlled it's turned on when the time it would take to consume the energy accumulated is equal or greater than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;The same applys to two loads. First it check the time it would take to consume if turning on both loads. If they can't be both turned on, but any of both by themselfs can, it turns on one load depending on the selected mode:&lt;/span&gt;&lt;/p&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; font-family:'Segoe UI','sans-serif';&quot; style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2n on if 1st on &lt;span style=&quot; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-style:italic; color:#202122; background-color:#ffffff;&quot;&gt;l&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI'; font-style:italic;&quot;&gt;oad 2 only turns on if the 1st load is on. This avoids the problem of both loads being able to turn one if the other doesn't.&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;By order &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic; color:#202122; background-color:#ffffff;&quot;&gt;load 1 has preference (this is not the same as the previous, since load 2 can be turned on if load 1 isn't)&lt;/span&gt;&lt;/li&gt;
+&lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Fastest &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; font-style:italic; color:#202122; background-color:#ffffff;&quot;&gt;turn on the load that consums the energy fastest&lt;/span&gt;&lt;/li&gt;&lt;/ul&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Finally, if both prebious conditions aren't true but one load can be turned on, it's turned on.&lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline;&quot;&gt;Time to consume &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;predict final energy&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; modes which predicts how much energy that hour slot will probably yield (&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;energy1h&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;). This value is calculated every sample. There are two modes:&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;If one load is controlled it's turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;predict final energy&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; modes which predicts how much energy that hour slot will probably yield (&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;energy1h&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;). This value is calculated every sample. There are two modes:&lt;/span&gt; &lt;/p&gt;
 &lt;ul style=&quot;margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;&quot;&gt;&lt;li style=&quot; margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Average Power &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;avgP = energyB / (3600 - sec_remaining) -&amp;gt; energy1h = avg*3600&lt;/span&gt; &lt;/li&gt;
 &lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Project Current Power &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;energy1h = energyB + timeLeft * powerP / 3600&lt;/span&gt; &lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;You can also configure:&lt;/span&gt; &lt;/p&gt;
@@ -2697,7 +2718,7 @@ p, li { white-space: pre-wrap; }
 &lt;li style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Power Produced &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;shows all the energy produced which.&lt;/span&gt; &lt;/li&gt;
 &lt;li style=&quot; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Show threshold &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;&quot;&gt;→ &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;displays horizontal lines corresponding to each threshold (works in &amp;quot;hysteresis&amp;quot; and in &amp;quot;min on use&amp;quot;).&lt;/span&gt; &lt;/li&gt;&lt;/ul&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;📊 Hourly Results&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;After simulating or calculating results, contains the hourly breakdown of the energy balance, commutations, efficiency, ... Both plot settings in summary are also available here.&lt;/span&gt; &lt;/p&gt;
+&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;After simulating or calculating results, contains the hourly breakdown of the energy, commutations, efficiency, ... Both plot settings in summary are also available here.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:11pt; font-weight:700;&quot;&gt;📈 Optimize&lt;/span&gt;&lt;span style=&quot; font-size:11pt;&quot;&gt; &lt;/span&gt;&lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;Used to simulate the dataset multiple times, each time incrementing by the &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;step &lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;the indicated setting value&lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;.&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt; After that, a plot is displayed where you can contrast different relevant data &lt;/span&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;(checkboxes)&lt;/span&gt;&lt;span style=&quot; font-family:'Segoe UI','sans-serif';&quot;&gt;. This is very useful for finding the best algorithm configuration for your case.&lt;/span&gt; &lt;/p&gt;
 &lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;  &lt;/p&gt;
@@ -2716,6 +2737,138 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </item>
+    <item row="1" column="0" colspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="load_file">
+        <property name="text">
+         <string>Load File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="unload_file">
+        <property name="text">
+         <string>Unload File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="file_path">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item row="2" column="0" colspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <item>
+       <widget class="QLabel" name="sampling_rate">
+        <property name="text">
+         <string>Sampling Rate</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="date_range">
+        <property name="text">
+         <string>Date Range</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="calc_time">
+        <property name="text">
+         <string>Calculation Time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_3">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="plotting_time">
+        <property name="text">
+         <string>Plotting Time</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line_11">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="n_samples">
+        <property name="text">
+         <string>N Samples</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
    </layout>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -2723,7 +2876,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1487</width>
+     <width>1508</width>
      <height>22</height>
     </rect>
    </property>
@@ -2766,7 +2919,6 @@ p, li { white-space: pre-wrap; }
   <tabstop>simulate</tabstop>
   <tabstop>results</tabstop>
   <tabstop>tabs</tabstop>
-  <tabstop>time_limit</tabstop>
   <tabstop>table_eb_t</tabstop>
   <tabstop>table_t</tabstop>
   <tabstop>show_values_t</tabstop>
@@ -2786,8 +2938,8 @@ p, li { white-space: pre-wrap; }
      <y>157</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2802,8 +2954,8 @@ p, li { white-space: pre-wrap; }
      <y>73</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2814,12 +2966,12 @@ p, li { white-space: pre-wrap; }
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>161</x>
-     <y>480</y>
+     <x>180</x>
+     <y>545</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2830,12 +2982,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>385</x>
-     <y>735</y>
+     <x>557</x>
+     <y>781</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2850,8 +3002,8 @@ p, li { white-space: pre-wrap; }
      <y>99</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2866,8 +3018,8 @@ p, li { white-space: pre-wrap; }
      <y>216</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2882,8 +3034,8 @@ p, li { white-space: pre-wrap; }
      <y>275</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2898,8 +3050,8 @@ p, li { white-space: pre-wrap; }
      <y>249</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2914,8 +3066,8 @@ p, li { white-space: pre-wrap; }
      <y>396</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2930,8 +3082,8 @@ p, li { white-space: pre-wrap; }
      <y>422</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2946,24 +3098,8 @@ p, li { white-space: pre-wrap; }
      <y>448</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>time_limit</sender>
-   <signal>valueChanged(int)</signal>
-   <receiver>recalc_warn</receiver>
-   <slot>show()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>119</x>
-     <y>203</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -2994,8 +3130,8 @@ p, li { white-space: pre-wrap; }
      <y>370</y>
     </hint>
     <hint type="destinationlabel">
-     <x>133</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -3007,11 +3143,11 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>84</x>
-     <y>737</y>
+     <y>783</y>
     </hint>
     <hint type="destinationlabel">
-     <x>139</x>
-     <y>534</y>
+     <x>158</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -3022,12 +3158,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>335</x>
-     <y>80</y>
+     <x>328</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1166</x>
-     <y>91</y>
+     <x>362</x>
+     <y>95</y>
     </hint>
    </hints>
   </connection>
@@ -3038,12 +3174,12 @@ p, li { white-space: pre-wrap; }
    <slot>hide()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>975</x>
-     <y>91</y>
+     <x>328</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1166</x>
-     <y>91</y>
+     <x>362</x>
+     <y>95</y>
     </hint>
    </hints>
   </connection>
@@ -3058,8 +3194,8 @@ p, li { white-space: pre-wrap; }
      <y>203</y>
     </hint>
     <hint type="destinationlabel">
-     <x>51</x>
-     <y>535</y>
+     <x>111</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -3070,12 +3206,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
+     <x>118</x>
      <y>203</y>
     </hint>
     <hint type="destinationlabel">
-     <x>72</x>
-     <y>526</y>
+     <x>132</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -3086,12 +3222,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
+     <x>118</x>
      <y>203</y>
     </hint>
     <hint type="destinationlabel">
-     <x>75</x>
-     <y>532</y>
+     <x>135</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -3102,12 +3238,12 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>119</x>
+     <x>118</x>
      <y>203</y>
     </hint>
     <hint type="destinationlabel">
-     <x>80</x>
-     <y>529</y>
+     <x>140</x>
+     <y>599</y>
     </hint>
    </hints>
   </connection>
@@ -3118,12 +3254,44 @@ p, li { white-space: pre-wrap; }
    <slot>show()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>917</x>
-     <y>339</y>
+     <x>328</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>109</x>
-     <y>533</y>
+     <x>158</x>
+     <y>599</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>time_limit</sender>
+   <signal>valueChanged(int)</signal>
+   <receiver>recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>119</x>
+     <y>203</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>158</x>
+     <y>599</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>mot_mode</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>recalc_warn</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>124</x>
+     <y>224</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>99</x>
+     <y>583</y>
     </hint>
    </hints>
   </connection>

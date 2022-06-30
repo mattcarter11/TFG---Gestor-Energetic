@@ -59,8 +59,10 @@ class App(QMainWindow):
         self.results = self.optimize = self.df_out = self.max_load_line = None
         self.eb_plotC = pc.EBPlotController()
         self.ebt_plotC = pc.EBPlotController()
-        self.eff_plotC = pc.BarPlotController()
+        self.effC_plotC = pc.BarPlotController()
+        self.effGR_plotC = pc.BarPlotController()
         self.bl_plotC = pc.BarPlotController()
+        self.commut_plotC = pc.BarPlotController()
 
         t0 = time()
         super().__init__()
@@ -111,6 +113,7 @@ class App(QMainWindow):
         self.load_op_settings(self.ui.algorithm.currentIndex())
         self.ui.time_limit.valueChanged.connect(self.time_limit_changed)
         self.ui.load1.valueChanged.connect(self.time_limit_changed)
+        self.ui.load2.valueChanged.connect(self.time_limit_changed)
         self.time_limit_changed()
         # Loads
         self.ui.load1.valueChanged.connect(self.th1_disable)
@@ -138,10 +141,13 @@ class App(QMainWindow):
         self.ui.show_values_eb.stateChanged.connect( self.eb_plotC.set_show_values)
         self.ui.show_ecm_eb.stateChanged.connect( self.eb_plotC.set_show_cm)
         self.ui.subdivide_eb.currentIndexChanged.connect( self.eb_plotC.set_subdivide)
-        # Other plot
-        self.ui.show_values_eff.stateChanged.connect( self.eff_plotC.set_show_values)
+        # Efficiency plot
+        self.ui.show_values_effC.stateChanged.connect( self.effC_plotC.set_show_values)
+        self.ui.show_values_effGR.stateChanged.connect( self.effGR_plotC.set_show_values)
+        # Balance and Commut plot
         self.ui.show_values_balance.stateChanged.connect( self.bl_plotC.set_show_values)
-        # Summary balance plot
+        self.ui.show_values_commut.stateChanged.connect( self.commut_plotC.set_show_values)
+        # Summary plot
         self.ui.show_values_t.stateChanged.connect( self.ebt_plotC.set_show_values)
         self.ui.show_ecm_t.stateChanged.connect( self.ebt_plotC.set_show_cm)
         self.ui.subdivide_t.currentIndexChanged.connect( self.ebt_plotC.set_subdivide)
@@ -318,8 +324,9 @@ class App(QMainWindow):
 
     #region -> Simulation Settings
     def time_limit_changed(self):
-        self.tl_eq = self.ui.time_limit.value() * self.ui.load1.value() / 3600
-        self.ui.wh_eq.setText(f'Top threshold {self.tl_eq:.2f} Wh')
+        self.tl1_eq = self.ui.time_limit.value() * self.ui.load1.value() / 3600
+        self.tl2_eq = self.ui.time_limit.value() * self.ui.load2.value() / 3600
+        self.ui.wh_eq.setText(f'Threshold L1 {self.tl1_eq:.2f} Wh \nThreshold L2 {self.tl2_eq:.2f} Wh \nThreshold L12 {self.tl1_eq+self.tl2_eq:.2f} Wh')
 
     def algorithm_changed(self, i):
         self.ui.load1.setEnabled(i != 0)
@@ -346,14 +353,14 @@ class App(QMainWindow):
     #region -> Simulation/Results/Optimize
     def results_press(self):
         t0 = time()
-        df = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString(), 3600 )
-        df.calc_powerAG()
-        df.calc_powerCM()
-        df.fill_missing_energy()
-        df.rearange_cols()
-        self.results = Results(df, self.df_price.iloc[:, 0], self.ui.sell_price.value())
+        self.df_out = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString(), 3600 )
+        self.df_out.calc_powerAG()
+        self.df_out.calc_powerCM()
+        self.df_out.fill_missing_energy()
+        self.df_out.rearange_cols()
+        self.results = Results(self.df_out, self.df_price.iloc[:, 0], self.ui.sell_price.value())
         self.ui.calc_time.setText(f'Results calculated in {time()-t0:.3f} s')
-        self.show_results(df)
+        self.show_results()
 
     def simulate_press(self):
         t0 = time()
@@ -363,7 +370,7 @@ class App(QMainWindow):
             self.results = Results(self.df_out, self.df_price.iloc[:, 0], self.ui.sell_price.value())
             self.ui.calc_time.setText(f'Simulated in {time()-t0:.3f} s. Results calculated in {time()-t1:.3f} s')
             self.print_sim_duration()
-            self.show_results(self.df_out)          
+            self.show_results()          
 
     def optimize_press(self):
         t0 = time()
@@ -400,7 +407,11 @@ class App(QMainWindow):
                     return ac.HysteresisConfig(th_top1, th_bottom1, th_top2, th_bottom2)
                 case 2: 
                     time_limit  = value if value is not None and element == 'time_limit' else self.ui.time_limit.value()
-                    return ac.MinOnTimeConfig(time_limit)
+                    match self.ui.mot_mode.currentIndex():
+                        case 0: mode = ac.MinOnTimeMode.on2_if_on1
+                        case 1: mode = ac.MinOnTimeMode.order
+                        case 2: mode = ac.MinOnTimeMode.fastest
+                    return ac.MinOnTimeConfig(time_limit, mode)
                 case 3:
                     end_at       = value if value is not None and element == 'ttc_end_at' else self.ui.ttc_end_at.value()
                     on_min       = value if value is not None and element == 'ttc_on_min' else self.ui.ttc_on_min.value()
@@ -433,12 +444,12 @@ class App(QMainWindow):
     #endregion
 
     #region -> Show results
-    def show_results(self, df:df.DataFrameOut): 
+    def show_results(self): 
         header = ['energyT', 'energyDT']
         columns = [col for col in COL_ORDER if 'energy' in col and col not in header+['energyB']]
         self.ui.table_eb_t.setModel( QPandasModelTranslate(self.results.df_total[columns].T, i=1, use_unit=header) )
         self.ui.table_t.setModel( QPandasModelTranslate(self.results.df_results, use_unit=True) )
-        self.ui.table_s.setModel( QPandasModelTranslate(df.df) )
+        self.ui.table_s.setModel( QPandasModelTranslate(self.df_out.df) )
         self.ui.table_eb.setModel( QPandasModelTranslate(self.results.df_hour, i=1) )
 
         # Remove wierd under space
@@ -453,9 +464,8 @@ class App(QMainWindow):
             table.horizontalHeader().setSectionResizeMode(0, QHeaderView.ResizeToContents)
         
         t0 = time()
-        self.plot_sim(df)
-        self.plot_eb()
-        self.plot_other()
+        self.plot_sim()
+        self.plot_hour()
         self.plot_t()
 
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
@@ -513,14 +523,14 @@ class App(QMainWindow):
         plot.toggable_legend_lines()
         self.data_line_style(self.ui.data_line_style.text())
 
-    def plot_sim(self, df:df.DataFrameOut):
+    def plot_sim(self):
         t0 = time()
         plot: mw.QMplTwinxPlot = self.ui.plot_s
         ax1, ax2 = plot.ax1, plot.ax2
         plot.clear()
 
-        max_load = df.aproximate_max_load()
-        df = df.df
+        max_load = self.df_out.aproximate_max_load()
+        df = self.df_out.df
 
         # Plot Power Lines
         self.sim_lines = []
@@ -548,8 +558,9 @@ class App(QMainWindow):
                     self.th_lines.append( ax2.axhline(self.ui.th_top2.value(), color=GRAY1) )
                     self.th_lines.append( ax2.axhline(self.ui.th_bottom2.value(), color=GRAY1) )
             case 2:
-                self.th_lines.append( ax2.axhline(self.tl_eq, color=GRAY1) )
-                self.th_lines.append( ax2.axhline(self.tl_eq*2, color=GRAY1) )
+                self.th_lines.append( ax2.axhline(self.tl1_eq, color=GRAY1) )
+                self.th_lines.append( ax2.axhline(self.tl2_eq, color=GRAY1) )
+                self.th_lines.append( ax2.axhline(self.tl1_eq+self.tl2_eq, color=GRAY1) )
             case 3:
                 self.th_lines.append( ax2.axhline(self.ui.ttc_end_at.value(), color=GRAY1) )
                 self.th_lines.append( ax2.axhline(self.ui.ttc_on_min.value(), color=GRAY1) )
@@ -574,26 +585,32 @@ class App(QMainWindow):
         plot.fig.autofmt_xdate()
         plot.toggable_legend_lines()
         plot.align = True
-        plot.ax_ylimit = (0, df['powerP'].max()*1.05)
+        ymax = max(df['powerP'].max(), self.results.df_results['loadApprox'].max())
+        plot.ax_ylimit = (0, ymax*1.05)
         plot.home_view()
         self.toggle_loads_area(self.ui.show_loads_area.isChecked())
         self.toggle_max_cons(self.ui.show_max_cons.currentIndex())
         self.sim_line_style(self.ui.sim_line_style.text())
         self.ui.plotting_time.setText(f'Plotted in {time()-t0:.3f} s')
 
-    def plot_eb(self):
+    def plot_hour(self):
         if self.results is not None:
             showV = self.ui.show_values_eb.isChecked()
             showD = self.ui.subdivide_eb.currentIndex()
             showCM = self.ui.show_ecm_eb.isChecked()
             self.eb_plotC.new_plot(self.results.df_hour, self.ui.plot_eb, showV, showD, showCM)
+            
+            showV = self.ui.show_values_effC.isChecked()
+            self.effC_plotC.new_plot(self.results.df_hour[['timestamp','efficC']], self.ui.plot_effC, showV, lrot=None, decimas=2)
 
-    def plot_other(self):
-        if self.results is not None:
-            showV = self.ui.show_values_eff.isChecked()
-            self.eff_plotC.new_plot(self.results.df_hour[['timestamp','efficCM']], self.ui.plot_eff, showV, lrot=None)
+            showV = self.ui.show_values_effGR.isChecked()
+            self.effGR_plotC.new_plot(self.results.df_hour[['timestamp','efficGR']], self.ui.plot_effGR, showV, lrot=None, decimas=2)
+
             showV = self.ui.show_values_balance.isChecked()
-            self.bl_plotC.new_plot(self.results.df_hour[['timestamp','balance']], self.ui.plot_balance, showV, lrot=None)
+            self.bl_plotC.new_plot(self.results.df_hour[['timestamp','balance']], self.ui.plot_balance, showV, lrot=None, decimas=3)
+            
+            showV = self.ui.show_values_commut.isChecked()
+            self.commut_plotC.new_plot(self.results.df_hour[['timestamp','on_offL1', 'on_offL2']], self.ui.plot_commut, showV, lrot=None)
 
     def plot_t(self):
         if self.results is not None:
@@ -652,7 +669,7 @@ class App(QMainWindow):
 
     def toggle_energyP(self):
         if self.df_out is not None:
-            self.plot_sim(self.df_out)
+            self.plot_sim()
 
     def toggle_th(self, val):
         if self.th_lines: # List Not empty

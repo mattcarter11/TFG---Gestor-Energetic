@@ -46,7 +46,7 @@ class BarPlotController:
         self.gbars = None
         self.ghandlab = None
 
-    def new_plot(self, data:DataFrame, plot:QMplPlot, showV:bool=True, showD:int=0, showCM:bool=True, gaxis:str='both', lrot:str='vertical', xtime:bool=True):
+    def new_plot(self, data:DataFrame, plot:QMplPlot, showV:bool=True, showD:int=0, showCM:bool=True, gaxis:str='both', lrot:str='vertical', xtime:bool=True, decimas:int=0):
         self.data = data
         self.plot = plot
         self.showV = showV
@@ -56,6 +56,7 @@ class BarPlotController:
         self.gaxis = gaxis
         self.lrot = lrot
         self.xtime = xtime
+        self.decimas = decimas
         self._plot_bars()
         self._set_show_values(showV)
         self._set_subdivide(showD)
@@ -77,8 +78,8 @@ class BarPlotController:
         containers = ax.containers
         self.glabels= [[[]], [[]], [[]], []]
         for i, col in enumerate(columns):
-            labels = [f'{p:.3f}' for p in self.data[col]]
-            self.glabels[0][0].extend( ax.bar_label(containers[i], labels=labels, rotation=self.lrot, color=colors[i], fontsize=8, padding=4) )
+            labels = [f'{p:.{self.decimas}f}' for p in self.data[col]]
+            self.glabels[0][0].extend( ax.bar_label(containers[i], labels=labels, rotation=self.lrot, fontsize=8, padding=4, label_type='center') )
 
         # Visuals
         ax.margins(y=0.1)

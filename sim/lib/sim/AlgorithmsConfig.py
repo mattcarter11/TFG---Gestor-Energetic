@@ -6,6 +6,16 @@ class AlgorithmsEnum(Enum):
     min_on_time = 2
     time_to_consume = 3
 
+class PredictFinalEnergy(Enum):
+    disabled = 0
+    avarage_power = 1
+    project_current_power = 2
+
+class MinOnTimeMode(Enum):
+    on2_if_on1 = 0
+    order = 1
+    fastest = 2
+
 class AlgorithmConfig():
     def __init__(self):
         self.type = AlgorithmsEnum.none
@@ -20,14 +30,10 @@ class HysteresisConfig(AlgorithmConfig):
         self.th_bottom2 = th_bottom2
 
 class MinOnTimeConfig(AlgorithmConfig):
-    def __init__(self, min_on_time:float):
+    def __init__(self, time_limit:float, mode:MinOnTimeMode):
         self.type = AlgorithmsEnum.min_on_time
-        self.min_on_time = min_on_time
-
-class PredictFinalEnergy(Enum):
-    disabled = 0
-    avarage_power = 1
-    project_current_power = 2
+        self.time_limit = time_limit
+        self.mode = mode
 
 class TimeToConsume(AlgorithmConfig):
        def __init__(self, predict_final_energy:PredictFinalEnergy, end_at_energy:float, on_min_energy:float, fime_factor:float):

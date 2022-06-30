@@ -30,7 +30,7 @@ class Ui_MainWindow(object):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.setEnabled(True)
-        MainWindow.resize(1487, 843)
+        MainWindow.resize(1508, 843)
         sizePolicy = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -251,13 +251,12 @@ class Ui_MainWindow(object):
         self.arnau_options.setObjectName(u"arnau_options")
         self.verticalLayout_2 = QVBoxLayout(self.arnau_options)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.formLayout = QFormLayout()
+        self.formLayout.setObjectName(u"formLayout")
         self.label_5 = QLabel(self.arnau_options)
         self.label_5.setObjectName(u"label_5")
-        sizePolicy3.setHeightForWidth(self.label_5.sizePolicy().hasHeightForWidth())
-        self.label_5.setSizePolicy(sizePolicy3)
-        self.label_5.setFont(font)
 
-        self.verticalLayout_2.addWidget(self.label_5, 0, Qt.AlignTop)
+        self.formLayout.setWidget(0, QFormLayout.LabelRole, self.label_5)
 
         self.time_limit = QSpinBox(self.arnau_options)
         self.time_limit.setObjectName(u"time_limit")
@@ -268,7 +267,23 @@ class Ui_MainWindow(object):
         self.time_limit.setSingleStep(25)
         self.time_limit.setValue(300)
 
-        self.verticalLayout_2.addWidget(self.time_limit)
+        self.formLayout.setWidget(0, QFormLayout.FieldRole, self.time_limit)
+
+        self.label_31 = QLabel(self.arnau_options)
+        self.label_31.setObjectName(u"label_31")
+
+        self.formLayout.setWidget(1, QFormLayout.LabelRole, self.label_31)
+
+        self.mot_mode = QComboBox(self.arnau_options)
+        self.mot_mode.addItem("")
+        self.mot_mode.addItem("")
+        self.mot_mode.addItem("")
+        self.mot_mode.setObjectName(u"mot_mode")
+
+        self.formLayout.setWidget(1, QFormLayout.FieldRole, self.mot_mode)
+
+
+        self.verticalLayout_2.addLayout(self.formLayout)
 
         self.wh_eq = QLabel(self.arnau_options)
         self.wh_eq.setObjectName(u"wh_eq")
@@ -375,9 +390,10 @@ class Ui_MainWindow(object):
 
         self.load1 = QSpinBox(self.centralwidget)
         self.load1.setObjectName(u"load1")
+        self.load1.setMinimum(25)
         self.load1.setMaximum(99999)
         self.load1.setSingleStep(25)
-        self.load1.setValue(1000)
+        self.load1.setValue(500)
 
         self.formLayout_5.setWidget(2, QFormLayout.FieldRole, self.load1)
 
@@ -385,7 +401,7 @@ class Ui_MainWindow(object):
         self.load2.setObjectName(u"load2")
         self.load2.setMaximum(99999)
         self.load2.setSingleStep(25)
-        self.load2.setValue(1000)
+        self.load2.setValue(500)
 
         self.formLayout_5.setWidget(3, QFormLayout.FieldRole, self.load2)
 
@@ -417,7 +433,7 @@ class Ui_MainWindow(object):
         self.generation_factor = QDoubleSpinBox(self.centralwidget)
         self.generation_factor.setObjectName(u"generation_factor")
         self.generation_factor.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
-        self.generation_factor.setMaximum(1.000000000000000)
+        self.generation_factor.setMaximum(10.000000000000000)
         self.generation_factor.setSingleStep(0.100000000000000)
         self.generation_factor.setValue(1.000000000000000)
 
@@ -457,94 +473,6 @@ class Ui_MainWindow(object):
 
 
         self.gridLayout.addLayout(self.options, 0, 0, 1, 1)
-
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.load_file = QPushButton(self.centralwidget)
-        self.load_file.setObjectName(u"load_file")
-
-        self.horizontalLayout.addWidget(self.load_file)
-
-        self.unload_file = QPushButton(self.centralwidget)
-        self.unload_file.setObjectName(u"unload_file")
-
-        self.horizontalLayout.addWidget(self.unload_file)
-
-        self.file_path = QLineEdit(self.centralwidget)
-        self.file_path.setObjectName(u"file_path")
-        self.file_path.setEnabled(True)
-        self.file_path.setReadOnly(True)
-
-        self.horizontalLayout.addWidget(self.file_path)
-
-
-        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 2)
-
-        self.horizontalLayout_4 = QHBoxLayout()
-        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
-        self.sampling_rate = QLabel(self.centralwidget)
-        self.sampling_rate.setObjectName(u"sampling_rate")
-
-        self.horizontalLayout_4.addWidget(self.sampling_rate)
-
-        self.line = QFrame(self.centralwidget)
-        self.line.setObjectName(u"line")
-        self.line.setFrameShadow(QFrame.Plain)
-        self.line.setLineWidth(0)
-        self.line.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line)
-
-        self.date_range = QLabel(self.centralwidget)
-        self.date_range.setObjectName(u"date_range")
-
-        self.horizontalLayout_4.addWidget(self.date_range)
-
-        self.line_2 = QFrame(self.centralwidget)
-        self.line_2.setObjectName(u"line_2")
-        self.line_2.setFrameShadow(QFrame.Plain)
-        self.line_2.setLineWidth(0)
-        self.line_2.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line_2)
-
-        self.calc_time = QLabel(self.centralwidget)
-        self.calc_time.setObjectName(u"calc_time")
-
-        self.horizontalLayout_4.addWidget(self.calc_time)
-
-        self.line_3 = QFrame(self.centralwidget)
-        self.line_3.setObjectName(u"line_3")
-        self.line_3.setFrameShadow(QFrame.Plain)
-        self.line_3.setLineWidth(0)
-        self.line_3.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line_3)
-
-        self.plotting_time = QLabel(self.centralwidget)
-        self.plotting_time.setObjectName(u"plotting_time")
-
-        self.horizontalLayout_4.addWidget(self.plotting_time)
-
-        self.line_11 = QFrame(self.centralwidget)
-        self.line_11.setObjectName(u"line_11")
-        self.line_11.setFrameShadow(QFrame.Plain)
-        self.line_11.setLineWidth(0)
-        self.line_11.setFrameShape(QFrame.VLine)
-
-        self.horizontalLayout_4.addWidget(self.line_11)
-
-        self.n_samples = QLabel(self.centralwidget)
-        self.n_samples.setObjectName(u"n_samples")
-
-        self.horizontalLayout_4.addWidget(self.n_samples)
-
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_4.addItem(self.horizontalSpacer)
-
-
-        self.gridLayout.addLayout(self.horizontalLayout_4, 2, 0, 1, 2)
 
         self.data = QVBoxLayout()
         self.data.setObjectName(u"data")
@@ -741,14 +669,17 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5 = QVBoxLayout()
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
-        self.verticalSpacer_5 = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_5 = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_5)
 
         self.table_eb_t = QTableView(self.global_results)
         self.table_eb_t.setObjectName(u"table_eb_t")
-        sizePolicy3.setHeightForWidth(self.table_eb_t.sizePolicy().hasHeightForWidth())
-        self.table_eb_t.setSizePolicy(sizePolicy3)
+        sizePolicy8 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.table_eb_t.sizePolicy().hasHeightForWidth())
+        self.table_eb_t.setSizePolicy(sizePolicy8)
         self.table_eb_t.setMinimumSize(QSize(350, 0))
         self.table_eb_t.setMaximumSize(QSize(350, 10000000))
         self.table_eb_t.setContextMenuPolicy(Qt.PreventContextMenu)
@@ -764,7 +695,7 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_5.addWidget(self.table_eb_t, 0, Qt.AlignHCenter)
 
-        self.verticalSpacer_6 = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.verticalSpacer_6 = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.verticalLayout_5.addItem(self.verticalSpacer_6)
 
@@ -824,11 +755,11 @@ class Ui_MainWindow(object):
 
         self.label_27 = QLabel(self.global_results)
         self.label_27.setObjectName(u"label_27")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.label_27.sizePolicy().hasHeightForWidth())
-        self.label_27.setSizePolicy(sizePolicy8)
+        sizePolicy9 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy9.setHorizontalStretch(0)
+        sizePolicy9.setVerticalStretch(0)
+        sizePolicy9.setHeightForWidth(self.label_27.sizePolicy().hasHeightForWidth())
+        self.label_27.setSizePolicy(sizePolicy9)
 
         self.layout.addWidget(self.label_27)
 
@@ -1056,30 +987,31 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.addItem(self.horizontalSpacer_3)
 
         self.tabWidget_3.addTab(self.plot_eb, "")
-        self.plot_other = QWidget()
-        self.plot_other.setObjectName(u"plot_other")
-        self.verticalLayout_10 = QVBoxLayout(self.plot_other)
+        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.plot_eb), u"\ud83d\udd0b Energy")
+        self.eff_t = QWidget()
+        self.eff_t.setObjectName(u"eff_t")
+        self.verticalLayout_10 = QVBoxLayout(self.eff_t)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
-        self.plot_eff = QMplPlot(self.plot_other)
-        self.plot_eff.setObjectName(u"plot_eff")
-        sizePolicy5.setHeightForWidth(self.plot_eff.sizePolicy().hasHeightForWidth())
-        self.plot_eff.setSizePolicy(sizePolicy5)
+        self.plot_effC = QMplPlot(self.eff_t)
+        self.plot_effC.setObjectName(u"plot_effC")
+        sizePolicy5.setHeightForWidth(self.plot_effC.sizePolicy().hasHeightForWidth())
+        self.plot_effC.setSizePolicy(sizePolicy5)
 
-        self.verticalLayout_10.addWidget(self.plot_eff)
+        self.verticalLayout_10.addWidget(self.plot_effC)
 
         self.horizontalLayout_19 = QHBoxLayout()
         self.horizontalLayout_19.setObjectName(u"horizontalLayout_19")
-        self.show_values_eff = QCheckBox(self.plot_other)
-        self.show_values_eff.setObjectName(u"show_values_eff")
-        sizePolicy9 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
-        sizePolicy9.setHorizontalStretch(0)
-        sizePolicy9.setVerticalStretch(0)
-        sizePolicy9.setHeightForWidth(self.show_values_eff.sizePolicy().hasHeightForWidth())
-        self.show_values_eff.setSizePolicy(sizePolicy9)
+        self.show_values_effC = QCheckBox(self.eff_t)
+        self.show_values_effC.setObjectName(u"show_values_effC")
+        sizePolicy10 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Maximum)
+        sizePolicy10.setHorizontalStretch(0)
+        sizePolicy10.setVerticalStretch(0)
+        sizePolicy10.setHeightForWidth(self.show_values_effC.sizePolicy().hasHeightForWidth())
+        self.show_values_effC.setSizePolicy(sizePolicy10)
 
-        self.horizontalLayout_19.addWidget(self.show_values_eff)
+        self.horizontalLayout_19.addWidget(self.show_values_effC)
 
-        self.line_15 = QFrame(self.plot_other)
+        self.line_15 = QFrame(self.eff_t)
         self.line_15.setObjectName(u"line_15")
         self.line_15.setFrameShadow(QFrame.Plain)
         self.line_15.setLineWidth(0)
@@ -1087,7 +1019,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_19.addWidget(self.line_15)
 
-        self.label_24 = QLabel(self.plot_other)
+        self.label_24 = QLabel(self.eff_t)
         self.label_24.setObjectName(u"label_24")
 
         self.horizontalLayout_19.addWidget(self.label_24)
@@ -1099,23 +1031,23 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_10.addLayout(self.horizontalLayout_19)
 
-        self.plot_balance = QMplPlot(self.plot_other)
-        self.plot_balance.setObjectName(u"plot_balance")
-        sizePolicy5.setHeightForWidth(self.plot_balance.sizePolicy().hasHeightForWidth())
-        self.plot_balance.setSizePolicy(sizePolicy5)
+        self.plot_effGR = QMplPlot(self.eff_t)
+        self.plot_effGR.setObjectName(u"plot_effGR")
+        sizePolicy5.setHeightForWidth(self.plot_effGR.sizePolicy().hasHeightForWidth())
+        self.plot_effGR.setSizePolicy(sizePolicy5)
 
-        self.verticalLayout_10.addWidget(self.plot_balance)
+        self.verticalLayout_10.addWidget(self.plot_effGR)
 
         self.horizontalLayout_18 = QHBoxLayout()
         self.horizontalLayout_18.setObjectName(u"horizontalLayout_18")
-        self.show_values_balance = QCheckBox(self.plot_other)
-        self.show_values_balance.setObjectName(u"show_values_balance")
-        sizePolicy9.setHeightForWidth(self.show_values_balance.sizePolicy().hasHeightForWidth())
-        self.show_values_balance.setSizePolicy(sizePolicy9)
+        self.show_values_effGR = QCheckBox(self.eff_t)
+        self.show_values_effGR.setObjectName(u"show_values_effGR")
+        sizePolicy10.setHeightForWidth(self.show_values_effGR.sizePolicy().hasHeightForWidth())
+        self.show_values_effGR.setSizePolicy(sizePolicy10)
 
-        self.horizontalLayout_18.addWidget(self.show_values_balance)
+        self.horizontalLayout_18.addWidget(self.show_values_effGR)
 
-        self.line_16 = QFrame(self.plot_other)
+        self.line_16 = QFrame(self.eff_t)
         self.line_16.setObjectName(u"line_16")
         self.line_16.setFrameShadow(QFrame.Plain)
         self.line_16.setLineWidth(0)
@@ -1123,7 +1055,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_18.addWidget(self.line_16)
 
-        self.label_25 = QLabel(self.plot_other)
+        self.label_25 = QLabel(self.eff_t)
         self.label_25.setObjectName(u"label_25")
 
         self.horizontalLayout_18.addWidget(self.label_25)
@@ -1135,14 +1067,91 @@ class Ui_MainWindow(object):
 
         self.verticalLayout_10.addLayout(self.horizontalLayout_18)
 
-        self.tabWidget_3.addTab(self.plot_other, "")
-        self.tab_2 = QWidget()
-        self.tab_2.setObjectName(u"tab_2")
-        self.horizontalLayout_16 = QHBoxLayout(self.tab_2)
+        self.tabWidget_3.addTab(self.eff_t, "")
+        self.bal_com_t = QWidget()
+        self.bal_com_t.setObjectName(u"bal_com_t")
+        self.verticalLayout_12 = QVBoxLayout(self.bal_com_t)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.plot_balance = QMplPlot(self.bal_com_t)
+        self.plot_balance.setObjectName(u"plot_balance")
+        sizePolicy5.setHeightForWidth(self.plot_balance.sizePolicy().hasHeightForWidth())
+        self.plot_balance.setSizePolicy(sizePolicy5)
+
+        self.verticalLayout_12.addWidget(self.plot_balance)
+
+        self.horizontalLayout_21 = QHBoxLayout()
+        self.horizontalLayout_21.setObjectName(u"horizontalLayout_21")
+        self.show_values_balance = QCheckBox(self.bal_com_t)
+        self.show_values_balance.setObjectName(u"show_values_balance")
+        sizePolicy10.setHeightForWidth(self.show_values_balance.sizePolicy().hasHeightForWidth())
+        self.show_values_balance.setSizePolicy(sizePolicy10)
+
+        self.horizontalLayout_21.addWidget(self.show_values_balance)
+
+        self.line_18 = QFrame(self.bal_com_t)
+        self.line_18.setObjectName(u"line_18")
+        self.line_18.setFrameShadow(QFrame.Plain)
+        self.line_18.setLineWidth(0)
+        self.line_18.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_21.addWidget(self.line_18)
+
+        self.label_30 = QLabel(self.bal_com_t)
+        self.label_30.setObjectName(u"label_30")
+
+        self.horizontalLayout_21.addWidget(self.label_30)
+
+        self.horizontalSpacer_11 = QSpacerItem(898, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_21.addItem(self.horizontalSpacer_11)
+
+
+        self.verticalLayout_12.addLayout(self.horizontalLayout_21)
+
+        self.plot_commut = QMplPlot(self.bal_com_t)
+        self.plot_commut.setObjectName(u"plot_commut")
+        sizePolicy5.setHeightForWidth(self.plot_commut.sizePolicy().hasHeightForWidth())
+        self.plot_commut.setSizePolicy(sizePolicy5)
+
+        self.verticalLayout_12.addWidget(self.plot_commut)
+
+        self.horizontalLayout_20 = QHBoxLayout()
+        self.horizontalLayout_20.setObjectName(u"horizontalLayout_20")
+        self.show_values_commut = QCheckBox(self.bal_com_t)
+        self.show_values_commut.setObjectName(u"show_values_commut")
+        sizePolicy10.setHeightForWidth(self.show_values_commut.sizePolicy().hasHeightForWidth())
+        self.show_values_commut.setSizePolicy(sizePolicy10)
+
+        self.horizontalLayout_20.addWidget(self.show_values_commut)
+
+        self.line_17 = QFrame(self.bal_com_t)
+        self.line_17.setObjectName(u"line_17")
+        self.line_17.setFrameShadow(QFrame.Plain)
+        self.line_17.setLineWidth(0)
+        self.line_17.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_20.addWidget(self.line_17)
+
+        self.label_29 = QLabel(self.bal_com_t)
+        self.label_29.setObjectName(u"label_29")
+
+        self.horizontalLayout_20.addWidget(self.label_29)
+
+        self.horizontalSpacer_10 = QSpacerItem(898, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_20.addItem(self.horizontalSpacer_10)
+
+
+        self.verticalLayout_12.addLayout(self.horizontalLayout_20)
+
+        self.tabWidget_3.addTab(self.bal_com_t, "")
+        self.table_t_2 = QWidget()
+        self.table_t_2.setObjectName(u"table_t_2")
+        self.horizontalLayout_16 = QHBoxLayout(self.table_t_2)
         self.horizontalLayout_16.setSpacing(0)
         self.horizontalLayout_16.setObjectName(u"horizontalLayout_16")
         self.horizontalLayout_16.setContentsMargins(0, 2, 0, 0)
-        self.table_eb = QTableView(self.tab_2)
+        self.table_eb = QTableView(self.table_t_2)
         self.table_eb.setObjectName(u"table_eb")
         sizePolicy5.setHeightForWidth(self.table_eb.sizePolicy().hasHeightForWidth())
         self.table_eb.setSizePolicy(sizePolicy5)
@@ -1163,7 +1172,7 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_16.addWidget(self.table_eb)
 
-        self.tabWidget_3.addTab(self.tab_2, "")
+        self.tabWidget_3.addTab(self.table_t_2, "")
 
         self.horizontalLayout_5.addWidget(self.tabWidget_3)
 
@@ -1236,11 +1245,11 @@ class Ui_MainWindow(object):
         self.op_calculate = QPushButton(self.optimise_t)
         self.op_calculate.setObjectName(u"op_calculate")
         self.op_calculate.setEnabled(False)
-        sizePolicy10 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy10.setHorizontalStretch(0)
-        sizePolicy10.setVerticalStretch(0)
-        sizePolicy10.setHeightForWidth(self.op_calculate.sizePolicy().hasHeightForWidth())
-        self.op_calculate.setSizePolicy(sizePolicy10)
+        sizePolicy11 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy11.setHorizontalStretch(0)
+        sizePolicy11.setVerticalStretch(0)
+        sizePolicy11.setHeightForWidth(self.op_calculate.sizePolicy().hasHeightForWidth())
+        self.op_calculate.setSizePolicy(sizePolicy11)
         self.op_calculate.setAutoDefault(False)
         self.op_calculate.setFlat(False)
         self.op_calculate.setProperty("dataValidEnable", True)
@@ -1278,11 +1287,11 @@ class Ui_MainWindow(object):
 
         self.op_ax_left = QComboBox(self.plot_op)
         self.op_ax_left.setObjectName(u"op_ax_left")
-        sizePolicy11 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy11.setHorizontalStretch(0)
-        sizePolicy11.setVerticalStretch(0)
-        sizePolicy11.setHeightForWidth(self.op_ax_left.sizePolicy().hasHeightForWidth())
-        self.op_ax_left.setSizePolicy(sizePolicy11)
+        sizePolicy12 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy12.setHorizontalStretch(0)
+        sizePolicy12.setVerticalStretch(0)
+        sizePolicy12.setHeightForWidth(self.op_ax_left.sizePolicy().hasHeightForWidth())
+        self.op_ax_left.setSizePolicy(sizePolicy12)
 
         self.horizontalLayout_11.addWidget(self.op_ax_left)
 
@@ -1299,8 +1308,8 @@ class Ui_MainWindow(object):
 
         self.op_ax_right = QComboBox(self.plot_op)
         self.op_ax_right.setObjectName(u"op_ax_right")
-        sizePolicy11.setHeightForWidth(self.op_ax_right.sizePolicy().hasHeightForWidth())
-        self.op_ax_right.setSizePolicy(sizePolicy11)
+        sizePolicy12.setHeightForWidth(self.op_ax_right.sizePolicy().hasHeightForWidth())
+        self.op_ax_right.setSizePolicy(sizePolicy12)
 
         self.horizontalLayout_11.addWidget(self.op_ax_right)
 
@@ -1357,10 +1366,98 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addLayout(self.data, 0, 1, 1, 1)
 
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.load_file = QPushButton(self.centralwidget)
+        self.load_file.setObjectName(u"load_file")
+
+        self.horizontalLayout.addWidget(self.load_file)
+
+        self.unload_file = QPushButton(self.centralwidget)
+        self.unload_file.setObjectName(u"unload_file")
+
+        self.horizontalLayout.addWidget(self.unload_file)
+
+        self.file_path = QLineEdit(self.centralwidget)
+        self.file_path.setObjectName(u"file_path")
+        self.file_path.setEnabled(True)
+        self.file_path.setReadOnly(True)
+
+        self.horizontalLayout.addWidget(self.file_path)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 2)
+
+        self.horizontalLayout_4 = QHBoxLayout()
+        self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
+        self.sampling_rate = QLabel(self.centralwidget)
+        self.sampling_rate.setObjectName(u"sampling_rate")
+
+        self.horizontalLayout_4.addWidget(self.sampling_rate)
+
+        self.line = QFrame(self.centralwidget)
+        self.line.setObjectName(u"line")
+        self.line.setFrameShadow(QFrame.Plain)
+        self.line.setLineWidth(0)
+        self.line.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line)
+
+        self.date_range = QLabel(self.centralwidget)
+        self.date_range.setObjectName(u"date_range")
+
+        self.horizontalLayout_4.addWidget(self.date_range)
+
+        self.line_2 = QFrame(self.centralwidget)
+        self.line_2.setObjectName(u"line_2")
+        self.line_2.setFrameShadow(QFrame.Plain)
+        self.line_2.setLineWidth(0)
+        self.line_2.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line_2)
+
+        self.calc_time = QLabel(self.centralwidget)
+        self.calc_time.setObjectName(u"calc_time")
+
+        self.horizontalLayout_4.addWidget(self.calc_time)
+
+        self.line_3 = QFrame(self.centralwidget)
+        self.line_3.setObjectName(u"line_3")
+        self.line_3.setFrameShadow(QFrame.Plain)
+        self.line_3.setLineWidth(0)
+        self.line_3.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line_3)
+
+        self.plotting_time = QLabel(self.centralwidget)
+        self.plotting_time.setObjectName(u"plotting_time")
+
+        self.horizontalLayout_4.addWidget(self.plotting_time)
+
+        self.line_11 = QFrame(self.centralwidget)
+        self.line_11.setObjectName(u"line_11")
+        self.line_11.setFrameShadow(QFrame.Plain)
+        self.line_11.setLineWidth(0)
+        self.line_11.setFrameShape(QFrame.VLine)
+
+        self.horizontalLayout_4.addWidget(self.line_11)
+
+        self.n_samples = QLabel(self.centralwidget)
+        self.n_samples.setObjectName(u"n_samples")
+
+        self.horizontalLayout_4.addWidget(self.n_samples)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout_4, 2, 0, 1, 2)
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1487, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1508, 22))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
@@ -1379,8 +1476,7 @@ class Ui_MainWindow(object):
         QWidget.setTabOrder(self.load2, self.simulate)
         QWidget.setTabOrder(self.simulate, self.results)
         QWidget.setTabOrder(self.results, self.tabs)
-        QWidget.setTabOrder(self.tabs, self.time_limit)
-        QWidget.setTabOrder(self.time_limit, self.table_eb_t)
+        QWidget.setTabOrder(self.tabs, self.table_eb_t)
         QWidget.setTabOrder(self.table_eb_t, self.table_t)
         QWidget.setTabOrder(self.table_t, self.show_values_t)
         QWidget.setTabOrder(self.show_values_t, self.file_path)
@@ -1398,7 +1494,6 @@ class Ui_MainWindow(object):
         self.base_load.valueChanged.connect(self.recalc_warn.show)
         self.load1.valueChanged.connect(self.recalc_warn.show)
         self.load2.valueChanged.connect(self.recalc_warn.show)
-        self.time_limit.valueChanged.connect(self.recalc_warn.show)
         self.algorithm.currentIndexChanged.connect(self.algorithm_options.setCurrentIndex)
         self.use_data_bl.toggled.connect(self.recalc_warn.show)
         self.load_file.clicked.connect(self.recalc_warn.show)
@@ -1409,6 +1504,8 @@ class Ui_MainWindow(object):
         self.ttc_time_factor.valueChanged.connect(self.recalc_warn.show)
         self.ttc_on_min.valueChanged.connect(self.recalc_warn.show)
         self.sell_price.valueChanged.connect(self.recalc_warn.show)
+        self.time_limit.valueChanged.connect(self.recalc_warn.show)
+        self.mot_mode.currentIndexChanged.connect(self.recalc_warn.show)
 
         self.algorithm_options.setCurrentIndex(0)
         self.simulate.setDefault(False)
@@ -1457,9 +1554,14 @@ class Ui_MainWindow(object):
         self.th_bottom2.setSuffix(QCoreApplication.translate("MainWindow", u" Wh", None))
         self.th_bottom2.setPrefix("")
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Top L1", None))
-        self.label_5.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p align=\"center\"><span style=\" font-size:11pt;\">Time Limit</span></p></body></html>", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Time Limit", None))
         self.time_limit.setSuffix(QCoreApplication.translate("MainWindow", u" s", None))
         self.time_limit.setPrefix("")
+        self.label_31.setText(QCoreApplication.translate("MainWindow", u"Mode", None))
+        self.mot_mode.setItemText(0, QCoreApplication.translate("MainWindow", u"2n on if 1st on", None))
+        self.mot_mode.setItemText(1, QCoreApplication.translate("MainWindow", u"by order", None))
+        self.mot_mode.setItemText(2, QCoreApplication.translate("MainWindow", u"fastest", None))
+
         self.wh_eq.setText(QCoreApplication.translate("MainWindow", u"= Wh", None))
         self.label_11.setText(QCoreApplication.translate("MainWindow", u"Predict Final Energy", None))
         self.predict_final_energy.setItemText(0, QCoreApplication.translate("MainWindow", u"Disabled", None))
@@ -1493,19 +1595,12 @@ class Ui_MainWindow(object):
         self.simulate.setText(QCoreApplication.translate("MainWindow", u"Simulate", None))
         self.results.setText(QCoreApplication.translate("MainWindow", u"Data In Results", None))
         self.recalc_warn.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-weight:700; color:#f4b300;\">\u26a0</span><span style=\" color:#f4b300;\"> Recalculate \u26a0</span></p></body></html>", None))
-        self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
-        self.unload_file.setText(QCoreApplication.translate("MainWindow", u"Unload File", None))
-        self.sampling_rate.setText(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
-        self.date_range.setText(QCoreApplication.translate("MainWindow", u"Date Range", None))
-        self.calc_time.setText(QCoreApplication.translate("MainWindow", u"Calculation Time", None))
-        self.plotting_time.setText(QCoreApplication.translate("MainWindow", u"Plotting Time", None))
-        self.n_samples.setText(QCoreApplication.translate("MainWindow", u"N Samples", None))
         self.label_10.setText(QCoreApplication.translate("MainWindow", u"Line Style", None))
         self.data_line_style.setInputMask("")
         self.data_line_style.setText("")
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.plot_dr), QCoreApplication.translate("MainWindow", u"\ud83d\udcc8 Graph", None))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.table_dr_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcc5 Table [W, Wh]", None))
-        self.tabs.setTabText(self.tabs.indexOf(self.daterange_t), QCoreApplication.translate("MainWindow", u"\u231a Data Range (In)", None))
+        self.tabs.setTabText(self.tabs.indexOf(self.daterange_t), QCoreApplication.translate("MainWindow", u"\ud83d\udd57 Data Range (In)", None))
         self.label_21.setText(QCoreApplication.translate("MainWindow", u"Sell Price", None))
         self.sell_price.setPrefix("")
         self.sell_price.setSuffix(QCoreApplication.translate("MainWindow", u" \u20ac/kWh", None))
@@ -1542,13 +1637,17 @@ class Ui_MainWindow(object):
         self.subdivide_eb.setItemText(2, QCoreApplication.translate("MainWindow", u"Level 2", None))
 
         self.label_23.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
-        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.plot_eb), QCoreApplication.translate("MainWindow", u"\ud83d\udcca Energy Balance", None))
-        self.show_values_eff.setText(QCoreApplication.translate("MainWindow", u"Values", None))
+        self.show_values_effC.setText(QCoreApplication.translate("MainWindow", u"Values", None))
         self.label_24.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
-        self.show_values_balance.setText(QCoreApplication.translate("MainWindow", u"Values", None))
+        self.show_values_effGR.setText(QCoreApplication.translate("MainWindow", u"Values", None))
         self.label_25.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
-        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.plot_other), QCoreApplication.translate("MainWindow", u"\ud83d\udcca Other", None))
-        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.tab_2), QCoreApplication.translate("MainWindow", u"\ud83d\udcc5 Table [Wh, %, c\u00e9nt.]", None))
+        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.eff_t), QCoreApplication.translate("MainWindow", u"% Efficiencnies", None))
+        self.show_values_balance.setText(QCoreApplication.translate("MainWindow", u"Values", None))
+        self.label_30.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
+        self.show_values_commut.setText(QCoreApplication.translate("MainWindow", u"Values", None))
+        self.label_29.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
+        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.bal_com_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcc3 Balance && Commut", None))
+        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.table_t_2), QCoreApplication.translate("MainWindow", u"\ud83d\udcc5 Table [Wh, %, c\u00e9nt.]", None))
         self.tabs.setTabText(self.tabs.indexOf(self.resultsH_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcca Hourly Results", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Setting:", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Start", None))
@@ -1623,92 +1722,107 @@ class Ui_MainWindow(object):
                         "n-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Select a date line to move it </span></li>\n"
 "<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Pres ESC to cancel the move</span> </li></ul>\n"
 "<p style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">Algorithm</span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">You can select what algorithm to simulate and its associated settings.</span> </p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inde"
-                        "nt:0px;\"><span style=\" font-size:10pt; text-decoration: underline;\">Hysteresis </span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">You can select what algorithm to simulate and its associated settings.</span> They can control up two two loads.</p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:"
+                        "0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; text-decoration: underline;\">Hysteresis </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">As the names says, loads are controlled using hysteresis. It allows for up two loads to be managed. Each top and bottom threshold corresponds to the load with the same number. If the load is 0, the thresholds get disabled.</span> </p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; text-decoration: underline;\">Min On Use </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greate"
-                        "r than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.</span> </p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">If one load is controlled it's turned on when the time it would take to consume the energ"
+                        "y accumulated is equal or greater than the time indicated, and will stay on until that time has passed. It's equivalent to having a single threshold (which is also calculated for reference). While the load is on, it keeps doing the check and refreshing the timer.</span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">The same applys to two loads. First it check the time it would take to consume if turning on both loads. If they can't be both turned on, but any of both by themselfs can, it turns on one load depending on the selected mode:</span></p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" font-family:'Segoe UI','sans-serif';\" style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">2n on if 1st on <span style=\" color:#202122; back"
+                        "ground-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic; color:#202122; background-color:#ffffff;\">l</span><span style=\" font-family:'Segoe UI'; font-style:italic;\">oad 2 only turns on if the 1st load is on. This avoids the problem of both loads being able to turn one if the other doesn't.</span></li></ul>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">By order </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic; color:#202122; background-color:#ffffff;\">load 1 has preference (this is not the same as the previous, since load 2 can be turned on if load 1 isn't)</span></li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px;"
+                        " margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Fastest </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-family:'Segoe UI','sans-serif'; font-style:italic; color:#202122; background-color:#ffffff;\">turn on the load that consums the energy fastest</span></li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Finally, if both prebious conditions aren't true but one load can be turned on, it's turned on.</span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:10pt; text-decoration: underline;\">Time to consume </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Controls only one load, which is turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the </span><span style=\" font-style:italic;\">predict final energy</span><span style=\" font-family:'Segoe UI','sans-serif';\"> modes which predicts how much energy that hour slot will probably yield (<"
-                        "/span><span style=\" font-style:italic;\">energy1h</span><span style=\" font-family:'Segoe UI','sans-serif';\">). This value is calculated every sample. There are two modes:</span> </p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Average Power </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">avgP = energyB / (3600 - sec_remaining) -&gt; energy1h = avg*3600</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Project Current Power </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">"
-                        "\u2192 </span><span style=\" font-style:italic;\">energy1h = energyB + timeLeft * powerP / 3600</span> </li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; "
+                        "-qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">If one load is controlled it's turned on when the time it would take to consume the energy accumulated is equal or greater than the time left to end the hour. You can also enable the </span><span style=\" font-style:italic;\">predict final energy</span><span style=\" font-family:'Segoe UI','sans-serif';\"> modes which predicts how much energy that hour slot will probably yield (</span><span style=\" font-style:italic;\">energy1h</span><span style=\" font-family:'Segoe UI','sans-serif';\">). This value is calculated every sample. There are two modes:</span> </p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Average Power </span><span style=\" font-family:'Segoe UI','sans-serif'; co"
+                        "lor:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">avgP = energyB / (3600 - sec_remaining) -&gt; energy1h = avg*3600</span> </li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Project Current Power </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">energy1h = energyB + timeLeft * powerP / 3600</span> </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">You can also configure:</span> </p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">End at </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">indicates how much energyB should be left when the hour ends (recommended at 0 or more, so you don't pay/have a negative hour energy balance)</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-"
-                        "block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">On Min </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">while the energyB is less than this value, the load cannot turn on.</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Time Factor </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">this values gest multiplied to the time left to end the hour. This means, that if set to less than 1, it will turn on earlier since it &quot;will think that is has less time&quot;. This is useful, for example, if the prediction is off and a bunch more energy is produced, if this time shift wasn't applied that energy would be lost. </span></li></ul>\n"
-""
-                        "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic; text-decoration: underline;\">Calculating energyB</span></p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; tex"
+                        "t-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">End at </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">indicates how much energyB should be left when the hour ends (recommended at 0 or more, so you don't pay/have a negative hour energy balance)</span> </li>\n"
+"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">On Min </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">while the energyB is less than this value, the load cannot turn on.</span> </li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Time Factor </span><span style=\" font-f"
+                        "amily:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">this values gest multiplied to the time left to end the hour. This means, that if set to less than 1, it will turn on earlier since it &quot;will think that is has less time&quot;. This is useful, for example, if the prediction is off and a bunch more energy is produced, if this time shift wasn't applied that energy would be lost. </span></li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic; text-decoration: underline;\">Calculating energyB</span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Because of how energy is calculated, at each hour the load doesn't always turn off. </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">The formula is </span><span style=\" font-style:italic;\">energyB = ( powerP - powerC ) * Ts / 3600 + energyB, </span><span style=\" font-family:'Segoe UI','sans-serif';\">which means we are supposing/&quot;predicting&quot; that after Ts will have produced</span><span style=\" font-style:italic;\"> energyP = ( powerP - powerC ) * Ts / 3600 </span>"
-                        "<span style=\" font-family:'Segoe UI','sans-serif';\">Wh. </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">If we instead did </span><span style=\" font-style:italic;\">energyP = ( powerP(-1) - powerC(-1) ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">and at t=0 </span><span style=\" font-style:italic;\">energy = 0</span><span style=\" font-family:'Segoe UI','sans-serif';\"> we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of the fact that we don\u2019t start at 0 Wh.</span> </p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px"
+                        "; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">The formula is </span><span style=\" font-style:italic;\">energyB = ( powerP - powerC ) * Ts / 3600 + energyB, </span><span style=\" font-family:'Segoe UI','sans-serif';\">which means we are supposing/&quot;predicting&quot; that after Ts will have produced</span><span style=\" font-style:italic;\"> energyP = ( powerP - powerC ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">Wh. </span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">If we instead did </span><span style=\" font-style:italic;\">energyP = ( powerP(-1) - powerC(-1) ) * Ts / 3600 </span><span style=\" font-family:'Segoe UI','sans-serif';\">and at t=0 </span><span style=\" font-style:italic;\">energy = 0</span><span style=\" font-family:'Segoe UI','sans-serif';\""
+                        "> we would not have this prediction. We might think this can be problematic, but in fact is the opposite, since it vastly improves the algorithms by avoiding a lot of possible commutations because of the fact that we don\u2019t start at 0 Wh.</span> </p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">Loads </span></p>\n"
-"<p style=\" margin-top:1"
-                        "2px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">It's where you indicate the loads values for simulating. </span></p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" text-decoration: underline;\">Load X</span><span style=\" font-family:'Segoe UI','sans-serif';\"> Depending on the number of loads that the algorithm supports, the fields get disabled.</span> </li>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">It's where you indicate the loads values for simulating. </span></p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" text-decoration: underline;\">Load X</span><span style=\" font-family:'Sego"
+                        "e UI','sans-serif';\"> Depending on the number of loads that the algorithm supports, the fields get disabled.</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" text-decoration: underline;\">Base Load</span><span style=\" font-family:'Segoe UI','sans-serif';\"> represent the constant power draw of a building. It can be 0 if needed to not factor it.</span> </li>\n"
-"<li sty"
-                        "le=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" text-decoration: underline;\">Use base load</span><span style=\" font-family:'Segoe UI','sans-serif';\"> If checked and the data you loaded has the </span><span style=\" font-style:italic;\">powerLB</span><span style=\" font-family:'Segoe UI','sans-serif';\">, the simulation will use those values. If not checked or no values exist, it will use the number indicated.</span> </li></ul>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">Generation Factor</span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">When simulating, power generated is multiplied by this value. This can be usefull for simulating diferent situations: <span style=\" font-style:italic;\">seasons, cloudy, havi"
-                        "ng less or more solar panels, ...</span></p>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" text-decoration: underline;\">Use base load</span><span style=\" font-family:'Segoe UI','sans-serif';\"> If checked and the data you loaded has the </span><span style=\" font-style:italic;\">powerLB</span><span style=\" font-family:'Segoe UI','sans-serif';\">, the simulation will use those values. If not checked or no values exist, it will use the number indicated.</span> </li></ul>\n"
+"<p style=\" margin-top:12p"
+                        "x; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">Generation Factor</span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">When simulating, power generated is multiplied by this value. This can be usefull for simulating diferent situations: <span style=\" font-style:italic;\">seasons, cloudy, having less or more solar panels, ...</span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">  </p>\n"
 "<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:xx-large; font-weight:700;\">Input Tabs </span></h1>\n"
 "<hr />\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\u231a Data Range </span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size"
+                        ":11pt; font-weight:700;\">\u231a Data Range </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Used for seeing the input data (power generated) from the .csv. You can also easily change the date by interacting with the plot:</span> </p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-"
-                        "indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Click on a date line to select it.</span> </li>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Click on a date line to select it.</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Click again to set it.</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Pres 'ESC' to set the value to the original position.</span> </li></ul>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><s"
+                        "pan style=\" font-style:italic;\">Pres 'ESC' to set the value to the original position.</span> </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcb0 Energy Price </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Se"
-                        "goe UI','sans-serif';\">Used for setting and visualizing the price of the energy at every hour. There are two ways of setting the values</span> </p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Used for setting and visualizing the price of the energy at every hour. There are two ways of setting the values</span> </p>\n"
 "<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Using the plot</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Click any point or line to select it. </span></li>\n"
+"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right"
+                        ":0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Click any point or line to select it. </span></li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Click again to set it. </span></li>\n"
-"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-st"
-                        "yle:italic;\">Pres 'ESC' to set the value to the original position.</span> </li>\n"
+"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Pres 'ESC' to set the value to the original position.</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Using text inputs</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Double click or select+F2 to edit the value on the table</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Set the sell price using the number input</span> </li></ul>\n"
+"<li style=\" margin"
+                        "-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-style:italic;\">Set the sell price using the number input</span> </li></ul>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">  </p>\n"
-"<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" f"
-                        "ont-size:xx-large; font-weight:700;\">Output Tabs </span></h1>\n"
+"<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:xx-large; font-weight:700;\">Output Tabs </span></h1>\n"
 "<hr />\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcca\ud83d\udcc5 Results </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">After simulating or calculating results, this tab contains the important results. It also has two plot settings that are very useful:</span> </p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Values </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192"
-                        " </span><span style=\" font-style:italic;\">displays a label next to each bar/area value</span> </li>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">After simulating or calculating results, this tab contains the importa"
+                        "nt results. It also has two plot settings that are very useful:</span> </p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Values </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">displays a label next to each bar/area value</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">System Max Consuption </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">displays the max consumption that the system could achieve</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Subdivide </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">each bar is subdivided in its relevant data parts</span> </li></ul>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px"
-                        "; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcc9 Simulation</span><span style=\" font-size:11pt;\"> </span></p>\n"
+"<li style=\" "
+                        "margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Subdivide </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">each bar is subdivided in its relevant data parts</span> </li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcc9 Simulation</span><span style=\" font-size:11pt;\"> </span></p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">After simulating or calculating results, is filled with a plot of the simulated data. It also has three plot settings:</span> </p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Power Consumed by Loads </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">shows the loads plots as a stacked area, this helps see the components of Power C"
-                        "onsumed.</span> </li>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: "
+                        "0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Power Consumed by Loads </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">shows the loads plots as a stacked area, this helps see the components of Power Consumed.</span> </li>\n"
 "<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Power Produced </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">shows all the energy produced which.</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Show threshold </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">displays horizontal lines corresponding to each threshold (works in &quot;hysteresis&quot; and in &quot;min on use&quot;).</span> </li></ul>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-inde"
-                        "nt:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcca Hourly Results</span><span style=\" font-size:11pt;\"> </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">After simulating or calculating results, contains the hourly breakdown of the energy balance, commutations, efficiency, ... Both plot settings in summary are also available here.</span> </p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcc8 Optimize</span><span style=\" font-size:11pt;\"> </span></p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Used to simulate the dataset multiple times, each time incrementing by the </span"
-                        "><span style=\" font-style:italic;\">step </span><span style=\" font-family:'Segoe UI','sans-serif';\">the indicated setting value</span><span style=\" font-style:italic;\">.</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After that, a plot is displayed where you can contrast different relevant data </span><span style=\" font-style:italic;\">(checkboxes)</span><span style=\" font-family:'Segoe UI','sans-serif';\">. This is very useful for finding the best algorithm configuration for your case.</span> </p>\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">  </p>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\""
+                        "><span style=\" font-family:'Segoe UI','sans-serif';\">Show threshold </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">displays horizontal lines corresponding to each threshold (works in &quot;hysteresis&quot; and in &quot;min on use&quot;).</span> </li></ul>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcca Hourly Results</span><span style=\" font-size:11pt;\"> </span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">After simulating or calculating results, contains the hourly breakdown of the energy, commutations, efficiency, ... Both plot settings in summary are also available here.</span> </p>\n"
+"<p style=\" margin-top:12px; margin-b"
+                        "ottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:11pt; font-weight:700;\">\ud83d\udcc8 Optimize</span><span style=\" font-size:11pt;\"> </span></p>\n"
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Used to simulate the dataset multiple times, each time incrementing by the </span><span style=\" font-style:italic;\">step </span><span style=\" font-family:'Segoe UI','sans-serif';\">the indicated setting value</span><span style=\" font-style:italic;\">.</span><span style=\" font-family:'Segoe UI','sans-serif';\"> After that, a plot is displayed where you can contrast different relevant data </span><span style=\" font-style:italic;\">(checkboxes)</span><span style=\" font-family:'Segoe UI','sans-serif';\">. This is very useful for finding the best algorithm configuration for your case.</span> </p>\n"
+"<p style=\" margin-top:1"
+                        "2px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">  </p>\n"
 "<h1 style=\" margin-top:18px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:xx-large; font-weight:700;\">Interactive Plots</span></h1>\n"
 "<hr />\n"
-"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" f"
-                        "ont-family:'Segoe UI','sans-serif';\">The plots are made </span><span style=\" font-style:italic;\">matplotlib, t</span>his means that they have all the <span style=\" font-style:italic;\">matplotlib</span> funcionalities. But apart from that, some <span style=\" font-family:'Segoe UI','sans-serif';\">extra options have been added. </span></p>\n"
-"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Cross Hair Cursor </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">Toggled by selecting the toolbar buttons + it displays a cross hair which snaps to the closest point of the data line. To change the line it snaps, you simply have to select it.</span> </li>\n"
-"<li style=\" margin-top:0"
-                        "px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Line Style </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">A input that accepts any matplotlib line style and marker to apply to the displayed lines.</span> </li>\n"
-"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Hide lines </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">Any line in a plot can be hidden by pressing the lines in the legend. Hidden lines still show in the legend but more transparent.</span> </li></ul></body></html>", None))
+"<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">The plots are made </span><span style=\" font-style:italic;\">matplotlib, t</span>his means that they have all the <span style=\" font-style:italic;\">matplotlib</span> funcionalities. But apart from that, some <span style=\" font-family:'Segoe UI','sans-serif';\">extra options have been added. </span></p>\n"
+"<ul style=\"margin-top: 0px; margin-bottom: 0px; margin-left: 0px; margin-right: 0px; -qt-list-indent: 1;\"><li style=\" margin-top:12px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-i"
+                        "ndent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Cross Hair Cursor </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">Toggled by selecting the toolbar buttons + it displays a cross hair which snaps to the closest point of the data line. To change the line it snaps, you simply have to select it.</span> </li>\n"
+"<li style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:'Segoe UI','sans-serif';\">Line Style </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">A input that accepts any matplotlib line style and marker to apply to the displayed lines.</span> </li>\n"
+"<li style=\" margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span st"
+                        "yle=\" font-family:'Segoe UI','sans-serif';\">Hide lines </span><span style=\" font-family:'Segoe UI','sans-serif'; color:#202122; background-color:#ffffff;\">\u2192 </span><span style=\" font-style:italic;\">Any line in a plot can be hidden by pressing the lines in the legend. Hidden lines still show in the legend but more transparent.</span> </li></ul></body></html>", None))
         self.tabs.setTabText(self.tabs.indexOf(self.help_t), QCoreApplication.translate("MainWindow", u"\u2139 Help", None))
+        self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
+        self.unload_file.setText(QCoreApplication.translate("MainWindow", u"Unload File", None))
+        self.sampling_rate.setText(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
+        self.date_range.setText(QCoreApplication.translate("MainWindow", u"Date Range", None))
+        self.calc_time.setText(QCoreApplication.translate("MainWindow", u"Calculation Time", None))
+        self.plotting_time.setText(QCoreApplication.translate("MainWindow", u"Plotting Time", None))
+        self.n_samples.setText(QCoreApplication.translate("MainWindow", u"N Samples", None))
     # retranslateUi
 

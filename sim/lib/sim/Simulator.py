@@ -1,13 +1,13 @@
 import datetime as dt
 from .Load import Load
 from .DataFrames import DataFrameIn, DataFrameOut
-from .AlgorithmsConfig import AlgorithmConfig, AlgorithmsEnum, PredictFinalEnergy
+from .AlgorithmsConfig import AlgorithmConfig, AlgorithmsEnum, PredictFinalEnergy, MinOnTimeMode
 
 def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Load, baseload:float|int|None=0):
     #region -> Init
     use_df_bl = isinstance(df_in, DataFrameOut) and baseload is None
     current_hour = None
-    two_load_system = load1.power > 0 and load2.power > 0
+    two_load_system = is_load(load1) and is_load(load2)
     off_timestamps = [dt.datetime.now(), dt.datetime.now()]
     sim_data = {'powerC':[], 'powerLB':[], 'powerL1':[], 'powerL2':[], 'energyP':[], 'energyB':[], 'on_offL1':[], 'on_offL2':[]}
     #endregion
@@ -35,35 +35,38 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
         on_offL1 = on_offL2 = 0
         match algorithm.type:
             case AlgorithmsEnum.hysteresis:
-                if load1.power > 0:
-                    if energy_b >= algorithm.th_top1: 
-                        on_offL1 = load1.turn_on()
-                    elif energy_b <= algorithm.th_bottom1:
-                        on_offL1 = load1.turn_off()
-                if load2.power > 0:
-                    if energy_b >= algorithm.th_top2: 
-                        on_offL2 = load2.turn_on()
-                    elif energy_b <= algorithm.th_bottom2:
-                        on_offL2 = load2.turn_off()
+                if load1.value > 0: on_offL1 = hystereis(load1, algorithm.th_top1, algorithm.th_bottom1, energy_b)
+                if load2.value > 0: on_offL2 = hystereis(load2, algorithm.th_top2, algorithm.th_bottom2, energy_b)
             
             case AlgorithmsEnum.min_on_time:
                 if two_load_system:
-                    time_to_use = energy_b/(load1.power+load2.power) * 3600 # [s] <- Wh/W = h
-                    if time_to_use >= algorithm.min_on_time:
-                        off_timestamps = [timestamp + dt.timedelta(seconds=algorithm.min_on_time)]*2
+                    time_to_use = energy_b/(load1.value+load2.value) * 3600 # [s] <- Wh/W = h
+                    if time_to_use >= algorithm.time_limit:
+                        off_timestamps = [timestamp + dt.timedelta(seconds=algorithm.time_limit)]*2
                         on_offL1 = load1.turn_on()
                         on_offL2 = load2.turn_on()
                     else:
-                        time_to_use = energy_b/load1.power * 3600 # [s] <- Wh/W = h
-                        if time_to_use >= algorithm.min_on_time:
-                            off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.min_on_time)
+                        time_to_use1 = energy_b/load1.value * 3600 # [s] <- Wh/W = h
+                        time_to_use2 = energy_b/load2.value * 3600 # [s] <- Wh/W = h
+                        if algorithm.mode == MinOnTimeMode.fastest and time_to_use1 >= algorithm.time_limit and time_to_use2 >= algorithm.time_limit:
+                            if time_to_use1 <= time_to_use2:
+                                off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.time_limit)
+                                on_offL1 = load1.turn_on()
+                            else:
+                                off_timestamps[1] = timestamp + dt.timedelta(seconds=algorithm.time_limit)
+                                on_offL2 = load2.turn_on()
+                        elif time_to_use1 >= algorithm.time_limit:
+                            off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.time_limit)
                             on_offL1 = load1.turn_on()
+                        elif algorithm.mode != MinOnTimeMode.on2_if_on1 and time_to_use2 >= algorithm.time_limit:
+                            off_timestamps[1] = timestamp + dt.timedelta(seconds=algorithm.time_limit)
+                            on_offL2 = load2.turn_on()
                 else:
-                    time_to_use = energy_b/load1.power * 3600 # [s] <- Wh/W = h
-                    if time_to_use >= algorithm.min_on_time:
-                        off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.min_on_time)
+                    time_to_use = energy_b/load1.value * 3600 # [s] <- Wh/W = h
+                    if time_to_use >= algorithm.time_limit:
+                        off_timestamps[0] = timestamp + dt.timedelta(seconds=algorithm.time_limit)
                         on_offL1 = load1.turn_on()
-                
+
                 if timestamp >= off_timestamps[0]:
                     on_offL1 = load1.turn_off()
                 if timestamp >= off_timestamps[1]:
@@ -79,7 +82,7 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
                         avg = energy_b / (3600-time_remaining)
                         energy1h = avg*3600
                     case PredictFinalEnergy.project_current_power:
-                        energy1h = energy_b + time_remaining*(power_a)/3600
+                        energy1h = energy_b + time_remaining*power_a/3600
 
                 on1, on2 = load1.on, load2.on
                 if two_load_system:
@@ -123,9 +126,19 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
     df_out.rearange_cols()
     return df_out
 
+def is_load(load:Load):
+    return load.value > 0
+
+def hystereis(load:Load, th_top:float, th_bottom:float, energy_a:float):
+    if energy_a >= th_top and not load.on:
+        return load.turn_on()
+    elif energy_a <= th_bottom and load.on:
+        return load.turn_off()
+    return 0
+
 def _TTC_load_control_on(load:Load, energy1h:float, time_remaining:float, algorithm:AlgorithmConfig):
     if not load.on and energy1h >= algorithm.on_min_energy:
-        time_to_use = energy1h / load.power * 3600 # [s] <- Wh/W = h
+        time_to_use = energy1h / load.value * 3600 # [s] <- Wh/W = h
         if time_to_use >= (time_remaining*algorithm.time_factor):
             return load.turn_on()
     return 0

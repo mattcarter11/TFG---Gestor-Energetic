@@ -67,21 +67,21 @@ class Results:
 
         # Efficiency Con. Max
         with np.errstate(divide='ignore', invalid='ignore'):
-            self.df_hour['efficCM'] = 100 - (self.df_hour['energyL'].values/self.df_hour['energyCM'].values)*100
+            self.df_hour['efficC'] = 100 - (self.df_hour['energyL'].values/self.df_hour['energyCM'].values)*100
             self.df_hour['efficGR'] = (self.df_hour['energyGR'].values/self.df_hour['energyGP'].values)*100
 
         # Commutations
         self.df_hour[on_off] = data_h_sum[on_off]
 
         columns = [col for col in COL_ORDER if col in self.df_hour.columns]
-        self.df_hour = self.df_hour[columns]
+        self.df_hour = self.df_hour[[columns[0]]+columns[3:]+columns[1:3]]
 
     def _total(self):
         # Energy Balance - Add hourly columns to get one row series of the total        
         self.df_total = self.df_hour.sum(numeric_only=True).rename('energyT')
         self.df_total = self.df_total.to_frame()
         with np.errstate(divide='ignore', invalid='ignore'):
-            self.df_total.loc['efficCM',:] = 100 - (self.df_total.loc['energyL',:]/self.df_total.loc['energyCM',:])*100
+            self.df_total.loc['efficC',:] = 100 - (self.df_total.loc['energyL',:]/self.df_total.loc['energyCM',:])*100
             self.df_total.loc['efficGR',:] = (self.df_total.loc['energyGR',:]/self.df_total.loc['energyGP',:])*100
         self.df_total['energyDT'] = self.df_total['energyT'].mul(self.sim_days)
         self.df_total = self.df_total.T
@@ -107,13 +107,17 @@ class Results:
         hours_on_daily = hours_on*self.sim_days
 
         # Aprox Loads
+        total = 0
         for i, key in enumerate(select):
-            self.aprox_loads[name[i]] = self.aprox_loads.pop(key)
+            val = self.aprox_loads.pop(key)
+            self.aprox_loads[name[i]] = val
+            total += val
+        self.aprox_loads['total'] = total
 
         # Convert to dataframe
         dic = {
-            'loadAprox': self.aprox_loads,
-            'efficCM': {'total': self.df_total['efficCM'].values[0]}, 
+            'loadApprox': self.aprox_loads,
+            'efficC': {'total': self.df_total['efficC'].values[0]}, 
             'efficGR': {'total': self.df_total['efficGR'].values[0]}, 
             'balance': {'total': self.df_total['balance'].values[0]}, 
             'commut':commutations,  'commutD':daily_com, 

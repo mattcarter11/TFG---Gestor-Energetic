@@ -1,6 +1,6 @@
 class Load():
-    def __init__(self, power:float):
-        self.power = power
+    def __init__(self, value:float):
+        self.value = value
         self.on = False
 
     def turn_on(self):
@@ -16,4 +16,4 @@ class Load():
         return 0
 
     def get_power(self) -> float:
-        return self.on*self.power*1.0
+        return self.on*self.value*1.0

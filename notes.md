@@ -10,7 +10,7 @@
 - 21/06/2022 a les 16:23 -> testing ttc
 - 22/06/2022 a les 15:49 -> restart per testing ttc
 - 24/06/2022 a les 14:42 -> 150 mon to 70
-
+- 28/06/2022 a les 22:44 -> switch to average_power
 
 # === OLD ===
 
