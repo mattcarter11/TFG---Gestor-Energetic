@@ -16,7 +16,7 @@ class PredictFinalEnergy(Enum):
     avarage_power = 1
     project_current_power = 2
 
-# ======== INIT ========
+# ======== Settings ========
 # Global parameters
 Ts              = 10 # [s]
 database        = InfluxDB('10.10.10.100', 18086, 'gestor-energetic-SVC')
@@ -45,7 +45,7 @@ on_min_energy   = 70      # [Wh]  (must be > end_at_energy to avoid oscillations
 
 # Do not touch
 on_min_energy = end_at_energy if end_at_energy > on_min_energy else on_min_energy
-# ======== MAIN ========
+# ========== MAIN ==========
 def is_load(load):
     return isinstance(load, LoadBase)
 
