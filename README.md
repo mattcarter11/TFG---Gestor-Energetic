@@ -4,13 +4,15 @@ This is my TFG project while suding TIC at UPC of Manresa. I really recomend rea
 
 ## Project Summary
 
-In Spain, the energy bill goes as follows: At the end of every hour your energy balance is calculated (energyConsumed - energyProduced). 
+In Spain, if you have renewable energy porduction, your energy bill goes as follows: At the end of every hour your energy balance is calculated (energyConsumed - energyProduced). 
 - If you have consumed more energy that produced, you must pay that difference. Which can get very expensive depending on the hour. 
 - If instead you have produced more that consumed, the company has to pay. But the price they pay is around half of the lowest hour price, which is not very good. 
 
 Thanks to this hour slot system you can, for example, consume 1 kWh of energy in the first 10 min and then produce 1kWh during 20 min, thus having a net zero consumption and not paying anything. 
 
-This project aims to create an intelligent system that manages loads adequately so to achieve or at least get close to a neat zero o even positive income (produce more that consumed) system.
+This project aims to create, analize and compare diferent algorithms which manag loads adequately so to achieve: the màximum energy bill price reduction (try to get to 0), maximise the use of the energy produced, and minimize the number of load commutations.
+
+A simulator has been implemented to test and analize the algorithms. With it, the best settings can be found before implementing the system in real life. Once found, the algorithms have been implemented and tested in real life.
 
 # File and folder structure
 
