@@ -5,6 +5,8 @@ from .constants import COL_ORDER
 
 numType  = (float, np.float64, int, np.int64)
 
+# Represents the dataframe that the simulate function accept
+# It also provides some usefull functions for the main program, the simulator and the results modules
 class DataFrameIn:
 
     def __init__(self, df:pd.DataFrame, _correct=True):
@@ -55,6 +57,7 @@ class DataFrameIn:
     def max_powerG(self):
         return self.df['powerG'].max()
 
+# Represents the dataframe that the simulate function and Results class accept
 class DataFrameOut (DataFrameIn):
 
     def __init__(self, df:pd.DataFrame, _correct=True):

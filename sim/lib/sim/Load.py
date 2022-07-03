@@ -3,14 +3,11 @@ class Load():
         self.value = value
         self.on = False
 
-    def turn_on(self):
-        if not self.on:
+    def set_status(self, status:bool):
+        if status and not self.on:
             self.on = True
             return 1
-        return 0
-
-    def turn_off(self):
-        if self.on:
+        if not status and self.on:
             self.on = False
             return -1
         return 0

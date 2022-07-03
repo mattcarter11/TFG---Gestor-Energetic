@@ -1,14 +1,19 @@
 UI_FILE = "mainwindow.ui"
+HELP_FILE = "Simulator Manual.html"
 DT_FORMAT = 'yyyy-MM-dd HH:mm'
+
+# Generci colors
 GRAY0    = '#cacaca'
 GRAY1    = '#a5a5a5'
 GRAY2    = '#7e7e7e'
 GREEN1   = '#6dbf31'
 
+# Date time selector colors
 COLOR_SD = '#60b0ff'
 COLOR_ED = '#9865c6'
 
-# ordered key: (color, unit, translate)
+# === Translation ===
+# Used to get the color, unit, and text of each pandas colum (OCT = color, unit, translate)
 OCT = {
     'timestamp' :{"color":None,         "unit":'',     "translate": ('Timestamp', 'Timestamp')},
 
@@ -78,8 +83,8 @@ def oct_translate(key:str, i:int=0, use_unit:bool=False):
         return f'{trans} [{unit}]'
     return trans
 
-
-
+# === Load & Save ===
+# Used for loading and saving the GUI settings
 SettingsQDateTimeEdits = ('start_date', 'end_date')
 SettingsQComboBoxes = ('algorithm', 'predict_final_energy', 'subdivide_eb', 'subdivide_t', 'op_setting', 'op_ax_right', 'op_ax_left', 'show_max_cons', 'mot_mode')
 SettingsQSpinBoxes = ('th_top1', 'th_top2', 'th_bottom1', 'th_bottom2', 'time_limit', 'base_load', 'load1', 'load2', 'ttc_end_at', 'ttc_on_min')
@@ -87,10 +92,12 @@ SettingsQDoubleSpinBox = [ 'op_start', 'op_end', 'op_step', 'ttc_time_factor', '
 SettingsQCheckBoxes = ('use_data_bl', 'show_loads_area', 'show_th', 'energyP_s', 'show_values_eb', 'show_ecm_eb', 'show_values_effC', 'show_values_effGR', 'show_values_balance', 'show_values_commut', 'show_values_t', 'show_ecm_t')
 SettingsQLineEdits = ('data_line_style', 'sim_line_style')
 
+# === Options Options ===
+# Possible axes of the optimitation plot
 OpAxDict = {
     'None'                      :{'row':'none',     'column':'none',        'table':None}, 
-    'Cons. Max. Efficiency [%]' :{'row':'total',    'column':'efficC',  'table':'results'}, 
-    'Grid Ret. Efficiency [%]'  :{'row':'total',    'column':'efficGR',  'table':'results'}, 
+    'Cons. Max. Efficiency [%]' :{'row':'total',    'column':'efficC',      'table':'results'}, 
+    'Grid Ret. Efficiency [%]'  :{'row':'total',    'column':'efficGR',     'table':'results'}, 
     'Balance [cént.]'           :{'row':'total',    'column':'balance',     'table':'results'}, 
     'Daily Commutations'        :{'row':'total',    'column':'commutD',     'table':'results'}, 
     'Daily Commut. Load 1'      :{'row':'load1',    'column':'commutD',     'table':'results'}, 
@@ -103,6 +110,7 @@ OpAxDict = {
     'Energy Lost [Wh]'          :{'row':'energyDT', 'column':'energyL',     'table':'total'},
 }
 
+# Possible  options to optimize
 OpAlgorithm = {
     'None': {},
     'Hysteresis':{

@@ -107,12 +107,9 @@ class Results:
         hours_on_daily = hours_on*self.sim_days
 
         # Aprox Loads
-        total = 0
         for i, key in enumerate(select):
-            val = self.aprox_loads.pop(key)
-            self.aprox_loads[name[i]] = val
-            total += val
-        self.aprox_loads['total'] = total
+            self.aprox_loads[name[i]] = self.aprox_loads.pop(key)
+        self.aprox_loads['total'] = self.aprox_max_load
 
         # Convert to dataframe
         dic = {

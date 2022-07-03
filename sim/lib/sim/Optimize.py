@@ -1,8 +1,8 @@
 import pandas as pd
 from .Results import Results
 
+# Stores the results passed with the add_result function in a pandas dataframe
 class Optimize:
-
     def __init__(self, index_name:str, columns:dict[str:dict[str:str, str:str, str:str]]):
         columns = columns.copy()
         columns.pop('None')

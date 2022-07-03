@@ -1,7 +1,7 @@
 import sys, json, traceback
 from time import time
 from PySide6.QtUiTools import QUiLoader
-from PySide6.QtCore import QFile, QIODevice, QDateTime, QCoreApplication, Qt, QModelIndex
+from PySide6.QtCore import QFile, QIODevice, QDateTime, QCoreApplication, Qt, QModelIndex, QTextStream
 from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox, QHeaderView, QCheckBox, QTableView, QDateTimeEdit, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit
 import pandas as pd
 import matplotlib as mp
@@ -103,6 +103,12 @@ class App(QMainWindow):
         for key, _ in OpAxDict.items():
             self.ui.op_ax_left.addItem(key)
             self.ui.op_ax_right.addItem(key)
+        # Load help html
+        help_file = QFile(HELP_FILE)
+        if not help_file.open(QIODevice.ReadOnly):
+            self.ui.help.setText('Simulator Manual.html not found')
+        else:
+            self.ui.help.setHtml(QTextStream(help_file).readAll())
             
     def sig_init(self):
         # Date Time

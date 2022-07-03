@@ -4,7 +4,7 @@ from enum import Enum
 from drivers.DataBase.InfluxDB import InfluxDB
 from drivers.Load.LoadBase import LoadBase
 from drivers.Load.Shelly import ShellyLoad
-from drivers.PowerMeter.JordiPM import JordiPM
+from drivers.PowerMeter.EnvoyS import EnvoyS
 
 class AlgorithmsEnum(Enum):
     hysteresis = 1
@@ -22,7 +22,7 @@ Ts              = 10 # [s]
 database        = InfluxDB('10.10.10.100', 18086, 'gestor-energetic-SVC')
 load1           = ShellyLoad('192.168.100.131', value=700, on_time=3630) # None = no load
 load2           = ShellyLoad('192.168.100.132', value=1000, on_time=3630) # None = no load
-powermeter      = JordiPM('http://envoy.local/stream/meter', 'installer', 'aeceha39', 5, 20)
+powermeter      = EnvoyS('http://envoy.local/stream/meter', 'installer', 'aeceha39', 5, 20)
 algorithm       = AlgorithmsEnum.time_to_consume
 # Managing load interval
 start_managing  = '06:00:00'
@@ -41,7 +41,7 @@ time_limit      = 600
 predict         = PredictFinalEnergy.project_current_power
 end_at_energy   = 20       # [Wh]
 time_factor     = 0.9      # [0..1]
-on_min_energy   = 70      # [Wh]  (must be > end_at_energy to avoid oscillations)
+on_min_energy   = 70       # [Wh]  (must be > end_at_energy to avoid oscillations)
 
 # Do not touch
 on_min_energy = end_at_energy if end_at_energy > on_min_energy else on_min_energy
@@ -73,17 +73,22 @@ def _TTC_load_control_off(load:LoadBase, is_on:bool, energy_b:float, power_a:flo
             load.set_status(False)
 
 if __name__ == '__main__':
-    # Get power_a from monitoring so they can start synced, plus it makes all that hour slot more efficient
-    last60s = database.query('select last(*) from hysteresis where time > now() - 60s')
-    energy_b = last60s[0]['last_energyA'] if last60s else 0
-    current_hour = dt.datetime.now().hour
+    #region -> [Init]
+    current_hour = None
     two_load_system = is_load(load1) and is_load(load2)
     next_hour = next_hour_datetime(dt.datetime.now())
     start_managing = dt.datetime.strptime(start_managing, format_date).time()
     end_managing = dt.datetime.strptime(end_managing, format_date).time()
+    # Get power_b from monitoring so if we restart, we don't lose all the balance previously calculated
+    sec_from_oclock = (dt.datetime.now() - dt.datetime.now().replace(minute=0, second=0, microsecond=0)).total_seconds()
+    last_from_oclock = database.query(f'select last(*) from hysteresis where time > now() - {int(sec_from_oclock)}s')
+    if last_from_oclock != []:
+        current_hour = dt.datetime.now().hour
+        energy_b = last_from_oclock[0]['last_energyA']
 
     if is_load(load1): load1.set_status(False)
     if is_load(load2): load2.set_status(False)
+    #endregion
 
     while True:
         start = time.time()
@@ -100,8 +105,7 @@ if __name__ == '__main__':
                 if is_load(load1): load1.set_status(ison1)
                 if is_load(load2): load2.set_status(ison2)
         
-        power_g, power_c = powermeter.power_gc()
-        power_a = power_g - power_c
+        power_a = powermeter.power_available()
         energy_b = (power_a) * Ts / 3600 + energy_b
         #endregion
 

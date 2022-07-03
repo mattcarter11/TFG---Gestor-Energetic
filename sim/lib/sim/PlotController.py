@@ -1,6 +1,4 @@
-from abc import abstractclassmethod
 import warnings
-from matplotlib import colors
 from pandas import DataFrame
 from ..myQT.QMplWidgets import QMplPlot
 from .constants import oct_color, oct_translate

@@ -227,7 +227,7 @@ class Zoom:
 
         return zoom
 
-# Matplotlib widget
+# Matplotlib plot widget
 class QMplPlot(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
@@ -315,7 +315,6 @@ class QMplPlot(QWidget):
         if self.legend_PS is not None:
             self.toggable_legend_lines()
         self.draw_idle()
-
     #endregion
 
     #region -> Show/Hide lines if selected in legend
@@ -371,7 +370,7 @@ class QMplPlot(QWidget):
         return f'({x:.3f}, {y:.3f})'
     #endregion
 
-# Two axes matplotlib widget
+# Two axes matplotlib plot widget
 class QMplTwinxPlot(QMplPlot):
     def __init__(self, parent=None):
         QMplPlot.__init__(self, parent)
@@ -412,7 +411,7 @@ class QMplTwinxPlot(QMplPlot):
                 return ('Left: {:<}  |  Right: {:<}'.format(*[self._format_coords_str(x, y) for x, y in coords]))
         return format_coord
 
-# Editable Plot by moving poits in y axis
+# Editable matplotli plot by moving poits in y axis
 class QMplPlotterWidget(QMplPlot):
     dataChanged = Signal([object, object])
 
