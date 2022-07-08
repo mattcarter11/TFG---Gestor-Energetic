@@ -332,7 +332,7 @@ class App(QMainWindow):
     def time_limit_changed(self):
         self.tl1_eq = self.ui.time_limit.value() * self.ui.load1.value() / 3600
         self.tl2_eq = self.ui.time_limit.value() * self.ui.load2.value() / 3600
-        self.ui.wh_eq.setText(f'Threshold L1 {self.tl1_eq:.2f} Wh \nThreshold L2 {self.tl2_eq:.2f} Wh \nThreshold L12 {self.tl1_eq+self.tl2_eq:.2f} Wh')
+        self.ui.wh_eq.setText(f'Thresholds: \n - Load 1: {self.tl1_eq:.2f} Wh \n - Load 2: {self.tl2_eq:.2f} Wh \n - Load 1&2: {self.tl1_eq+self.tl2_eq:.2f} Wh')
 
     def algorithm_changed(self, i):
         self.ui.load1.setEnabled(i != 0)
@@ -361,10 +361,10 @@ class App(QMainWindow):
         t0 = time()
         self.df_out = self.df_in.select_daterange( self.ui.start_date.dateTime().toString(), self.ui.end_date.dateTime().toString(), 3600 )
         self.df_out.calc_powerAG()
-        self.df_out.calc_powerCM()
+        self.df_out.calc_powerCM(self.df_in.aproximate_max_load())
         self.df_out.fill_missing_energy()
         self.df_out.rearange_cols()
-        self.results = Results(self.df_out, self.df_price.iloc[:, 0], self.ui.sell_price.value())
+        self.results = Results(self.df_out, self.df_in.aproximate_loads(), self.df_price.iloc[:, 0], self.ui.sell_price.value())
         self.ui.calc_time.setText(f'Results calculated in {time()-t0:.3f} s')
         self.show_results()
 
@@ -373,7 +373,7 @@ class App(QMainWindow):
         err = self.simulate()
         t1 = time()
         if not err:
-            self.results = Results(self.df_out, self.df_price.iloc[:, 0], self.ui.sell_price.value())
+            self.results = Results(self.df_out, self.calc_loads(), self.df_price.iloc[:, 0], self.ui.sell_price.value())
             self.ui.calc_time.setText(f'Simulated in {time()-t0:.3f} s. Results calculated in {time()-t1:.3f} s')
             self.print_sim_duration()
             self.show_results()          
@@ -386,7 +386,7 @@ class App(QMainWindow):
             err = self.simulate(value)
             if err: 
                 break
-            self.optimize.add_results(value, Results(self.df_out, self.df_price.iloc[:, 0], self.ui.sell_price.value()))
+            self.optimize.add_results(value, Results(self.df_out, self.calc_loads(), self.df_price.iloc[:, 0], self.ui.sell_price.value()))
         if not err:
             self.ui.calc_time.setText(f'Optimize calculations in {time()-t0:.3f} s')
             self.print_sim_duration()
@@ -397,7 +397,11 @@ class App(QMainWindow):
         alI = self.ui.algorithm.currentIndex()
         opI = self.ui.op_setting.currentIndex()
         alKey = list(OpAlgorithm)[alI]
-        opKey = list( OpAlgorithm[alKey] )[opI]
+        lenOp = len(OpAlgorithm[alKey]) 
+        if lenOp <= opI:
+            alKey = 'Shared'
+            opI = opI-lenOp+1
+        opKey = list(OpAlgorithm[alKey])[opI]
         element = OpAlgorithm[alKey][opKey]
             
         def get_algorithm_config():
@@ -447,6 +451,13 @@ class App(QMainWindow):
     
     def print_sim_duration(self):
         self.ui.n_samples.setText(f'Simulating {self.df_out.nsec/3600:.3f} h ({self.df_out.nsamples} Samples)')
+    
+    def calc_loads(self):
+        base = self.ui.base_load.value()
+        if isinstance(self.df_in, df.DataFrameOut) and self.ui.use_data_bl.isChecked():
+            base = self.df_in.aproximate_loads()['powerLB']
+        return {'powerLB':base, 'powerL1':self.ui.load1.value(), 'powerL2':self.ui.load2.value()}
+
     #endregion
 
     #region -> Show results
@@ -691,7 +702,7 @@ class App(QMainWindow):
             date = date.toPython()
             date_diff = date + dt.timedelta(hours=1)
             end_date = self.ui.end_date.dateTime().toPython()
-            if date_diff > end_date:
+            if date_diff >= end_date:
                 self.ui.end_date.setDateTime(date_diff)
 
             self.date_range_lines[0].set_xydata(date, 0)
@@ -702,7 +713,7 @@ class App(QMainWindow):
             date = date.toPython()
             date_diff = date - dt.timedelta(hours=1)
             start_date = self.ui.start_date.dateTime().toPython()
-            if date_diff < start_date:
+            if date_diff <= start_date:
                 self.ui.start_date.setDateTime(date_diff)
 
             self.date_range_lines[1].set_xydata(date, 0)

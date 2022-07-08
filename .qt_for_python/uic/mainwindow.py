@@ -61,6 +61,7 @@ class Ui_MainWindow(object):
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout = QGridLayout(self.centralwidget)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.gridLayout.setContentsMargins(-1, -1, -1, 0)
         self.options = QVBoxLayout()
         self.options.setObjectName(u"options")
         self.options.setSizeConstraint(QLayout.SetNoConstraint)
@@ -464,8 +465,9 @@ class Ui_MainWindow(object):
         self.recalc_warn.setEnabled(True)
         sizePolicy3.setHeightForWidth(self.recalc_warn.sizePolicy().hasHeightForWidth())
         self.recalc_warn.setSizePolicy(sizePolicy3)
+        self.recalc_warn.setAlignment(Qt.AlignCenter)
 
-        self.options.addWidget(self.recalc_warn, 0, Qt.AlignHCenter)
+        self.options.addWidget(self.recalc_warn)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -1208,6 +1210,7 @@ class Ui_MainWindow(object):
         self.op_start.setObjectName(u"op_start")
         self.op_start.setEnabled(True)
         self.op_start.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
+        self.op_start.setMinimum(-9999.989999999999782)
         self.op_start.setMaximum(9999.989999999999782)
 
         self.op_settings.addWidget(self.op_start)
@@ -1223,6 +1226,7 @@ class Ui_MainWindow(object):
         self.op_end.setObjectName(u"op_end")
         self.op_end.setEnabled(True)
         self.op_end.setLocale(QLocale(QLocale.English, QLocale.UnitedStates))
+        self.op_end.setMinimum(-9999.989999999999782)
         self.op_end.setMaximum(9999.989999999999782)
 
         self.op_settings.addWidget(self.op_end)
@@ -1366,28 +1370,6 @@ class Ui_MainWindow(object):
 
         self.gridLayout.addLayout(self.data, 0, 1, 1, 1)
 
-        self.horizontalLayout = QHBoxLayout()
-        self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.load_file = QPushButton(self.centralwidget)
-        self.load_file.setObjectName(u"load_file")
-
-        self.horizontalLayout.addWidget(self.load_file)
-
-        self.unload_file = QPushButton(self.centralwidget)
-        self.unload_file.setObjectName(u"unload_file")
-
-        self.horizontalLayout.addWidget(self.unload_file)
-
-        self.file_path = QLineEdit(self.centralwidget)
-        self.file_path.setObjectName(u"file_path")
-        self.file_path.setEnabled(True)
-        self.file_path.setReadOnly(True)
-
-        self.horizontalLayout.addWidget(self.file_path)
-
-
-        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 2)
-
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
         self.sampling_rate = QLabel(self.centralwidget)
@@ -1453,6 +1435,28 @@ class Ui_MainWindow(object):
 
 
         self.gridLayout.addLayout(self.horizontalLayout_4, 2, 0, 1, 2)
+
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.load_file = QPushButton(self.centralwidget)
+        self.load_file.setObjectName(u"load_file")
+
+        self.horizontalLayout.addWidget(self.load_file)
+
+        self.unload_file = QPushButton(self.centralwidget)
+        self.unload_file.setObjectName(u"unload_file")
+
+        self.horizontalLayout.addWidget(self.unload_file)
+
+        self.file_path = QLineEdit(self.centralwidget)
+        self.file_path.setObjectName(u"file_path")
+        self.file_path.setEnabled(True)
+        self.file_path.setReadOnly(True)
+
+        self.horizontalLayout.addWidget(self.file_path)
+
+
+        self.gridLayout.addLayout(self.horizontalLayout, 1, 0, 1, 2)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
@@ -1647,7 +1651,7 @@ class Ui_MainWindow(object):
         self.show_values_commut.setText(QCoreApplication.translate("MainWindow", u"Values", None))
         self.label_29.setText(QCoreApplication.translate("MainWindow", u"<html><head/><body><p><span style=\" font-style:italic;\">(1:00 hour zone = 1:00 to 1:59)</span></p></body></html>", None))
         self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.bal_com_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcc3 Balance && Commut", None))
-        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.table_t_2), QCoreApplication.translate("MainWindow", u"\ud83d\udcc5 Table [Wh, %, c\u00e9nt.]", None))
+        self.tabWidget_3.setTabText(self.tabWidget_3.indexOf(self.table_t_2), QCoreApplication.translate("MainWindow", u"\ud83d\udcc5 Table [Wh, %, c\u00e8nt.]", None))
         self.tabs.setTabText(self.tabs.indexOf(self.resultsH_t), QCoreApplication.translate("MainWindow", u"\ud83d\udcca Hourly Results", None))
         self.label_14.setText(QCoreApplication.translate("MainWindow", u"Setting:", None))
         self.label_12.setText(QCoreApplication.translate("MainWindow", u"Start", None))
@@ -1666,12 +1670,12 @@ class Ui_MainWindow(object):
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:xx-large; font-weight:700;\"><br /></p></body></html>", None))
         self.tabs.setTabText(self.tabs.indexOf(self.help_t), QCoreApplication.translate("MainWindow", u"\u2139 Help", None))
-        self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
-        self.unload_file.setText(QCoreApplication.translate("MainWindow", u"Unload File", None))
         self.sampling_rate.setText(QCoreApplication.translate("MainWindow", u"Sampling Rate", None))
         self.date_range.setText(QCoreApplication.translate("MainWindow", u"Date Range", None))
         self.calc_time.setText(QCoreApplication.translate("MainWindow", u"Calculation Time", None))
         self.plotting_time.setText(QCoreApplication.translate("MainWindow", u"Plotting Time", None))
         self.n_samples.setText(QCoreApplication.translate("MainWindow", u"N Samples", None))
+        self.load_file.setText(QCoreApplication.translate("MainWindow", u"Load File", None))
+        self.unload_file.setText(QCoreApplication.translate("MainWindow", u"Unload File", None))
     # retranslateUi
 

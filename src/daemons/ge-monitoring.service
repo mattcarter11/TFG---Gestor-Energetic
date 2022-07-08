@@ -6,13 +6,8 @@ After=multi-user.target
 WorkingDirectory=/home/pi2/TFG
 ExecStart=python3 -u monitoring.py
 User=pi2
-
-StandardOutput=append:/home/pi2/TFG/monitoring-output.log
-StandardError=append:/home/pi2/TFG/monitoring-error.log
-
 Restart=on-failure
 RestartSec=10s
-
 
 [Install]
 WantedBy=multi-user.target

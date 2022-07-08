@@ -54,6 +54,9 @@ QHeaderView {
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item row="0" column="0">
      <layout class="QVBoxLayout" name="options">
       <property name="sizeConstraint">
@@ -832,7 +835,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item alignment="Qt::AlignHCenter">
+      <item>
        <widget class="QLabel" name="recalc_warn">
         <property name="enabled">
          <bool>true</bool>
@@ -845,6 +848,9 @@ p, li { white-space: pre-wrap; }
         </property>
         <property name="text">
          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700; color:#f4b300;&quot;&gt;⚠&lt;/span&gt;&lt;span style=&quot; color:#f4b300;&quot;&gt; Recalculate ⚠&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignCenter</set>
         </property>
        </widget>
       </item>
@@ -2198,7 +2204,7 @@ p, li { white-space: pre-wrap; }
             </widget>
             <widget class="QWidget" name="table_t_2">
              <attribute name="title">
-              <string>📅 Table [Wh, %, cént.]</string>
+              <string>📅 Table [Wh, %, cènt.]</string>
              </attribute>
              <layout class="QHBoxLayout" name="horizontalLayout_16">
               <property name="spacing">
@@ -2328,6 +2334,9 @@ p, li { white-space: pre-wrap; }
               <property name="locale">
                <locale language="English" country="UnitedStates"/>
               </property>
+              <property name="minimum">
+               <double>-9999.989999999999782</double>
+              </property>
               <property name="maximum">
                <double>9999.989999999999782</double>
               </property>
@@ -2353,6 +2362,9 @@ p, li { white-space: pre-wrap; }
               </property>
               <property name="locale">
                <locale language="English" country="UnitedStates"/>
+              </property>
+              <property name="minimum">
+               <double>-9999.989999999999782</double>
               </property>
               <property name="maximum">
                <double>9999.989999999999782</double>
@@ -2624,34 +2636,6 @@ p, li { white-space: pre-wrap; }
       </item>
      </layout>
     </item>
-    <item row="1" column="0" colspan="2">
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="load_file">
-        <property name="text">
-         <string>Load File</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="unload_file">
-        <property name="text">
-         <string>Unload File</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLineEdit" name="file_path">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="readOnly">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </item>
     <item row="2" column="0" colspan="2">
      <layout class="QHBoxLayout" name="horizontalLayout_4">
       <item>
@@ -2753,6 +2737,34 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
        </spacer>
+      </item>
+     </layout>
+    </item>
+    <item row="1" column="0" colspan="2">
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QPushButton" name="load_file">
+        <property name="text">
+         <string>Load File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="unload_file">
+        <property name="text">
+         <string>Unload File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="file_path">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>

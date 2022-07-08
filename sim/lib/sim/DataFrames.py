@@ -75,6 +75,13 @@ class DataFrameOut (DataFrameIn):
             self.df['powerLB'] = self.df.loc[:,'powerC'].values - self.df.loc[:,'powerL1'].values - self.df.loc[:,'powerL2'].values
             self.df.loc[self.df['powerLB'].values < 0, 'powerLB'] = 0
     
+    def valid_for_results(self):
+        columns = ['powerA', 'powerG', 'powerCM', 'energyAB', 'energyGD', 'energyB', 'energyP']
+        if all([x in columns for x in columns]):
+            if all([isinstance(self.df[col].iloc[0], numType) for _, col in enumerate(columns)]):
+                    return True
+        return False 
+
     def calc_powerAG(self):
         self.df['powerA'] = self.df['powerP'].values - self.df['powerC'].values
         power_g = self.df['powerA'].copy()
@@ -84,8 +91,9 @@ class DataFrameOut (DataFrameIn):
         self.df['powerGP'] = self.df['powerG'].copy()
         self.df.loc[self.df['powerP'].values <= 0, 'powerGP'] = 0 # Fastest
 
-    def calc_powerCM(self):
-        max_load = self.aproximate_max_load()
+    def calc_powerCM(self, max_load:float|int=None):
+        if max_load is None:
+            max_load = self.aproximate_max_load()
         tmp = self.df['powerP'].copy()
         tmp[tmp > max_load] = max_load
         self.df['powerCM'] = tmp
@@ -97,8 +105,8 @@ class DataFrameOut (DataFrameIn):
         self.df.loc[self.df['energyGD'].values < 0, 'energyGD']= 0 # Fastest
 
     def fill_missing_energy(self):
-        calcB = 'energyB' not in self.df.columns or self.df['energyB'].isna().any()
-        calcP = 'energyP' not in self.df.columns or self.df['energyP'].isna().any()
+        calcB = 'energyB' not in self.df.columns or self.df['energyB'].max() == 0
+        calcP = 'energyP' not in self.df.columns or self.df['energyP'].max() == 0
         if calcB or calcP:
             energyB, energyP = [], []
             current_hour = None
@@ -126,7 +134,7 @@ class DataFrameOut (DataFrameIn):
         if any([x not in self.df.columns for x in ['energyAB', 'energyGD']]):
             self.split_energyB() 
 
-    def aproximate_loads(self):
+    def aproximate_loads(self) -> dict[float]:
         if self.aprox_loads is None:
             loads = {'powerLB':0, 'powerL1':0, 'powerL2':0}
             for k in loads:
@@ -134,9 +142,9 @@ class DataFrameOut (DataFrameIn):
                 if (suma := df.sum()):
                     loads[k] = suma / df.count()
             self.aprox_loads = loads
-        return self.aprox_loads
+        return self.aprox_loads.copy()
 
-    def aproximate_max_load(self):
+    def aproximate_max_load(self) -> float:
         if self.max_load is None:
             self.aproximate_loads()
             self.max_load = sum(self.aprox_loads.values())

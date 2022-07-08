@@ -13,6 +13,8 @@ import numpy as np
 import datetime as dt
 from enum import Enum
 
+from sqlalchemy import false
+
 # Ensure using PyQt5 backend
 mp.use('QT5Agg')
 
@@ -271,6 +273,7 @@ class QMplPlot(QWidget):
         self.fig.tight_layout()
         self.fig.canvas.draw_idle()
     
+    
     def home_view(self):
         for ax in self.axes:
             ax.relim()      # make sure all the data fits
@@ -286,8 +289,9 @@ class QMplPlot(QWidget):
                 self.ax2.set_ylim(*self.ax2_ylimit)
             self.align_yaxis()
         self.draw_idle()
-    
+        
     def clear(self):
+        self.snap_cross_hair.setChecked(False)
         for ax in self.axes:
             ax.clear()
     

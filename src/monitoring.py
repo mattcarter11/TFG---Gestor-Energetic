@@ -1,6 +1,5 @@
 import time
 import datetime as dt
-from dateutil import parser, tz
 from drivers.DataBase.InfluxDB import InfluxDB
 from drivers.Load.LoadBase import LoadBase
 from drivers.Load.Shelly import ShellyLoad
@@ -19,6 +18,7 @@ def is_load(load):
     return isinstance(load, LoadBase)
     
 if __name__ == '__main__':
+    #region -> Init
     current_hour = prel1 = prel2 = None
     # Get data from last same inside the hour slot
     sec_from_oclock = (dt.datetime.now() - dt.datetime.now().replace(minute=0, second=0, microsecond=0)).total_seconds()
@@ -29,7 +29,7 @@ if __name__ == '__main__':
         energy_p = last_from_oclock[0]['last_energyP']
         prel1 = bool(last_from_oclock[0]['last_on_offL1'])
         prel2 = bool(last_from_oclock[0]['last_on_offL2'])
-
+    #endregion
 
     while True:
         start = time.time()
@@ -61,7 +61,7 @@ if __name__ == '__main__':
         dic = {
             "powerP": power_p,
             "powerC": power_c,
-            "energyA": energy_b,
+            "energyB": energy_b,
             "energyP": energy_p,
             "on_offL1": on_off_l1 if is_load(load1) else None,
             "on_offL2": on_off_l2 if is_load(load2) else None,
@@ -71,7 +71,7 @@ if __name__ == '__main__':
         database.insert(table, dic)
         #endregion
 
-        # Wait
+        #region -> Wait
         runtime = time.time()-start
         time.sleep(max(0, Ts-runtime))
-
+        #endregion

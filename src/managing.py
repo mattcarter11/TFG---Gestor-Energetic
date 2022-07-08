@@ -7,6 +7,7 @@ from drivers.Load.Shelly import ShellyLoad
 from drivers.PowerMeter.EnvoyS import EnvoyS
 
 class AlgorithmsEnum(Enum):
+    none = 0
     hysteresis = 1
     min_on_time = 2
     time_to_consume = 3
@@ -38,7 +39,7 @@ th_bottom2      = 100
 # Minimun On Time [s]
 time_limit      = 600
 # Time to Consume
-predict         = PredictFinalEnergy.project_current_power
+predict         = PredictFinalEnergy.avarage_power
 end_at_energy   = 20       # [Wh]
 time_factor     = 0.9      # [0..1]
 on_min_energy   = 70       # [Wh]  (must be > end_at_energy to avoid oscillations)
@@ -93,15 +94,20 @@ if __name__ == '__main__':
     while True:
         start = time.time()
 
-        #region -> Power
-        # See if hour has passed
         timestamp = dt.datetime.now()
         working_hours = start_managing <= timestamp.time() <= end_managing
+        if working_hours:
+            if is_load(load1): ison1 = load1.get_status()['ison']
+            if is_load(load2): ison2 = load2.get_status()['ison']
+
+        #region -> Get Power/Calc Energy
+        # See if hour has passed
         if current_hour != timestamp.hour:
             energy_b = 0
             current_hour = timestamp.hour
             next_hour = next_hour_datetime(timestamp)
-            if working_hours: # Refresh loads when hour change in working hours
+            # Refresh loads when hour change while in working hours
+            if working_hours and algorithm != AlgorithmsEnum.min_on_time:
                 if is_load(load1): load1.set_status(ison1)
                 if is_load(load2): load2.set_status(ison2)
         
@@ -143,8 +149,6 @@ if __name__ == '__main__':
                             load.set_status(True, time_limit)
 
             elif algorithm == AlgorithmsEnum.time_to_consume:
-                if is_load(load1): ison1 = load1.get_status()['ison']
-                if is_load(load2): ison2 = load2.get_status()['ison']
                 time_remaining = (next_hour - timestamp).total_seconds()
 
                 if predict == PredictFinalEnergy.disabled:
@@ -157,9 +161,9 @@ if __name__ == '__main__':
 
                 if two_load_system: 
                     if not ison1 and not ison2:
-                        _TTC_load_control_on(load1, ison1, energy_b, time_remaining, 1)
+                        _TTC_load_control_on(load1, ison1, energy1h, time_remaining, 1)
                     elif ison1 and not ison2:
-                        on = _TTC_load_control_on(load2, ison2, energy_b, time_remaining, 2)
+                        on = _TTC_load_control_on(load2, ison2, energy1h, time_remaining, 2)
                         if not on: # means maybe less power
                             _TTC_load_control_off(load1, ison1, energy_b, power_a, time_remaining, 1)
                     elif ison1 and ison2:
@@ -169,15 +173,16 @@ if __name__ == '__main__':
                     load = load1 if is_load(load1) else load2
                     ison = ison1 if is_load(load1) else ison2
                     if not ison:
-                        _TTC_load_control_on(load, ison, energy_b, time_remaining, 1)
+                        _TTC_load_control_on(load, ison, energy1h, time_remaining, 1)
                     elif ison:
                         _TTC_load_control_off(load, ison, energy_b, time_remaining, 1)
 
 
         #endregion
 
-        # Wait
-        runtime = time.time() - start
-        time.sleep(max(0, Ts - runtime))
+        #region -> Wait
+        runtime = time.time()-start
+        time.sleep(max(0, Ts-runtime))
+        #endregion
 
 

@@ -41,10 +41,11 @@ A simulator has been implemented to test and analize the algorithms. With it, th
 1. Copy the *src* folder tot your server (e.g. Raspberry)
 2. Inside *src* run: `pip install -r requirements.txt`
 3. Move the daemons folder contents to */etc/systemd/system*
-4. Create the database using the corresponding method
-5. Create your won drivers if needed 
-6. Configure each script by changing the *settings* section
-7. Start the daemons
+4. Configure them adequatly (user, foder where the script is located, ...)
+5. Create the database using the corresponding method
+6. Create your won drivers if needed 
+7. Configure each script by changing the *settings* section
+8. Start the daemons
 
 # Daemon
 There are two daemons, ge-managing & ge-monitoring, one for each script, managing.py & monitoring.py (ge stands for 'Gestor Energèrtic`).

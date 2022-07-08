@@ -22,7 +22,7 @@ def jordi_open(fileOpen):
     # Load
     df = pd.read_csv(fileOpen, parse_dates=['time'])
     # Remove/renamve columns
-    df.drop(['name'], axis = 1, inplace = True)
+    df.drop(['name', 'powerP'], axis = 1, inplace = True)
     df.rename(columns={'time': 'timestamp','powerG': 'powerP', 'energyA':'energyB'}, inplace=True, errors='raise')
     # Format datetime
     df['timestamp'] = pd.to_datetime(df['timestamp'].astype('int64'))
@@ -47,13 +47,19 @@ if __name__ == "__main__":
     df = jordi_open('hysteresis.csv')
     # proces_jordi(df, 'Jordi.csv', "2022-04-22", "2022-04-27")
     # proces_jordi(df, 'Jordi.csv', "2022-04-27", "2022-05-02")
-    proces_jordi(df, 'Jordi.csv', "2022-05-02", "2022-05-08")
+    # proces_jordi(df, 'Jordi.csv', "2022-05-02", "2022-05-08")
     # proces_jordi(df, 'Jordi.csv', "2022-05-08", "2022-05-13")
     # proces_jordi(df, 'Jordi.csv', "2022-05-17", "2022-05-22")
     # proces_jordi(df, 'Jordi.csv', "2022-05-22", "2022-05-27")
     # proces_jordi(df, 'Jordi.csv', "2022-05-27", "2022-06-01")
     # proces_jordi(df, 'Jordi.csv', "2022-06-01", "2022-06-06")
     # proces_jordi(df, 'Jordi.csv', "2022-06-06", "2022-06-11")
-    # proces_jordi(df, 'Jordi.csv', "2022-06-11", "2022-06-14")
-    # proces_jordi(df, 'Jordi.csv', "2022-04-22", "2022-06-14") # All
+    # proces_jordi(df, 'Jordi.csv', "2022-06-11", "2022-06-16")
+    # proces_jordi(df, 'Jordi.csv', "2022-06-16", "2022-06-22")
+    # proces_jordi(df, 'Jordi.csv', "2022-06-22", "2022-06-28")
+    # proces_jordi(df, 'Jordi.csv', "2022-06-28", "2022-07-02")
+    # proces_jordi(df, 'Jordi.csv', "2022-07-02", "2022-07-05")
+    # proces_jordi(df, 'Jordi.csv', "2022-04-22", "2022-07-05") # All
+
+
 

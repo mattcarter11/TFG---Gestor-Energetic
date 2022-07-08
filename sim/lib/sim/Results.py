@@ -5,8 +5,10 @@ from .constants import COL_ORDER
 
 class Results:
 
-    def __init__(self, df:DataFrameOut, df_price=None, sell_price:float|int=0.1):
+    def __init__(self, df:DataFrameOut, aprox_loads:dict[float], df_price=None, sell_price:float|int=0.1):
         df.fill_missing_energy()
+        if not df.valid_for_results():
+            raise Exception("DataFrameOut doen't have all the necessary columns")
         self.Ts = df.Ts
         self.nsec = df.nsec
         self.sim_hours = self.nsec/3600
@@ -17,8 +19,8 @@ class Results:
         self.df_hour = pd.DataFrame()
         self.df_total = pd.DataFrame()
         self.df_results = pd.DataFrame()
-        self.aprox_loads = df.aproximate_loads()
-        self.aprox_max_load = df.aproximate_max_load()
+        self.aprox_loads = aprox_loads
+        self.aprox_max_load = sum(self.aprox_loads.values())
         self._hourly()
         self._total()
         self._results()
@@ -63,7 +65,7 @@ class Results:
         # Price
         if self.df_price is not None:
             buy_price = [self.df_price.values[hour-1] for hour in self.df_hour['timestamp'].dt.hour]
-            self.df_hour['balance'] = (self.df_hour['energyAB'].values*self.sell_price - self.df_hour['energyGD'].values*buy_price)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cént.
+            self.df_hour['balance'] = (self.df_hour['energyAB'].values*self.sell_price - self.df_hour['energyGD'].values*buy_price)/100 # W * €/kWh -> €/1000 | €/1000 * 10 -> cènt.
 
         # Efficiency Con. Max
         with np.errstate(divide='ignore', invalid='ignore'):

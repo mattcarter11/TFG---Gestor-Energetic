@@ -86,7 +86,7 @@ def simulate(df_in:DataFrameIn, algorithm:AlgorithmConfig, load1:Load, load2:Loa
 
                 on1, on2 = load1.on, load2.on
                 if two_load_system:
-                    if not on1:
+                    if not on1 and not on2:
                         on_offL1 = _TTC_load_control_on(load1, energy1h, time_remaining, algorithm)
                     elif on1 and not on2:
                         on_offL2 = _TTC_load_control_on(load2, energy1h, time_remaining, algorithm)

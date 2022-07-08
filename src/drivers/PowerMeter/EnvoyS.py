@@ -39,8 +39,8 @@ class EnvoyS(PowerMeterBase):
             prod = self.__exract_produced(data)
             cons = self.__exract_consumed(data)
             if prod > self.zero_ref:
-                prod = 0
-            return prod-cons
+                return prod-cons
+            return cons
         return 0
 
     def __get_data(self) -> dict:
