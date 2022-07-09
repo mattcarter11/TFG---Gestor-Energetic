@@ -32,17 +32,17 @@ format_date     = '%H:%M:%S'
 
 # Algorithms parameters
 # Hysteresis thresholds [Wh]
-th_top1         = 100
+th_top1         = 70
 th_bottom1      = -10 
-th_top2         = 170
-th_bottom2      = 100
+th_top2         = 200
+th_bottom2      = 0
 # Minimun On Time [s]
 time_limit      = 600
 # Time to Consume
-predict         = PredictFinalEnergy.avarage_power
-end_at_energy   = 20       # [Wh]
-time_factor     = 0.9      # [0..1]
-on_min_energy   = 70       # [Wh]  (must be > end_at_energy to avoid oscillations)
+predict         = PredictFinalEnergy.project_current_power
+end_at_energy   = 0       # [Wh]
+time_factor     = 1       # [0..1]
+on_min_energy   = 75      # [Wh]  (must be > end_at_energy to avoid oscillations)
 
 # Do not touch
 on_min_energy = end_at_energy if end_at_energy > on_min_energy else on_min_energy
