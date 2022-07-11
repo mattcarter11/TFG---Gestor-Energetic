@@ -59,7 +59,7 @@ def hystereis(load:LoadBase, th_top:float, th_bottom:float, energy_b:float):
     elif energy_b <= th_bottom and load.get_status()['ison']:
         load.set_status(False)
 
-def _TTC_load_control_on(load:LoadBase, is_on:bool, energy1h:float, time_remaining:float, i):
+def _TTC_load_control_on(load:LoadBase, is_on:bool, energy1h:float, time_remaining:float):
     if load.value > 0 and not is_on and energy1h >= on_min_energy:
         time_to_use = energy1h / load.value * 3600 # [s] <- Wh/W = h
         if time_to_use >= (time_remaining*time_factor):
@@ -67,7 +67,7 @@ def _TTC_load_control_on(load:LoadBase, is_on:bool, energy1h:float, time_remaini
             return 1
     return 0
 
-def _TTC_load_control_off(load:LoadBase, is_on:bool, energy_b:float, power_a:float, time_remaining:float, i):
+def _TTC_load_control_off(load:LoadBase, is_on:bool, energy_b:float, power_a:float, time_remaining:float):
     if load.value > 0 and is_on:
         energy1h_if_off = energy_b + (power_a + load.get_power()) * time_remaining / 3600
         if energy1h_if_off <= end_at_energy:
@@ -161,21 +161,21 @@ if __name__ == '__main__':
 
                 if two_load_system: 
                     if not ison1 and not ison2:
-                        _TTC_load_control_on(load1, ison1, energy1h, time_remaining, 1)
+                        _TTC_load_control_on(load1, ison1, energy1h, time_remaining)
                     elif ison1 and not ison2:
-                        on = _TTC_load_control_on(load2, ison2, energy1h, time_remaining, 2)
+                        on = _TTC_load_control_on(load2, ison2, energy1h, time_remaining)
                         if not on: # means maybe less power
-                            _TTC_load_control_off(load1, ison1, energy_b, power_a, time_remaining, 1)
+                            _TTC_load_control_off(load1, ison1, energy_b, power_a, time_remaining)
                     elif ison1 and ison2:
-                        _TTC_load_control_off(load2, ison2, energy_b, power_a, time_remaining, 2)
+                        _TTC_load_control_off(load2, ison2, energy_b, power_a, time_remaining)
                     
                 else: # One load system
                     load = load1 if is_load(load1) else load2
                     ison = ison1 if is_load(load1) else ison2
                     if not ison:
-                        _TTC_load_control_on(load, ison, energy1h, time_remaining, 1)
+                        _TTC_load_control_on(load, ison, energy1h, time_remaining)
                     elif ison:
-                        _TTC_load_control_off(load, ison, energy_b, time_remaining, 1)
+                        _TTC_load_control_off(load, ison, energy_b, time_remaining)
 
 
         #endregion

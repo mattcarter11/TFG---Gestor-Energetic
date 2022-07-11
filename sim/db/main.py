@@ -44,7 +44,7 @@ def proces_jordi(df:pd.DataFrame, fileSave:str, start:str, end:str):
 if __name__ == "__main__":
     # G_merge_LB('2022-02-1..8 (G).csv', 'consumed.csv', '2022-02-1..8 (G+LB).csv')
     # process_paco('2022-03-11..13.csv', '2022-03-11..13 Pluja (G).csv')
-    df = jordi_open('hysteresis.csv')
+    df = jordi_open('test.csv')
     # proces_jordi(df, 'Jordi.csv', "2022-04-22", "2022-04-27")
     # proces_jordi(df, 'Jordi.csv', "2022-04-27", "2022-05-02")
     # proces_jordi(df, 'Jordi.csv', "2022-05-02", "2022-05-08")
@@ -59,6 +59,7 @@ if __name__ == "__main__":
     # proces_jordi(df, 'Jordi.csv', "2022-06-22", "2022-06-28")
     # proces_jordi(df, 'Jordi.csv', "2022-06-28", "2022-07-02")
     # proces_jordi(df, 'Jordi.csv', "2022-07-02", "2022-07-05")
+    proces_jordi(df, 'Jordi.csv', "2022-07-05", "2022-07-11")
     # proces_jordi(df, 'Jordi.csv', "2022-04-22", "2022-07-05") # All
 
 
