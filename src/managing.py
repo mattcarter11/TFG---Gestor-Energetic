@@ -21,13 +21,13 @@ class PredictFinalEnergy(Enum):
 # Global parameters
 Ts              = 10 # [s]
 database        = InfluxDB('10.10.10.100', 18086, 'gestor-energetic-SVC')
-load1           = ShellyLoad('192.168.100.131', value=700, on_time=3630) # None = no load
-load2           = ShellyLoad('192.168.100.132', value=1000, on_time=3630) # None = no load
+load1           = ShellyLoad('192.168.100.131', value=700) # None = no load
+load2           = ShellyLoad('192.168.100.132', value=1000) # None = no load
 powermeter      = EnvoyS('http://envoy.local/stream/meter', 'installer', 'aeceha39', 5, 20)
 algorithm       = AlgorithmsEnum.time_to_consume
 # Managing load interval
-start_managing  = '06:00:00'
-end_managing    = '23:59:59'
+start_managing  = '10:00:00'
+end_managing    = '18:59:59'
 format_date     = '%H:%M:%S'
 
 # Algorithms parameters
@@ -53,9 +53,9 @@ def is_load(load):
 def next_hour_datetime(datetime:dt.datetime) -> dt.datetime:
     return datetime.replace(second=0, microsecond=0, minute=0) + dt.timedelta(hours=1)
 
-def hystereis(load:LoadBase, th_top:float, th_bottom:float, energy_b:float):
+def hystereis(load:LoadBase, th_top:float, th_bottom:float, energy_b:float, time_remaining:float):
     if energy_b >= th_top and not load.get_status()['ison']:
-        load.set_status(True)
+        load.set_status(True, time_remaining+Ts*3)
     elif energy_b <= th_bottom and load.get_status()['ison']:
         load.set_status(False)
 
@@ -63,7 +63,7 @@ def _TTC_load_control_on(load:LoadBase, is_on:bool, energy1h:float, time_remaini
     if load.value > 0 and not is_on and energy1h >= on_min_energy:
         time_to_use = energy1h / load.value * 3600 # [s] <- Wh/W = h
         if time_to_use >= (time_remaining*time_factor):
-            load.set_status(True)
+            load.set_status(True, time_remaining+Ts*3)
             return 1
     return 0
 
@@ -78,48 +78,57 @@ if __name__ == '__main__':
     current_hour = None
     two_load_system = is_load(load1) and is_load(load2)
     next_hour = next_hour_datetime(dt.datetime.now())
+    # working_hours variables
     start_managing = dt.datetime.strptime(start_managing, format_date).time()
     end_managing = dt.datetime.strptime(end_managing, format_date).time()
+    working_hours = start_managing <= dt.datetime.now().time() <= end_managing
     # Get power_b from monitoring so if we restart, we don't lose all the balance previously calculated
     sec_from_oclock = (dt.datetime.now() - dt.datetime.now().replace(minute=0, second=0, microsecond=0)).total_seconds()
     last_from_oclock = database.query(f'select last(*) from hysteresis where time > now() - {int(sec_from_oclock)}s')
     if last_from_oclock != []:
         current_hour = dt.datetime.now().hour
         energy_b = last_from_oclock[0]['last_energyA']
-
+    # Start loads off
     if is_load(load1): load1.set_status(False)
     if is_load(load2): load2.set_status(False)
     #endregion
 
     while True:
+        #region -> Get general vars
         start = time.time()
-
         timestamp = dt.datetime.now()
+        hour_change = current_hour != timestamp.hour
+        end_working_hours = working_hours and not (start_managing <= timestamp.time() <= end_managing)
         working_hours = start_managing <= timestamp.time() <= end_managing
-        if working_hours:
-            if is_load(load1): ison1 = load1.get_status()['ison']
-            if is_load(load2): ison2 = load2.get_status()['ison']
+        #endregion
 
         #region -> Get Power/Calc Energy
-        # See if hour has passed
-        if current_hour != timestamp.hour:
+        if hour_change:
             energy_b = 0
             current_hour = timestamp.hour
             next_hour = next_hour_datetime(timestamp)
-            # Refresh loads when hour change while in working hours
-            if working_hours and algorithm != AlgorithmsEnum.min_on_time:
-                if is_load(load1): load1.set_status(ison1)
-                if is_load(load2): load2.set_status(ison2)
-        
+
         power_a = powermeter.power_available()
         energy_b = (power_a) * Ts / 3600 + energy_b
         #endregion
 
-        # region -> Algorithms
         if working_hours: # [Day] Control loads - [Night] Don't controal loads
+            #region -> Get general vars
+            time_remaining = (next_hour - timestamp).total_seconds()
+            if is_load(load1): ison1 = load1.get_status()['ison']
+            if is_load(load2): ison2 = load2.get_status()['ison']
+            #endregion
+            
+            #region -> Refresh loads when hour change while in working hours
+            if hour_change and algorithm != AlgorithmsEnum.min_on_time:
+                if is_load(load1): load1.set_status(ison1, 3600+Ts*3)
+                if is_load(load2): load2.set_status(ison2, 3600+Ts*3)
+            #endregion
+
+            #region -> Algorithms
             if algorithm == AlgorithmsEnum.hysteresis:
-                if is_load(load1): hystereis(load1, th_top1, th_bottom1, energy_b)
-                if is_load(load2): hystereis(load2, th_top2, th_bottom2, energy_b)
+                if is_load(load1): hystereis(load1, th_top1, th_bottom1, energy_b, time_remaining)
+                if is_load(load2): hystereis(load2, th_top2, th_bottom2, energy_b, time_remaining)
 
             elif algorithm == AlgorithmsEnum.min_on_time:
                 if two_load_system:
@@ -149,8 +158,6 @@ if __name__ == '__main__':
                             load.set_status(True, time_limit)
 
             elif algorithm == AlgorithmsEnum.time_to_consume:
-                time_remaining = (next_hour - timestamp).total_seconds()
-
                 if predict == PredictFinalEnergy.disabled:
                     energy1h = energy_b
                 elif predict == PredictFinalEnergy.avarage_power:
@@ -176,10 +183,11 @@ if __name__ == '__main__':
                         _TTC_load_control_on(load, ison, energy1h, time_remaining)
                     elif ison:
                         _TTC_load_control_off(load, ison, energy_b, time_remaining)
+            #endregion
 
-
-        #endregion
-
+        if end_working_hours:
+            if is_load(load1): load1.set_status(False)
+            if is_load(load1): load2.set_status(False)
         #region -> Wait
         runtime = time.time()-start
         time.sleep(max(0, Ts-runtime))
