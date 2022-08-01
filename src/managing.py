@@ -87,7 +87,7 @@ if __name__ == '__main__':
     last_from_oclock = database.query(f'select last(*) from hysteresis where time > now() - {int(sec_from_oclock)}s')
     if last_from_oclock != []:
         current_hour = dt.datetime.now().hour
-        energy_b = last_from_oclock[0]['last_energyA']
+        energy_b = last_from_oclock[0]['last_energyB']
     # Start loads off
     if is_load(load1): load1.set_status(False)
     if is_load(load2): load2.set_status(False)

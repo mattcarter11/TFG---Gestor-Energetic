@@ -25,7 +25,7 @@ if __name__ == '__main__':
     last_from_oclock = database.query(f'select last(*) from hysteresis where time > now() - {int(sec_from_oclock)}s')
     if last_from_oclock != []:
         current_hour = dt.datetime.now().hour
-        energy_b = last_from_oclock[0]['last_energyA']
+        energy_b = last_from_oclock[0]['last_energyB']
         energy_p = last_from_oclock[0]['last_energyP']
         prel1 = bool(last_from_oclock[0]['last_on_offL1'])
         prel2 = bool(last_from_oclock[0]['last_on_offL2'])
